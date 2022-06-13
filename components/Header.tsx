@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import gsLogo from '../assets/gsLogo.png'
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
@@ -17,7 +17,8 @@ const style = {
     buttonsContainer: "border flex w-1/4 justify-end items-center",
     button: "border flex items-center bg-red-400 mx-2 text-md font-semibold cursor-pointer rounded-2xl",
     buttonPadding: "p-2",
-    buttonTextContainer: "h-8 flex items-center",
+    balanceContainer: "mx-2 text-md flex items-center",
+    buttonTextContainer: "bg-gray-400 rounded-lg px-4 py-2 text-md h-8 flex items-center",
     buttonAccent: "bg-blue-600 border border-[#163256] text-blue-200 h-full flex justify-center items-center rounded-xl",
 }
 
@@ -25,6 +26,7 @@ const Header = () => {
     const [selectedNavItem, setSelectedNavItem] = useState("positions")
     const [web3Modal, setweb3Modal] = useState<Web3Modal | null>(null)
     const [address, setAddress] = useState<string>("")
+    const [balance, setBalance] = useState<string>()
 
     // initiates web3modal
     useEffect(() => {
@@ -69,7 +71,9 @@ const Header = () => {
             const provider = await web3Modal.connect()
             const ethersProvider = new ethers.providers.Web3Provider(provider)
             const userAddress = await ethersProvider.getSigner().getAddress()
+            const userBalance = await ethersProvider.getBalance(userAddress)
             setAddress(userAddress)
+            setBalance(ethers.utils.formatEther(userBalance).slice(0, 6))
         }
     }
 
@@ -115,6 +119,9 @@ const Header = () => {
                     onClick={() => connectWallet()}
                     className={`${style.button} ${style.buttonPadding}`}
                     >
+                        <div className={style.balanceContainer}>
+                            {balance}
+                        </div>
                         <div className={style.buttonTextContainer}>
                             {truncateEthAddress(address)}
                         </div>
