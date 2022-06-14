@@ -14,6 +14,7 @@ const Layout = ({ children }: Props) => {
         <>
             <Head>
                 <title>GammaSwap</title>
+                <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className={style.wrapper}>{children}</main>
         </>
