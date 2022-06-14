@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import gsLogo from '../assets/gsLogo.png'
-import { BigNumber, ethers } from 'ethers'
+import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
@@ -84,36 +85,44 @@ const Header = () => {
             </div>
             <nav className={style.nav}>
                 <div className={style.navItemsContainer}>
-                    <div
-                    onClick={() => setSelectedNavItem('swap')}
-                    className={`${style.navItem} ${
-                        selectedNavItem === 'swap' && style.activeNavItem
-                    }`}
-                    >
-                        Swap
-                    </div>
-                    <div
-                    onClick={() => setSelectedNavItem("positions")}
-                    className={`${style.navItem} ${
-                        selectedNavItem === "positions" && style.activeNavItem
-                    }`}
-                    >
-                       Positions
-                    </div>
-                    <div
-                    onClick={() => setSelectedNavItem("pools")}
-                    className={`${style.navItem} ${
-                        selectedNavItem === "pools" && style.activeNavItem
-                    }`}
-                    >
-                        Pools
-                    </div>
+                    <Link href={'/swap'}>
+                        <div
+                        onClick={() => setSelectedNavItem('swap')}
+                        className={`${style.navItem} ${
+                            selectedNavItem === 'swap' && style.activeNavItem
+                        }`}
+                        >
+                            Swap
+                        </div>
+                    </Link>
+                    <Link href={'/positions'}>
+                        <div
+                        onClick={() => setSelectedNavItem("positions")}
+                        className={`${style.navItem} ${
+                            selectedNavItem === "positions" && style.activeNavItem
+                        }`}
+                        >
+                        Positions
+                        </div>
+                    </Link>
+                    <Link href={'/pools'}>
+                        <div
+                        onClick={() => setSelectedNavItem("pools")}
+                        className={`${style.navItem} ${
+                            selectedNavItem === "pools" && style.activeNavItem
+                        }`}
+                        >
+                            Pools
+                        </div>
+                    </Link>
                 </div>
             </nav>
             <div className={style.buttonsContainer}>
-                <div className={`${style.button} ${style.buttonPadding}`}>
-                    Buy ETH
-                </div>
+                <Link href={'/buyeth'}>
+                    <div className={`${style.button} ${style.buttonPadding}`}>
+                        Buy ETH
+                    </div>
+                </Link>
                 { address ? (
                     <div
                     onClick={() => connectWallet()}
