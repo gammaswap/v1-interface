@@ -9,6 +9,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Layout>
         <Header />
         <Component {...pageProps} />
+        <footer>Something</footer>
       </Layout>
     </>
   )
