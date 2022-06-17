@@ -1,3 +1,4 @@
+import { useState, ChangeEvent, SetStateAction, Dispatch } from 'react'
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import eth from '../assets/eth.svg'
@@ -19,6 +20,18 @@ const style = {
 
 
 const Positions: NextPage = () => {
+  const [tokenAInputVal, setTokenAInputVal] = useState<string>("")
+  const [tokenBInputVal, setTokenBInputVal] = useState<string>("")
+
+  // checks for non-numeric value inputs
+  const validateTokenInput = (
+    e: ChangeEvent<HTMLInputElement>,
+    setToken: Dispatch<SetStateAction<string>>
+  ): void => {
+    const tokenInput: string = (e.target as HTMLInputElement).value
+    setToken(tokenInput.replace(/\D/, ''))
+  }
+
   return (
     <div className={style.wrapper}>
       <div className={style.content}>
@@ -27,7 +40,7 @@ const Positions: NextPage = () => {
         </div>
         {/* slot for token A */}
         <div className={style.tokenContainer}>
-          <input type="text" placeholder="0.0" className={style.tokenInput} />
+          <input type="text" onChange={e => validateTokenInput(e, setTokenAInputVal)} value={tokenAInputVal} placeholder="0.0" className={style.tokenInput} />
           <div className={style.tokenSelectorContainer}>
             <div className={style.tokenSelectorContent}>
               <div className={style.tokenSelectorIcon}>
@@ -40,7 +53,7 @@ const Positions: NextPage = () => {
         </div>
         {/* slot for token B */}
         <div className={style.tokenContainer}>
-          <input type="text" placeholder="0.0" className={style.tokenInput} />
+          <input type="text" onChange={e => validateTokenInput(e, setTokenBInputVal)} value={tokenBInputVal} placeholder="0.0" className={style.tokenInput} />
           <div className={style.tokenSelectorContainer}>
             <div className={style.tokenSelectorContent}>
               <div className={style.tokenSelectorIcon}>
