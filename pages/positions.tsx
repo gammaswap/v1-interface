@@ -35,14 +35,14 @@ const Positions: NextPage = () => {
 
   // holds state of modal open and close
   const [isOpen, setIsOpen] = useState<boolean>(false)
-
+  
   // checks for non-numeric value inputs
   const validateTokenInput = (
     e: ChangeEvent<HTMLInputElement>,
     setToken: Dispatch<SetStateAction<string>>
   ): void => {
     const tokenInput: string = (e.target as HTMLInputElement).value
-    setToken(tokenInput.replace(/\.\D/, ''))
+    setToken(tokenInput.replace(/[^0-9.]/g, ''))
   }
 
   // checks which tokenSelector element was selected and opens modal
