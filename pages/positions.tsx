@@ -42,7 +42,7 @@ const Positions: NextPage = () => {
     setToken: Dispatch<SetStateAction<string>>
   ): void => {
     const tokenInput: string = (e.target as HTMLInputElement).value
-    setToken(tokenInput.replace(/\D/, ''))
+    setToken(tokenInput.replace(/\.\D/, ''))
   }
 
   // checks which tokenSelector element was selected and opens modal
