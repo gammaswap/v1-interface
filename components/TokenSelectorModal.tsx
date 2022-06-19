@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, ReactElement, Fragment } from 'react'
+import React, { Dispatch, SetStateAction, ReactElement, Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/solid'
 import Tokens from './Tokens'
@@ -22,15 +22,28 @@ const style = {
 type ModalProps = {
     isOpen: boolean
     setIsOpen: Dispatch<SetStateAction<boolean>>
+    setTokenSelected: Dispatch<SetStateAction<string>>
 }
 
-const TokenSelectorModal = ({ isOpen, setIsOpen }: ModalProps): ReactElement => {
+const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected }: ModalProps): ReactElement => {
+    // headlessUI requires at LEAST one focusable element
+    const closeIconRef = useRef(null)
+    
+    /** checks for selected token inside modal
+     * bubbles up selected token state to parent component
+     */
+    const handleSelectedToken = (tokenSelected: string) => {
+        setTokenSelected(tokenSelected)
+        setIsOpen(false)
+    }
+    
     return (
         <Transition appear show={isOpen} as={Fragment}>
         <Dialog
         as={"div"}
         onClose={() => setIsOpen(false)}
         className={style.modalWrapper}
+        initialFocus={closeIconRef}
         >
             <Transition.Child
             as={Fragment}
@@ -48,13 +61,18 @@ const TokenSelectorModal = ({ isOpen, setIsOpen }: ModalProps): ReactElement => 
                             <XIcon
                             className={style.closeIcon}
                             onClick={() => setIsOpen(false)}
+                            ref={closeIconRef}
                             />
                         </div>
                         <hr className={style.headingBreak}></hr>
                         <div className={style.tokensContainer}>
-                            {Tokens.map(token => {
+                            {Tokens.map((token, index) => {
                                 return (
-                                    <div className={style.tokenContainer}>
+                                    <div
+                                    key={index}
+                                    className={style.tokenContainer}
+                                    onClick={() => handleSelectedToken(token.symbol)}
+                                    >
                                         <img src={token.imgPath} className={style.tokenImg} />
                                         <div className={style.tokenSymbol}>{token.symbol}</div>
                                         <div className={style.tokenBalance}>0</div>
