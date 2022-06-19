@@ -1,7 +1,6 @@
 import { useState, ChangeEvent, SetStateAction, Dispatch } from 'react'
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import eth from '../assets/eth.svg'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import TokenSelectorModal from '../components/TokenSelectorModal'
 
@@ -50,7 +49,7 @@ const Positions: NextPage = () => {
             onClick={() => setIsOpen(true)}
             >
               <div className={style.tokenSelectorIcon}>
-                <Image src={eth} alt="token logo" width={32} height={32}/>
+                <Image src="/crypto/eth.svg" alt="token logo" width={32} height={32}/>
               </div>
               <div className={style.tokenSelectorTicker}>ETH</div>
               <ChevronDownIcon className={style.dropdownArrow}/>
@@ -66,7 +65,7 @@ const Positions: NextPage = () => {
             onClick={() => setIsOpen(true)}
             >
               <div className={style.tokenSelectorIcon}>
-                <Image src={eth} alt="token logo" width={32} height={32}/>
+                <Image src="/crypto/eth.svg" alt="token logo" width={32} height={32}/>
               </div>
               <div className={style.tokenSelectorTicker}>ETH</div>
               <ChevronDownIcon className={style.dropdownArrow}/>

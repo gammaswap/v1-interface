@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import gsLogo from '../assets/gsLogo.png'
 import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -81,7 +80,7 @@ const Header = () => {
     return (
         <div className={style.wrapper}>
             <div className={style.headerLogo}>
-                <Image src={gsLogo} alt="GammaSwap logo" width={40} height={40} />
+                <Image src="/gsLogo.png" alt="GammaSwap logo" width={40} height={40} />
             </div>
             <nav className={style.nav}>
                 <div className={style.navItemsContainer}>
