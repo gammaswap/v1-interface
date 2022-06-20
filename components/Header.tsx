@@ -9,7 +9,7 @@ import truncateEthAddress from 'truncate-eth-address'
 
 const style = {
     wrapper: "border p-4 w-screen flex justify-between items-center",
-    headerLogo: "border w-1/4 flex",
+    headerLogo: "border w-1/4 flex cursor-pointer",
     nav: "border flex-1 flex justify-center items-center",
     navItemsContainer: "flex bg-red-400 rounded-3xl",
     navItem: "px-4 py-2 m-1 text-lg font-semibold cursor-pointer rounded-3xl",
@@ -79,9 +79,11 @@ const Header = () => {
 
     return (
         <div className={style.wrapper}>
-            <div className={style.headerLogo}>
-                <Image src="/gsLogo.png" alt="GammaSwap logo" width={40} height={40} />
-            </div>
+            <Link href={'/positions'}>
+                <div className={style.headerLogo}>
+                    <Image src="/gsLogo.png" alt="GammaSwap logo" width={40} height={40} />
+                </div>
+            </Link>
             <nav className={style.nav}>
                 <div className={style.navItemsContainer}>
                     <Link href={'/swap'}>

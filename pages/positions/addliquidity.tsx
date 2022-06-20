@@ -2,7 +2,7 @@ import { useState, ChangeEvent, SetStateAction, Dispatch } from 'react'
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import { ChevronDownIcon } from '@heroicons/react/solid'
-import TokenSelectorModal from '../components/TokenSelectorModal'
+import TokenSelectorModal from '../../components/TokenSelectorModal'
 
 const style = {
   wrapper: "w-screen flex justify-center items-center",
@@ -20,8 +20,7 @@ const style = {
   confirmButton: "bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300"
 }
 
-
-const Positions: NextPage = () => {
+const AddLiquidity: NextPage = () => {
   // holds state of user amount inputted for each of the token input fields
   const [tokenAInputVal, setTokenAInputVal] = useState<string>("")
   const [tokenBInputVal, setTokenBInputVal] = useState<string>("")
@@ -46,7 +45,7 @@ const Positions: NextPage = () => {
   }
 
   // checks which tokenSelector element was selected and opens modal
-  const handleTokenSelector = (tokenSelected: string) => {
+  const handleTokenSelector = (tokenSelected: string): void => {
     setTokenSelected(tokenSelected)
     setIsOpen(true)
   }
@@ -127,4 +126,4 @@ const Positions: NextPage = () => {
   )
 }
 
-export default Positions
+export default AddLiquidity
