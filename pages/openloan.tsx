@@ -15,7 +15,7 @@ const theme = extendTheme({
     },
 })
 
-const Testopenloan: NextPage = () => {
+const OpenLoanPage: NextPage = () => {
     return (
         <ChakraProvider theme={theme}>
             <OpenLoan />
@@ -23,4 +23,4 @@ const Testopenloan: NextPage = () => {
     )
 }
 
-export default Testopenloan
+export default OpenLoanPage

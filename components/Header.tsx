@@ -115,16 +115,6 @@ const Header = () => {
                             Pools
                         </div>
                     </Link>
-                    <Link href={'/testopenloan'}>
-                        <div
-                        onClick={() => setSelectedNavItem("testopenloan")}
-                        className={`${style.navItem} ${
-                            selectedNavItem === "testopenloan" && style.activeNavItem
-                        }`}
-                        >
-                            Open Loan
-                        </div>
-                    </Link>
                 </div>
             </nav>
             <div className={style.buttonsContainer}>
