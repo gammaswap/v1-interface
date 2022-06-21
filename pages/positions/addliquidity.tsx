@@ -1,8 +1,9 @@
-import { useState, ChangeEvent, SetStateAction, Dispatch } from 'react'
+import { useState, ChangeEvent, SetStateAction, Dispatch, ReactElement } from 'react'
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import TokenSelectorModal from '../../components/TokenSelectorModal'
+import AddLiquiditySubmitButton from '../../components/AddLiquiditySubmitButton'
 
 const style = {
   wrapper: "w-screen flex justify-center items-center",
@@ -17,6 +18,7 @@ const style = {
   tokenSelectorIcon: "flex items-center",
   tokenSelectorTicker: "mx-2",
   dropdownArrow: "w-12 h-8",
+  invalidatedButton: "disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700",
   confirmButton: "bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300"
 }
 
@@ -48,6 +50,25 @@ const AddLiquidity: NextPage = () => {
   const handleTokenSelector = (tokenSelected: string): void => {
     setTokenSelected(tokenSelected)
     setIsOpen(true)
+  }
+
+  // validates add liquidity submit transaction button
+  const validateSubmit = (): JSX.Element | undefined => {
+    if (tokenBSelected === "") {
+      return (
+        <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={"Select Token"}/>
+      )
+    }
+    if (tokenAInputVal === "" || tokenBInputVal === "") {
+      return (
+        <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={"Enter an Amount"}/>
+      )
+    }
+    if (tokenBSelected !== "" && tokenAInputVal !== "" && tokenBInputVal !== "") {
+      return (
+        <AddLiquiditySubmitButton buttonStyle={style.confirmButton} buttonText={"Confirm"}/>
+      )
+    }
   }
 
   return (
@@ -108,8 +129,8 @@ const AddLiquidity: NextPage = () => {
             )
           }
         </div>
-        <div className={style.confirmButton}>
-          Confirm
+        <div>
+          {validateSubmit()}
         </div>
       </div>
     </div>
