@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ethers } from 'ethers'
@@ -6,6 +6,7 @@ import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import truncateEthAddress from 'truncate-eth-address'
+import { AccountInfoContext } from '../context/AccountInfoContext'
 
 const style = {
     wrapper: "border p-4 w-screen flex justify-between items-center",
@@ -25,8 +26,7 @@ const style = {
 const Header = () => {
     const [selectedNavItem, setSelectedNavItem] = useState("positions")
     const [web3Modal, setweb3Modal] = useState<Web3Modal | null>(null)
-    const [address, setAddress] = useState<string>("")
-    const [balance, setBalance] = useState<string>()
+    const { accountInfo, setAccountInfo } = useContext(AccountInfoContext)
 
     // initiates web3modal
     useEffect(() => {
@@ -72,8 +72,10 @@ const Header = () => {
             const ethersProvider = new ethers.providers.Web3Provider(provider)
             const userAddress = await ethersProvider.getSigner().getAddress()
             const userBalance = await ethersProvider.getBalance(userAddress)
-            setAddress(userAddress)
-            setBalance(ethers.utils.formatEther(userBalance).slice(0, 6))
+            setAccountInfo({
+                address: userAddress,
+                balance: ethers.utils.formatEther(userBalance).slice(0, 6)
+            })
         }
     }
 
@@ -124,16 +126,16 @@ const Header = () => {
                         Buy ETH
                     </div>
                 </Link>
-                { address ? (
+                { accountInfo?.address ? (
                     <div
                     onClick={() => connectWallet()}
                     className={`${style.button} ${style.buttonPadding}`}
                     >
                         <div className={style.balanceContainer}>
-                            {balance}
+                            {accountInfo.balance}
                         </div>
                         <div className={style.buttonTextContainer}>
-                            {truncateEthAddress(address)}
+                            {truncateEthAddress(accountInfo.address)}
                         </div>
                     </div>
                 ) : (
