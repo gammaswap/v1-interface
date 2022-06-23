@@ -7,6 +7,7 @@ import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import truncateEthAddress from 'truncate-eth-address'
+import { Provider, JsonRpcSigner } from "@ethersproject/providers"
 
 const style = {
     wrapper: "border p-4 w-screen flex justify-between items-center",
@@ -23,7 +24,11 @@ const style = {
     buttonAccent: "bg-blue-600 border border-[#163256] text-blue-200 h-full flex justify-center items-center rounded-xl",
 }
 
-const Header = () => {
+interface HeaderProps {
+    onConnect: (provider: Provider, signer: JsonRpcSigner) => any;
+}
+
+const Header = (props: HeaderProps) => {
     const [selectedNavItem, setSelectedNavItem] = useState("positions")
     const [web3Modal, setweb3Modal] = useState<Web3Modal | null>(null)
     const [address, setAddress] = useState<string>("")
@@ -71,6 +76,8 @@ const Header = () => {
         if (web3Modal !== null) {
             const provider = await web3Modal.connect()
             const ethersProvider = new ethers.providers.Web3Provider(provider)
+            const signer = await ethersProvider.getSigner();
+            props.onConnect(ethersProvider, signer)
             const userAddress = await ethersProvider.getSigner().getAddress()
             const userBalance = await ethersProvider.getBalance(userAddress)
             setAddress(userAddress)
