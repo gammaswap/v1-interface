@@ -1,9 +1,10 @@
-import * as React from 'react';
-import { Token, Tokens } from '../SelectToken/Token';
-import { CollateralType } from './CollateralType';
-import SelectTokenModal from '../SelectToken/SelectTokenModal';
-import SelectCollateralModal from './SelectCollateralModal';
+import React, { useState, useEffect, useContext } from 'react'
+import { Token, Tokens } from '../SelectToken/Token'
+import { CollateralType } from './CollateralType'
+import SelectTokenModal from '../SelectToken/SelectTokenModal'
+import SelectCollateralModal from './SelectCollateralModal'
 import { useDisclosure } from "@chakra-ui/hooks"
+import { EthersContext } from '../../context'
 import {
     Box,
     Container,
@@ -17,32 +18,36 @@ import {
     Image,
     NumberInput,
     NumberInputField,
-} from '@chakra-ui/react';
+} from '@chakra-ui/react'
 import {
     FaInfoCircle,
-} from 'react-icons/fa';
+} from 'react-icons/fa'
 import {
     ChevronDownIcon
-} from '@chakra-ui/icons';
+} from '@chakra-ui/icons'
 
-interface OpenLoanProps {
-}
+const OpenLoan = () => {
+    const ethersContext = useContext(EthersContext)
+    const [token0, setToken0] = useState<Token>(Tokens[0])
+    const [token1, setToken1] = useState<Token>(Tokens[0])
+    const [tokenNumber, setTokenNumber] = useState(0)
+    const [collateralType, setCollateralType] = useState<CollateralType>(CollateralType.None)
+    const [collateralButtonText, setCollateralButtonText] = useState("Select collateral type")
+    const [token0Text, setToken0Text] = useState("Select token")
+    const [token0Icon, setToken0Icon] = useState<React.ReactElement>(<Image h='25px'/>)
+    const [token1Text, setToken1Text] = useState("Select token")
+    const [token1Icon, setToken1Icon] = useState<React.ReactElement>(<Image h='25px'/>)
+    const [confirmVariant, setConfirmVariant] = useState("confirmGrey")
+    const [loanAmt, setLoanAmt] = useState(0)
+    const [collateralAmt0, setCollateralAmt0] = useState(0)
+    const [collateralAmt1, setCollateralAmt1] = useState(0)
+    const [showToken1, setShowToken1] = useState(false)
+    
+    useEffect(() => {
+        console.log("provider set and seen in openloan:", ethersContext?.provider, ethersContext?.provider?.getSigner().getAddress())
+        console.log("signer set and seen in openloan:", ethersContext?.signer, ethersContext?.provider?.getSigner().getAddress())
+    }, [ethersContext])
 
-const OpenLoan: React.FC<OpenLoanProps> = (props) => {
-    const [token0, setToken0] = React.useState<Token>(Tokens[0]);
-    const [token1, setToken1] = React.useState<Token>(Tokens[0]);
-    const [tokenNumber, setTokenNumber] = React.useState(0);
-    const [collateralType, setCollateralType] = React.useState<CollateralType>(CollateralType.None);
-    const [collateralButtonText, setCollateralButtonText] = React.useState("Select collateral type");
-    const [token0Text, setToken0Text] = React.useState("Select token");
-    const [token0Icon, setToken0Icon] = React.useState<React.ReactElement>(<Image h='25px'/>);
-    const [token1Text, setToken1Text] = React.useState("Select token");
-    const [token1Icon, setToken1Icon] = React.useState<React.ReactElement>(<Image h='25px'/>);
-    const [confirmVariant, setConfirmVariant] = React.useState("confirmGrey");
-    const [loanAmt, setLoanAmt] = React.useState(0);
-    const [collateralAmt0, setCollateralAmt0] = React.useState(0);
-    const [collateralAmt1, setCollateralAmt1] = React.useState(0);
-    const [showToken1, setShowToken1] = React.useState(false);
     const { 
         isOpen: isOpenSelectToken, 
         onOpen: onOpenSelectToken, 
@@ -57,121 +62,121 @@ const OpenLoan: React.FC<OpenLoanProps> = (props) => {
     const handleTokenSelected = (token: Token, tokenNumber: number) => {
         console.log("selected token", tokenNumber, token.symbol);
         if (tokenNumber==0) {
-            setToken0(token);
-            setToken0Text(token.symbol);
+            setToken0(token)
+            setToken0Text(token.symbol)
             setToken0Icon(<Image mr="5px" boxSize='25px' src={token.iconPath}  />)
         } else {
-            setToken1(token);
-            setToken1Text(token.symbol);
+            setToken1(token)
+            setToken1Text(token.symbol)
             setToken1Icon(<Image mr="5px" boxSize='25px' src={token.iconPath} />)
         }
-        onCloseSelectToken();
-        resetCollateralType();
-        validate();
+        onCloseSelectToken()
+        resetCollateralType()
+        validate()
     }
 
     const handleCollateralSelected = (type: CollateralType) => {
-        console.log("selected collateral type", CollateralType[type]);
-        setCollateralType(type);
-        setCollateralButtonText(getCollateralTypeButtonText(type));
-        setShowToken1(type == CollateralType.Both);
-        onCloseSelectCollateral();
-        validate();
+        console.log("selected collateral type", CollateralType[type])
+        setCollateralType(type)
+        setCollateralButtonText(getCollateralTypeButtonText(type))
+        setShowToken1(type == CollateralType.Both)
+        onCloseSelectCollateral()
+        validate()
     }
 
     function onOpenToken0() {
-        setTokenNumber(0);
-        onOpenSelectToken();
+        setTokenNumber(0)
+        onOpenSelectToken()
     }
 
     function onOpenToken1() {
-        setTokenNumber(1);
-        onOpenSelectToken();
+        setTokenNumber(1)
+        onOpenSelectToken()
     }
 
     function getCollateralTypeButtonText(collateralType: CollateralType) {
         switch(collateralType) {
             case CollateralType.None:
-                return "Select collateral type";
+                return "Select collateral type"
             case CollateralType.LPToken:
-                return "Liquidity pool tokens";
+                return "Liquidity pool tokens"
             case CollateralType.Token0:
-                return token0.symbol;
+                return token0.symbol
             case CollateralType.Token1:
-                return token1.symbol;
+                return token1.symbol
             case CollateralType.Both:
-                return "Both";
+                return "Both"
             default:
-                return "Select collateral type";
+                return "Select collateral type"
         }
         return "";
     }
 
     function resetCollateralType() {
-        setCollateralType(CollateralType.None);
-        setCollateralButtonText(getCollateralTypeButtonText(CollateralType.None));
-        setConfirmVariant("confirmGrey");
-        setShowToken1(false);
-        setCollateralAmt1(0);
+        setCollateralType(CollateralType.None)
+        setCollateralButtonText(getCollateralTypeButtonText(CollateralType.None))
+        setConfirmVariant("confirmGrey")
+        setShowToken1(false)
+        setCollateralAmt1(0)
     }
 
     function handleConfirmClick() {
         if (!validate()) {
-            console.log("invalid inputs");
-            return;
+            console.log("invalid inputs")
+            return
         }
-        console.log("Confirm values:", token0.symbol, token1.symbol, loanAmt, getCollateralTypeButtonText(collateralType), collateralAmt0, collateralAmt1);
+        console.log("Confirm values:", token0.symbol, token1.symbol, loanAmt, getCollateralTypeButtonText(collateralType), collateralAmt0, collateralAmt1)
     }
 
     function validate() {
         if (token0 == token1) {
-            console.log("Tokens must be different.");
-            setConfirmVariant("confirmGrey");
-            return false;
+            console.log("Tokens must be different.")
+            setConfirmVariant("confirmGrey")
+            return false
         }
         if (token0Text == "Select token" || token1Text == "Select token" ) {
-            console.log("Token must be selected.");
-            setConfirmVariant("confirmGrey");
-            return false;
+            console.log("Token must be selected.")
+            setConfirmVariant("confirmGrey")
+            return false
         }
         if (collateralType == CollateralType.None) {
-            console.log("Collateral must be selected");
-            setConfirmVariant("confirmGrey");
-            return false;
+            console.log("Collateral must be selected")
+            setConfirmVariant("confirmGrey")
+            return false
         }
         if (loanAmt <= 0) {
-            console.log("Loan amount must be positive.");
-            setConfirmVariant("confirmGrey");
-            return false;
+            console.log("Loan amount must be positive.")
+            setConfirmVariant("confirmGrey")
+            return false
         }
         if (collateralAmt0 <= 0) {
-            console.log(token0.symbol, "collateral amount must be positive.");
-            setConfirmVariant("confirmGrey");
-            return false;
+            console.log(token0.symbol, "collateral amount must be positive.")
+            setConfirmVariant("confirmGrey")
+            return false
         }
         if (collateralType == CollateralType.Both && collateralAmt1 <= 0) {
-            console.log(token1.symbol, "collateral amount must be positive.");
-            setConfirmVariant("confirmGrey");
-            return false;
+            console.log(token1.symbol, "collateral amount must be positive.")
+            setConfirmVariant("confirmGrey")
+            return false
         }
-        console.log("Valid inputs.");
-        setConfirmVariant("confirmGreen");
-        return true;
+        console.log("Valid inputs.")
+        setConfirmVariant("confirmGreen")
+        return true
     }
 
     function loanAmtChanged(valString: string, valNum: number) {
-        setLoanAmt(valNum);
-        validate();
+        setLoanAmt(valNum)
+        validate()
     }
     
     function collateralAmt0Changed(valString: string, valNum: number) {
-        setCollateralAmt0(valNum);
-        validate();
+        setCollateralAmt0(valNum)
+        validate()
     }
 
     function collateralAmt1Changed(valString: string, valNum: number) {
-        setCollateralAmt1(valNum);
-        validate();
+        setCollateralAmt1(valNum)
+        validate()
     }
 
     return (
