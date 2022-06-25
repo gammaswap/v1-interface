@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Token, Tokens } from '../SelectToken/Token';
+import Tokens, { Token } from '../Tokens'
 import { CollateralType } from './CollateralType';
 import SelectTokenModal from '../SelectToken/SelectTokenModal';
 import SelectCollateralModal from './SelectCollateralModal';
@@ -59,11 +59,11 @@ const OpenLoan: React.FC<OpenLoanProps> = (props) => {
         if (tokenNumber==0) {
             setToken0(token);
             setToken0Text(token.symbol);
-            setToken0Icon(<Image mr="5px" boxSize='25px' src={token.iconPath}  />)
+            setToken0Icon(<Image mr="5px" boxSize='25px' src={token.imgPath}  />)
         } else {
             setToken1(token);
             setToken1Text(token.symbol);
-            setToken1Icon(<Image mr="5px" boxSize='25px' src={token.iconPath} />)
+            setToken1Icon(<Image mr="5px" boxSize='25px' src={token.imgPath} />)
         }
         onCloseSelectToken();
         resetCollateralType();

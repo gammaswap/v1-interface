@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Token } from '../SelectToken/Token';
+import { Token } from '../Tokens'
 import { CollateralType } from './CollateralType';
 
 import {

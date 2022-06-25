@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Token, Tokens } from './Token';
+import Tokens, { Token } from '../Tokens'
 
 import {
     Container,
@@ -33,7 +33,7 @@ const SelectTokenModal: React.FC<Props> = (props) => {
                         <List color={'#e2e8f0'} fontSize={'md'} fontWeight={'semibold'} >
                             {Tokens.map((token) => (
                                 <ListItem cursor="pointer" key={token.symbol} display='flex' p={1} onClick={() => props.handleTokenSelected(token, props.tokenNumber)}> 
-                                    <Container p={0} w='80px'><img src={token.iconPath} /></Container>
+                                    <Container p={0} w='80px'><img src={token.imgPath} /></Container>
                                     <Container >{token.symbol}</Container> 
                                     <Container textAlign='right'>0</Container> 
                                 </ListItem>
