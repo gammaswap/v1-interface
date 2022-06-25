@@ -6,62 +6,62 @@ export type Token = {
 
 export const Tokens: Array<Token> = [
     {
-        iconPath: './crypto_icons/eth.png',
+        iconPath: '/crypto/eth.png',
         symbol: 'ETH',
         address: "",
     },
     {
-        iconPath: './crypto_icons/aave.png',
+        iconPath: '/crypto/aave.png',
         symbol: 'AAVE',
         address: "",
     },
     {
-        iconPath: './crypto_icons/bal.png',
+        iconPath: '/crypto/bal.png',
         symbol: 'BAL',
         address: "",
     },
     {
-        iconPath: './crypto_icons/uni.png',
+        iconPath: '/crypto/uni.png',
         symbol: 'UNI',
         address: "",
     },
     {
-        iconPath: './crypto_icons/usdt.png',
+        iconPath: '/crypto/usdt.png',
         symbol: 'USDT',
         address: "",
     },
     {
-        iconPath: './crypto_icons/usdc.png',
+        iconPath: '/crypto/usdc.png',
         symbol: 'USDC',
         address: "",
     },
     {
-        iconPath: './crypto_icons/sol.png',
+        iconPath: '/crypto/sol.png',
         symbol: 'SOL',
         address: "",
     },
     {
-        iconPath: './crypto_icons/bat.png',
+        iconPath: '/crypto/bat.png',
         symbol: 'BAT',
         address: "",
     },
     {
-        iconPath: './crypto_icons/link.png',
+        iconPath: '/crypto/link.png',
         symbol: 'LINK',
         address: "",
     },
     {
-        iconPath: './crypto_icons/wbtc.png',
+        iconPath: '/crypto/wbtc.png',
         symbol: 'WBTC',
         address: "",
     },
     {
-        iconPath: './crypto_icons/matic.png',
+        iconPath: '/crypto/matic.png',
         symbol: 'MATIC',
         address: "",
     },
     {
-        iconPath: './crypto_icons/dai.png',
+        iconPath: '/crypto/dai.png',
         symbol: 'DAI',
         address: "",
     },
