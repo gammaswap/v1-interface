@@ -16,7 +16,7 @@ const options: NextPage = () => {
                 </Link>
             </div>
             <div className={style.optionsButtonContainer}>
-                <Link href={'borrow'}>
+                <Link href={'openloan'}>
                     <button className={style.optionsButtonContent}>Borrow</button>
                 </Link>
             </div>
