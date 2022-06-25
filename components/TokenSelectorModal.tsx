@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, ReactElement, Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/solid'
-import Tokens from './Tokens'
+import Tokens, { Token } from './Tokens'
 
 const style = {
     modalWrapper: "relative z-50",
@@ -22,7 +22,7 @@ const style = {
 type ModalProps = {
     isOpen: boolean
     setIsOpen: Dispatch<SetStateAction<boolean>>
-    setTokenSelected: Dispatch<SetStateAction<string>>
+    setTokenSelected: Dispatch<SetStateAction<Token>>
 }
 
 const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected }: ModalProps): ReactElement => {
@@ -32,7 +32,7 @@ const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected }: ModalProps)
     /** checks for selected token inside modal
      * bubbles up selected token state to parent component
      */
-    const handleSelectedToken = (tokenSelected: string) => {
+    const handleSelectedToken = (tokenSelected: Token) => {
         setTokenSelected(tokenSelected)
         setIsOpen(false)
     }
@@ -71,7 +71,7 @@ const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected }: ModalProps)
                                     <div
                                     key={index}
                                     className={style.tokenContainer}
-                                    onClick={() => handleSelectedToken(token.symbol)}
+                                    onClick={() => handleSelectedToken(token)}
                                     >
                                         <img src={token.imgPath} className={style.tokenImg} />
                                         <div className={style.tokenSymbol}>{token.symbol}</div>

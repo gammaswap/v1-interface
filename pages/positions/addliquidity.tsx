@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import TokenSelectorModal from '../../components/TokenSelectorModal'
 import AddLiquiditySubmitButton from '../../components/AddLiquiditySubmitButton'
+import Tokens, { Token } from '../../components/Tokens'
 
 const style = {
   wrapper: "w-screen flex justify-center items-center",
@@ -28,8 +29,12 @@ const AddLiquidity: NextPage = () => {
   const [tokenBInputVal, setTokenBInputVal] = useState<string>("")
 
   // holds state of token selected for both token A and B input fields
-  const [tokenASelected, setTokenASelected] = useState<string>("ETH")
-  const [tokenBSelected, setTokenBSelected] = useState<string>("")
+  const [tokenASelected, setTokenASelected] = useState<Token>(Tokens[0])
+  const [tokenBSelected, setTokenBSelected] = useState<Token>({
+    imgPath: "",
+    symbol: "",
+    address: "",
+  })
 
   // holds state of what token input field was selected
   const [tokenSelected, setTokenSelected] = useState<string>("")
@@ -54,21 +59,26 @@ const AddLiquidity: NextPage = () => {
 
   // validates add liquidity submit transaction button
   const validateSubmit = (): JSX.Element | undefined => {
-    if (tokenBSelected === "") {
+    if (isTokenEmpty(tokenBSelected)) {
       return (
         <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={"Select Token"}/>
       )
     }
-    if (tokenAInputVal === "" || tokenBInputVal === "") {
+    if (isTokenEmpty(tokenASelected) || isTokenEmpty(tokenBSelected)) {
       return (
         <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={"Enter an Amount"}/>
       )
     }
-    if (tokenBSelected !== "" && tokenAInputVal !== "" && tokenBInputVal !== "") {
+    if (!isTokenEmpty(tokenBSelected) && tokenAInputVal !== "" && tokenBInputVal !== "") {
       return (
         <AddLiquiditySubmitButton buttonStyle={style.confirmButton} buttonText={"Confirm"}/>
       )
     }
+  }
+
+  // checks if token selected object is empty
+  const isTokenEmpty = (tokenToCheck: Token): boolean => {
+    return Object.values(tokenToCheck).every(tokenProp => tokenProp === "")
   }
 
   return (
@@ -87,9 +97,9 @@ const AddLiquidity: NextPage = () => {
             onClick={() => handleTokenSelector("tokenA")}
             >
               <div className={style.tokenSelectorIcon}>
-                <Image src={`/crypto/${tokenASelected.toLowerCase()}.svg`} alt="token logo" width={32} height={32}/>
+                <Image src={tokenASelected.imgPath} alt="token logo" width={32} height={32}/>
               </div>
-              <div className={style.tokenSelectorTicker}>{tokenASelected}</div>
+              <div className={style.tokenSelectorTicker}>{tokenASelected.symbol}</div>
               <ChevronDownIcon className={style.dropdownArrow}/>
             </div>
           </div>
@@ -101,7 +111,7 @@ const AddLiquidity: NextPage = () => {
            * renders "select token" button by default 
            * when a token is selected, renders dropdown with selected token displayed
           */}
-          {tokenBSelected === ""
+          {isTokenEmpty(tokenBSelected)
             ? (
               <div
               className={style.nonSelectedTokenContainer}
@@ -120,9 +130,9 @@ const AddLiquidity: NextPage = () => {
                 onClick={() => handleTokenSelector("tokenB")}
                 >
                   <div className={style.tokenSelectorIcon}>
-                    <Image src={`/crypto/${tokenBSelected.toLowerCase()}.svg`} alt="token logo" width={32} height={32}/>
+                    <Image src={tokenBSelected.imgPath} alt="token logo" width={32} height={32}/>
                   </div>
-                  <div className={style.tokenSelectorTicker}>{tokenBSelected}</div>
+                  <div className={style.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
                   <ChevronDownIcon className={style.dropdownArrow}/>
                 </div>
               </div>
