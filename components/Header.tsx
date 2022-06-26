@@ -7,6 +7,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import truncateEthAddress from 'truncate-eth-address'
 import { AccountInfoContext } from '../context/AccountInfoContext'
+import { EthersContext } from '../context/EthersContext'
 
 const style = {
     wrapper: "border p-4 w-screen flex justify-between items-center",
@@ -27,6 +28,7 @@ const Header = () => {
     const [selectedNavItem, setSelectedNavItem] = useState("positions")
     const [web3Modal, setweb3Modal] = useState<Web3Modal | null>(null)
     const { accountInfo, setAccountInfo } = useContext(AccountInfoContext)
+    const { setProvider, setSigner } = useContext(EthersContext)
 
     // initiates web3modal
     useEffect(() => {
@@ -70,7 +72,12 @@ const Header = () => {
         if (web3Modal !== null) {
             const provider = await web3Modal.connect()
             const ethersProvider = new ethers.providers.Web3Provider(provider)
-            const userAddress = await ethersProvider.getSigner().getAddress()
+            const signer = ethersProvider.getSigner()
+            
+            setProvider(ethersProvider)
+            setSigner(signer)
+
+            const userAddress = await signer.getAddress()
             const userBalance = await ethersProvider.getBalance(userAddress)
             setAccountInfo({
                 address: userAddress,

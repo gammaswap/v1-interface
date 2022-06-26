@@ -1,8 +1,8 @@
 import { useState, createContext, ReactNode, Dispatch, SetStateAction } from 'react'
 
 type AccountInfo = {
-    address: string
-    balance: string
+    address: string | null
+    balance: string | null
 }
 
 type AccountInfoContextType = {
