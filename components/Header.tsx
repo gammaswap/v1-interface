@@ -1,13 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ethers } from 'ethers'
-import Web3Modal from 'web3modal'
-import WalletConnectProvider from '@walletconnect/web3-provider'
-import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import truncateEthAddress from 'truncate-eth-address'
-import { AccountInfoContext } from '../context/AccountInfoContext'
-import { EthersContext } from '../context/EthersContext'
+import { useWallet } from '../context/WalletContext'
 
 const style = {
     wrapper: "border p-4 w-screen flex justify-between items-center",
@@ -26,65 +21,7 @@ const style = {
 
 const Header = () => {
     const [selectedNavItem, setSelectedNavItem] = useState("positions")
-    const [web3Modal, setweb3Modal] = useState<Web3Modal | null>(null)
-    const { accountInfo, setAccountInfo } = useContext(AccountInfoContext)
-    const { setProvider, setSigner } = useContext(EthersContext)
-
-    // initiates web3modal
-    useEffect(() => {
-        const providerOptions = {
-            walletconnect: {
-                package: WalletConnectProvider,
-                options: {
-                    infuraId: "6094a319cdce47e0a440b67fdf3c5a96" // save this to env file LATER
-                }
-            },
-            coinbasewallet: {
-                package: CoinbaseWalletSDK,
-                options: {
-                    appName: "GammaSwap",
-                    infuraId: "6094a319cdce47e0a440b67fdf3c5a96",
-                    chainId: 3
-                }
-            },
-            binancechainwallet: {
-                package: true
-            }
-        }
-        
-        const newWeb3Modal = new Web3Modal({
-            network: "ropsten",
-            cacheProvider: true,
-            providerOptions
-        })
-
-        setweb3Modal(newWeb3Modal)
-    }, [])
-
-    // connects automatically if user was previously signed in
-    useEffect(() => {
-        if (web3Modal && web3Modal.cachedProvider){
-            connectWallet()
-        }
-    }, [web3Modal])
-
-    const connectWallet = async () => {
-        if (web3Modal !== null) {
-            const provider = await web3Modal.connect()
-            const ethersProvider = new ethers.providers.Web3Provider(provider)
-            const signer = ethersProvider.getSigner()
-            
-            setProvider(ethersProvider)
-            setSigner(signer)
-
-            const userAddress = await signer.getAddress()
-            const userBalance = await ethersProvider.getBalance(userAddress)
-            setAccountInfo({
-                address: userAddress,
-                balance: ethers.utils.formatEther(userBalance).slice(0, 6)
-            })
-        }
-    }
+    const { accountInfo, connectWallet } = useWallet()
 
     return (
         <div className={style.wrapper}>
