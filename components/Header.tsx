@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import truncateEthAddress from 'truncate-eth-address'
-import { useWallet } from '../context/WalletContext'
+import { WalletContext } from '../context/WalletContext'
 
 const style = {
     wrapper: "border p-4 w-screen flex justify-between items-center",
@@ -21,7 +21,7 @@ const style = {
 
 const Header = () => {
     const [selectedNavItem, setSelectedNavItem] = useState("positions")
-    const { accountInfo, connectWallet } = useWallet()
+    const { accountInfo, connectWallet } = useContext(WalletContext)
 
     return (
         <div className={style.wrapper}>
@@ -76,7 +76,7 @@ const Header = () => {
                     className={`${style.button} ${style.buttonPadding}`}
                     >
                         <div className={style.balanceContainer}>
-                            {accountInfo.balance}
+                            {accountInfo.balance?.slice(0, 6)}
                         </div>
                         <div className={style.buttonTextContainer}>
                             {truncateEthAddress(accountInfo.address)}
