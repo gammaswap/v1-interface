@@ -9,8 +9,9 @@ import { WalletContext } from '../../context/WalletContext'
 // import Factory from '../../abis/Factory.json'
 import PositionMgr from '../../abis/PositionManager.json'
 import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
+import IERC20 from '../../abis/ERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
-import { useForm } from 'react-hook-form'
+import { FieldValues, useForm } from 'react-hook-form'
 import {
     Box,
     Container,
@@ -220,13 +221,94 @@ const OpenLoan = () => {
         setCollateralAmt1(0)
     }
 
-    function handleConfirmClick(data: any) {
+    async function openLoanHandler(data: FieldValues) {
         if (!validate()) {
             console.log("invalid inputs")
             return
         }
 
+        if (!accountInfo || !accountInfo.address) {
+            console.log("Wallet not connected.")
+            return
+        }
+
+        if (!posManager) {
+            console.log("Position manager not found.")
+            return
+        }
+
+        // unpack
         console.log(token0, token1, data)
+        var collateralAmt0 = data.collateralAmt0 ? data.collateralAmt0 : 0
+        var collateralAmt1 = data.collateralAmt1 ? data.collateralAmt1 : 0
+        var loanAmt = data.loanAmt
+
+        console.log("openPositionHandler() >>")
+        console.log(collateralAmt0)
+        console.log(collateralAmt1)
+        console.log(loanAmt)
+
+        const token0Allowance = await checkAllowance(accountInfo.address, token0);
+        console.log("token0Allowance >> ")
+        console.log(token0Allowance)
+        if (token0Allowance <= 0) {
+            console.log("approve for token0")
+            await approve(token0, posManager._address)
+        }
+
+        const token1Allowance = await checkAllowance(accountInfo.address, token1);
+        console.log("token1Allowance >> ")
+        console.log(token1Allowance)
+        if (token1Allowance <= 0) {
+            console.log("approve for token1")
+            await approve(token1, posManager._address)
+        }
+
+        // TODO
+        const createPosition = await posManager.openPosition(
+            token0.address,
+            token1.address,
+            ethers.utils.formatUnits(collateralAmt0, "wei"),
+            ethers.utils.formatUnits(collateralAmt1, "wei"),
+            ethers.utils.formatUnits(loanAmt, "wei"),
+            accountInfo.address,  
+        )
+        console.log("createPosition")
+        console.log(createPosition)/**/
+    }
+
+    async function checkAllowance(account: string, token: Token) {
+        if (!provider || !accountInfo || !posManager)
+            return
+        console.log("checking allowance...")
+        if (token.symbol) 
+            console.log(token.symbol)
+        if (token.address) 
+            console.log(token.address)
+        var erc20 = new ethers.Contract(token.address, IERC20.abi, provider)
+        console.log(accountInfo.address, posManager.address)
+        const allowedAmt = await erc20.allowance(accountInfo.address, posManager.address)
+            .then((res: string) => {
+                console.log("check allowance " + token.symbol);
+                console.log(res)
+                return res
+            })
+        //  .catch(err => {
+        //  console.log("IM HERE")
+        //  console.error(err)
+        //  })/**/
+        // console.log("allowedAmt >>", allowedAmt)
+        return allowedAmt
+    }
+
+    async function approve(fromToken: Token, toAddr: string) {
+        if (!provider || !accountInfo)
+            return
+        console.log(fromToken);
+        var erc20 = new ethers.Contract(fromToken.address, IERC20.abi, provider)
+        const res = await erc20.approve(toAddr, constants.MaxUint256).send({ from: accountInfo.address });
+        console.log("res >>");
+        console.log(res);
     }
 
     function validate() {
@@ -282,7 +364,11 @@ const OpenLoan = () => {
             //TODO: when the factory is available need to call it to get the pair's pool address to set
 
             if (provider) {
-                setPosManager(new ethers.Contract(address, PositionMgr.abi, provider))
+                if (accountInfo  && accountInfo?.address) {
+                    setPosManager(new ethers.Contract(address, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
+                } else {
+                    setPosManager(new ethers.Contract(address, PositionMgr.abi, provider))
+                }
             } else {
                 console.log("Please connect wallet")
             }
@@ -299,14 +385,10 @@ const OpenLoan = () => {
         validate()
     }
 
-    const onSubmit = (data: any) => {
-        console.log(data)
-    }
-
     return (
         <Container>
             <Box m='auto' borderRadius={'2xl'} bg={'#1d2c52'} maxW='420px' boxShadow='dark-lg'>
-                <form onSubmit={handleSubmit(handleConfirmClick)}>
+                <form onSubmit={handleSubmit(openLoanHandler)}>
                     <FormControl p='10px 15px 0px 15px' boxShadow='lg'>
                         <VStack>
                             <Heading color={'#e2e8f0'} marginBottom={'25px'}>Open Your Loan</Heading>
