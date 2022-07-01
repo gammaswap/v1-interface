@@ -25,7 +25,11 @@ const theme = extendTheme({
 const OpenLoanController = () => {
     const { provider, accountInfo } = useContext(WalletContext)
     const [token0, setToken0] = useState<Token>(Tokens[0])
-    const [token1, setToken1] = useState<Token>(Tokens[0])
+    const [token1, setToken1] = useState<Token>({
+        imgPath: "",
+        symbol: "",
+        address: "",
+    })
     const [posManager, setPosManager] = useState<Contract | null>(null)
     const [posId, setPosId] = useState("")
     const [pos, setPos] = useState({})

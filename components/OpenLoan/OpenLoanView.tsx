@@ -2,10 +2,11 @@ import * as React from 'react'
 import { useState, useEffect,  Dispatch } from 'react'
 import { Token } from '../Tokens'
 import { CollateralType } from './CollateralType'
-import SelectTokenModal from '../SelectToken/SelectTokenModal'
 import SelectCollateralModal from './SelectCollateralModal'
 import { useDisclosure } from "@chakra-ui/hooks"
 import { FieldValues, useForm } from 'react-hook-form'
+import TokenSelectorModal from '../../components/TokenSelectorModal'
+import Image from 'next/image'
 import {
     Box,
     Container,
@@ -16,7 +17,6 @@ import {
     ButtonGroup,
     Text,
     VStack,
-    Image,
     NumberInput,
     NumberInputField,
 } from '@chakra-ui/react'
@@ -26,6 +26,23 @@ import {
 import {
     ChevronDownIcon
 } from '@chakra-ui/icons'
+
+const style = {
+    wrapper: "w-screen flex justify-center items-center",
+    content: "bg-gray-900 w-[40rem] rounded-2xl p-4",
+    formHeader: "px-2 flex justify-between items-center font-semibold text-xl text-gray-200",
+    tokenContainer: "bg-gray-800 my-3 rounded-2xl p-6 text-3xl border-2 border-gray-800 hover:border-gray-600 flex justify-between",
+    tokenInput: "bg-transparent placeholder:text-gray-600 outline-none mb-6 w-full text-4xl text-gray-300 mt-4",
+    nonSelectedTokenContainer: "flex items-center text-gray-200",
+    nonSelectedTokenContent: "w-full h-min flex justify-center items-center bg-blue-500 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30",
+    tokenSelectorContainer: "flex items-center text-gray-200",
+    tokenSelectorContent: "w-full h-min flex justify-between items-center bg-gray-700 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-gray-700/30 hover:bg-gray-900 hover:shadow-gray-900/30",
+    tokenSelectorIcon: "flex items-center",
+    tokenSelectorTicker: "mx-2",
+    dropdownArrow: "w-12 h-8",
+    invalidatedButton: "disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700",
+    confirmButton: "bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300"
+}
 
 type OpenLoanProps = {
     openLoanHandler: (data: FieldValues) => Promise<void>
@@ -39,16 +56,13 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
     const [tokenNumber, setTokenNumber] = useState<number>(0)
     const [collateralType, setCollateralType] = useState<CollateralType>(CollateralType.None)
     const [collateralButtonText, setCollateralButtonText] = useState<string>("Select collateral type")
-    const [token0Text, setToken0Text] = useState<string>("Select token")
-    const [token0Icon, setToken0Icon] = useState<React.ReactElement>(<Image h='25px'/>)
-    const [token1Text, setToken1Text] = useState<string>("Select token")
-    const [token1Icon, setToken1Icon] = useState<React.ReactElement>(<Image h='25px'/>)
     const [confirmVariant, setConfirmVariant] = useState<string>("confirmGrey")
     const [loanAmt, setLoanAmt] = useState<number>(0)
     const [collateralAmt0, setCollateralAmt0] = useState<number>(0)
     const [collateralAmt1, setCollateralAmt1] = useState<number>(0)
     const [showToken1, setShowToken1] = useState<boolean>(false)
     const { register, handleSubmit } = useForm()
+    const [isOpen, setIsOpen] = useState<boolean>(false)
     
     useEffect(() => {
         resetCollateralType()
@@ -57,29 +71,10 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
     }, [token0, token1])
 
     const { 
-        isOpen: isOpenSelectToken, 
-        onOpen: onOpenSelectToken, 
-        onClose: onCloseSelectToken 
-    } = useDisclosure()
-    const { 
         isOpen: isOpenSelectCollateral, 
         onOpen: onOpenSelectCollateral, 
         onClose: onCloseSelectCollateral
     } = useDisclosure()
-
-    const handleTokenSelected = (token: Token, tokenNumber: number) => {
-        console.log("selected token", tokenNumber, token.symbol)
-        if (tokenNumber==0) {
-            setToken0(token)
-            setToken0Text(token.symbol)
-            setToken0Icon(<Image mr="5px" boxSize='25px' src={token.imgPath}  />)
-        } else {
-            setToken1(token)
-            setToken1Text(token.symbol)
-            setToken1Icon(<Image mr="5px" boxSize='25px' src={token.imgPath} />)
-        }
-        onCloseSelectToken()
-    }
 
     const handleCollateralSelected = (type: CollateralType) => {
         console.log("selected collateral type", CollateralType[type])
@@ -90,14 +85,9 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
         validate()
     }
 
-    function onOpenToken0() {
-        setTokenNumber(0)
-        onOpenSelectToken()
-    }
-
-    function onOpenToken1() {
-        setTokenNumber(1)
-        onOpenSelectToken()
+    function onOpenToken(tokenNumber: number) {
+        setTokenNumber(tokenNumber)
+        setIsOpen(true)
     }
 
     function getCollateralTypeButtonText(collateralType: CollateralType) {
@@ -132,7 +122,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
             setConfirmVariant("confirmGrey")
             return false
         }
-        if (token0Text == "Select token" || token1Text == "Select token" ) {
+        if (isTokenEmpty(token1)) {
             console.log("Token must be selected.")
             setConfirmVariant("confirmGrey")
             return false
@@ -177,104 +167,150 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
         validate()
     }
 
+    function isTokenEmpty(tokenToCheck: Token): boolean {
+        return Object.values(tokenToCheck).every(tokenProp => tokenProp === "")
+    }
+
+    async function validateBeforeSubmit(data: FieldValues):Promise<void> {
+        if (!validate()) {
+            return 
+        }
+        return openLoanHandler(data)
+    }
+
     return (
-        <Container>
-            <Box m='auto' borderRadius={'2xl'} bg={'#1d2c52'} maxW='420px' boxShadow='dark-lg'>
-                <form onSubmit={handleSubmit(openLoanHandler)}>
-                    <FormControl p='10px 15px 0px 15px' boxShadow='lg'>
-                        <VStack>
-                            <Heading color={'#e2e8f0'} marginBottom={'25px'}>Open Your Loan</Heading>
-                            <FormLabel variant='openLoan'>Select a Token Pair</FormLabel>
-                            <Container display='inline-block'>
-                                <Container w='50%' display='inline-grid' >
-                                    <Button id='token0' variant='select' onClick={onOpenToken0} rightIcon={<ChevronDownIcon />} leftIcon={token0Icon} >
-                                        {token0Text}
-                                    </Button>
+        <>
+            <Container>
+                <Box m='auto' borderRadius={'2xl'} bg={'#1d2c52'} maxW='420px' boxShadow='dark-lg'>
+                    <form onSubmit={handleSubmit(validateBeforeSubmit)}>
+                        <FormControl p='10px 15px 0px 15px' boxShadow='lg'>
+                            <VStack>
+                                <Heading color={'#e2e8f0'} marginBottom={'25px'}>Open Your Loan</Heading>
+                                <FormLabel variant='openLoan'>Select a Token Pair</FormLabel>
+                                <Container display='inline-block'>
+                                    <Container w='50%' display='inline-grid' >
+                                        <div className={style.tokenSelectorContainer}>
+                                            <div className={style.tokenSelectorContent} onClick={() => onOpenToken(0)} >
+                                                <div className={style.tokenSelectorIcon}>
+                                                    <Image src={token0.imgPath} alt="token logo" width={32} height={32}/>
+                                                </div>
+                                                <div className={style.tokenSelectorTicker}>{token0.symbol}</div>
+                                                <ChevronDownIcon className={style.dropdownArrow}/>
+                                            </div>
+                                        </div>
+                                    </Container>
+                                    <Container w='50%' display='inline-grid' >
+                                        {isTokenEmpty(token1) 
+                                            ? (
+                                                <div className={style.nonSelectedTokenContainer}>
+                                                    <div className={style.nonSelectedTokenContent} onClick={() => onOpenToken(1)} >
+                                                        <div className={style.tokenSelectorIcon}>
+                                                            <Image src={token0.imgPath} width={0} height={32}/>
+                                                        </div>
+                                                        Select Token
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className={style.tokenSelectorContainer}>
+                                                    <div className={style.tokenSelectorContent} onClick={() => onOpenToken(1)} >
+                                                        <div className={style.tokenSelectorIcon}>
+                                                            <Image src={token1.imgPath} alt="token logo" width={32} height={32}/>
+                                                        </div>
+                                                        <div className={style.tokenSelectorTicker}>{token1.symbol}</div>
+                                                        <ChevronDownIcon className={style.dropdownArrow}/>
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                    </Container>
                                 </Container>
-                                <Container w='50%' display='inline-grid' >
-                                    <Button id='token1' variant='select' onClick={onOpenToken1} rightIcon={<ChevronDownIcon />} leftIcon={token1Icon} >
-                                        {token1Text}
-                                    </Button>
+                                <Container textAlign='center'>
+                                    <ButtonGroup variant='loanInfo' display='inline-block' size='tiny' >
+                                        <Button leftIcon={<FaInfoCircle />}>
+                                            <Text pr='5px'>MaxLTV</Text>
+                                            <Text >--%</Text>
+                                        </Button>
+                                        <Button leftIcon={<FaInfoCircle />}>
+                                            <Text pr='5px'>Liquidation Threshold</Text>
+                                            <Text >--%</Text>
+                                        </Button>
+                                        <Button leftIcon={<FaInfoCircle />}>
+                                        <Text pr='5px'>Liquidation Penalty</Text>
+                                            <Text >--%</Text>
+                                        </Button>
+                                    </ButtonGroup>
                                 </Container>
-                                <SelectTokenModal handleTokenSelected={handleTokenSelected} isOpen={isOpenSelectToken} onClose={onCloseSelectToken} tokenNumber={tokenNumber}></SelectTokenModal>
-                            </Container>
-                            <Container textAlign='center'>
-                                <ButtonGroup variant='loanInfo' display='inline-block' size='tiny' >
-                                    <Button leftIcon={<FaInfoCircle />}>
-                                        <Text pr='5px'>MaxLTV</Text>
-                                        <Text >--%</Text>
+                                <FormLabel variant='openLoan'>Your Loan Amount</FormLabel>
+                                <NumberInput 
+                                    variant='openLoan' 
+                                    w='100%' 
+                                    defaultValue={0} 
+                                    min={0} 
+                                    clampValueOnBlur={true} 
+                                    keepWithinRange={true}
+                                    onChange={loanAmtChanged}
+                                    value={loanAmt}>
+                                    <NumberInputField {...register('loanAmt')}/>
+                                </NumberInput>
+                                <Container display='inline-flex' p='0' m='0'>
+                                    <FormLabel variant='openLoanFit' pr='20px' m='0'>Your Collateral</FormLabel>
+                                    <Button variant='select' size='tiny' h='20px' rightIcon={<ChevronDownIcon />} onClick={onOpenSelectCollateral}>
+                                        <Text ml='4px'>{collateralButtonText}</Text>
                                     </Button>
-                                    <Button leftIcon={<FaInfoCircle />}>
-                                        <Text pr='5px'>Liquidation Threshold</Text>
-                                        <Text >--%</Text>
-                                    </Button>
-                                    <Button leftIcon={<FaInfoCircle />}>
-                                    <Text pr='5px'>Liquidation Penalty</Text>
-                                        <Text >--%</Text>
-                                    </Button>
-                                </ButtonGroup>
-                            </Container>
-                            <FormLabel variant='openLoan'>Your Loan Amount</FormLabel>
-                            <NumberInput 
-                                variant='openLoan' 
-                                w='100%' 
-                                defaultValue={0} 
-                                min={0} 
-                                clampValueOnBlur={true} 
-                                keepWithinRange={true}
-                                onChange={loanAmtChanged}
-                                value={loanAmt}>
-                                <NumberInputField {...register('loanAmt')}/>
-                            </NumberInput>
-                            <Container display='inline-flex' p='0' m='0'>
-                                <FormLabel variant='openLoanFit' pr='20px' m='0'>Your Collateral</FormLabel>
-                                <Button variant='select' size='tiny' h='20px' rightIcon={<ChevronDownIcon />} onClick={onOpenSelectCollateral}>
-                                    <Text ml='4px'>{collateralButtonText}</Text>
-                                </Button>
-                                <SelectCollateralModal 
-                                    token0={token0} 
-                                    token1={token1} 
-                                    handleCollateralSelected={handleCollateralSelected} 
-                                    isOpen={isOpenSelectCollateral} 
-                                    onClose={onCloseSelectCollateral}
-                                />
-                            </Container>
-                            <NumberInput 
-                                variant='openLoan' 
-                                w='100%' 
-                                defaultValue={0} 
-                                min={0} 
-                                clampValueOnBlur={true} 
-                                keepWithinRange={true}
-                                onChange={collateralAmt0Changed}
-                                value={collateralAmt0}>
-                                <NumberInputField {...register('collateralAmt0')} />
-                            </NumberInput>
-                            { showToken1 ? 
-                            <NumberInput 
-                                variant='openLoan' 
-                                w='100%' 
-                                defaultValue={0} 
-                                min={0} 
-                                clampValueOnBlur={true} 
-                                keepWithinRange={true}
-                                onChange={collateralAmt1Changed}
-                                value={collateralAmt1}>
-                                <NumberInputField {...register('collateralAmt1')} />
-                            </NumberInput> : null }
-                            <Container p='20px' />
-                            <Container textAlign='right'>
-                                <Text variant='loanInfoRight' pr='5px'>Interest Rate</Text>
-                                <Text variant='loanInfoRight' >--%</Text>
-                            </Container>
-                            <Container p='0 0 5px 0'>
-                                <Button variant={confirmVariant} type="submit" >Confirm</Button>
-                            </Container>
-                        </VStack>
-                    </FormControl>
-                </form>
-            </Box >
-        </Container>
+                                    <SelectCollateralModal 
+                                        token0={token0} 
+                                        token1={token1} 
+                                        handleCollateralSelected={handleCollateralSelected} 
+                                        isOpen={isOpenSelectCollateral} 
+                                        onClose={onCloseSelectCollateral}
+                                    />
+                                </Container>
+                                <NumberInput 
+                                    variant='openLoan' 
+                                    w='100%' 
+                                    defaultValue={0} 
+                                    min={0} 
+                                    clampValueOnBlur={true} 
+                                    keepWithinRange={true}
+                                    onChange={collateralAmt0Changed}
+                                    value={collateralAmt0}>
+                                    <NumberInputField {...register('collateralAmt0')} />
+                                </NumberInput>
+                                { showToken1 ? 
+                                <NumberInput 
+                                    variant='openLoan' 
+                                    w='100%' 
+                                    defaultValue={0} 
+                                    min={0} 
+                                    clampValueOnBlur={true} 
+                                    keepWithinRange={true}
+                                    onChange={collateralAmt1Changed}
+                                    value={collateralAmt1}>
+                                    <NumberInputField {...register('collateralAmt1')} />
+                                </NumberInput> : null }
+                                <Container p='20px' />
+                                <Container textAlign='right'>
+                                    <Text variant='loanInfoRight' pr='5px'>Interest Rate</Text>
+                                    <Text variant='loanInfoRight' >--%</Text>
+                                </Container>
+                                <Container p='0 0 5px 0'>
+                                    <Button variant={confirmVariant} type="submit" >Confirm</Button>
+                                </Container>
+                            </VStack>
+                        </FormControl>
+                    </form>
+                </Box >
+            </Container>
+            <TokenSelectorModal
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                setTokenSelected={
+                tokenNumber === 0
+                ? setToken0
+                : setToken1
+                }
+            />
+        </>
     )
 }
 
