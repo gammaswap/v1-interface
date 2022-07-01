@@ -1,10 +1,18 @@
-import { useState, ChangeEvent, SetStateAction, Dispatch, ReactElement } from 'react'
+import { useState, useEffect, useContext, ChangeEvent, SetStateAction, Dispatch } from 'react'
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import TokenSelectorModal from '../../components/TokenSelectorModal'
 import AddLiquiditySubmitButton from '../../components/AddLiquiditySubmitButton'
 import Tokens, { Token } from '../../components/Tokens'
+import getSmartContract from '../../utils/getSmartContract'
+import { AccountInfo, WalletContext } from '../../context/WalletContext'
+import { Provider } from '@ethersproject/providers'
+
+// TO CHANGE WHEN v1-sdk ON NPM IS IMPROVED
+const erc20ABI = require('erc-20-abi')
+const { abi: IUniswapV2PairABI } = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
+const DEPOSIT_POOL_ADDR = "0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152"
 
 const style = {
   wrapper: "w-screen flex justify-center items-center",
@@ -41,6 +49,9 @@ const AddLiquidity: NextPage = () => {
 
   // holds state of modal open and close
   const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  // holds global state of user info and ethers provider for contract calls
+  const { accountInfo, provider } = useContext(WalletContext)
   
   // checks for non-numeric value inputs
   const validateTokenInput = (
@@ -64,7 +75,7 @@ const AddLiquidity: NextPage = () => {
         <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={"Select Token"}/>
       )
     }
-    if (isTokenEmpty(tokenASelected) || isTokenEmpty(tokenBSelected)) {
+    if (tokenAInputVal === "" || tokenBInputVal === "") {
       return (
         <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={"Enter an Amount"}/>
       )
@@ -81,79 +92,92 @@ const AddLiquidity: NextPage = () => {
     return Object.values(tokenToCheck).every(tokenProp => tokenProp === "")
   }
 
+  /**
+   * TESTING
+   */
+  useEffect(() => {
+    getSmartContract(
+      erc20ABI,
+      "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+      accountInfo as AccountInfo,
+      provider as Provider,
+    )
+  }, [tokenASelected, tokenBSelected])
+
   return (
     <>
-    <div className={style.wrapper}>
-      <div className={style.content}>
-        <div className={style.formHeader}>
-          <div>Add Liquidity</div>
-        </div>
-        {/* slot for token A */}
-        <div className={style.tokenContainer}>
-          <input type="text" onChange={e => validateTokenInput(e, setTokenAInputVal)} value={tokenAInputVal} placeholder="0.0" className={style.tokenInput} />
-          <div className={style.tokenSelectorContainer}>
-            <div
-            className={style.tokenSelectorContent}
-            onClick={() => handleTokenSelector("tokenA")}
-            >
-              <div className={style.tokenSelectorIcon}>
-                <Image src={tokenASelected.imgPath} alt="token logo" width={32} height={32}/>
+      <div className={style.wrapper}>
+        <div className={style.content}>
+          <div className={style.formHeader}>
+            <div>Add Liquidity</div>
+          </div>
+          {/* slot for token A */}
+          <div className={style.tokenContainer}>
+            <input type="text" onChange={e => validateTokenInput(e, setTokenAInputVal)} value={tokenAInputVal} placeholder="0.0" className={style.tokenInput} />
+            <div className={style.tokenSelectorContainer}>
+              <div
+              className={style.tokenSelectorContent}
+              onClick={() => handleTokenSelector("tokenA")}
+              >
+                <div className={style.tokenSelectorIcon}>
+                  <Image src={tokenASelected.imgPath} alt="token logo" width={32} height={32}/>
+                </div>
+                <div className={style.tokenSelectorTicker}>{tokenASelected.symbol}</div>
+                <ChevronDownIcon className={style.dropdownArrow}/>
               </div>
-              <div className={style.tokenSelectorTicker}>{tokenASelected.symbol}</div>
-              <ChevronDownIcon className={style.dropdownArrow}/>
             </div>
           </div>
-        </div>
-        {/* slot for token B */}
-        <div className={style.tokenContainer}>
-          <input type="text" onChange={e => validateTokenInput(e, setTokenBInputVal)} value={tokenBInputVal} placeholder="0.0" className={style.tokenInput} />
-          { /**
-           * renders "select token" button by default 
-           * when a token is selected, renders dropdown with selected token displayed
-          */}
-          {isTokenEmpty(tokenBSelected)
-            ? (
-              <div
-              className={style.nonSelectedTokenContainer}
-              onClick={() => handleTokenSelector("tokenB")}
-              >
-                <div className={style.nonSelectedTokenContent}>
-                  Select Token
-                </div>
-              </div>
-            )
-            
-            : (
-              <div className={style.tokenSelectorContainer}>
+          {/* slot for token B */}
+          <div className={style.tokenContainer}>
+            <input type="text" onChange={e => validateTokenInput(e, setTokenBInputVal)} value={tokenBInputVal} placeholder="0.0" className={style.tokenInput} />
+            { /**
+             * renders "select token" button by default 
+             * when a token is selected, renders dropdown with selected token displayed
+            */}
+            {isTokenEmpty(tokenBSelected)
+              ? (
                 <div
-                className={style.tokenSelectorContent}
+                className={style.nonSelectedTokenContainer}
                 onClick={() => handleTokenSelector("tokenB")}
                 >
-                  <div className={style.tokenSelectorIcon}>
-                    <Image src={tokenBSelected.imgPath} alt="token logo" width={32} height={32}/>
+                  <div className={style.nonSelectedTokenContent}>
+                    Select Token
                   </div>
-                  <div className={style.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
-                  <ChevronDownIcon className={style.dropdownArrow}/>
                 </div>
-              </div>
-            )
-          }
-        </div>
-        <div>
-          {validateSubmit()}
+              )
+              
+              : (
+                <div className={style.tokenSelectorContainer}>
+                  <div
+                  className={style.tokenSelectorContent}
+                  onClick={() => handleTokenSelector("tokenB")}
+                  >
+                    <div className={style.tokenSelectorIcon}>
+                      <Image src={tokenBSelected.imgPath} alt="token logo" width={32} height={32}/>
+                    </div>
+                    <div className={style.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
+                    <ChevronDownIcon className={style.dropdownArrow}/>
+                  </div>
+                </div>
+              )
+            }
+          </div>
+          <div>
+            {validateSubmit()}
+          </div>
         </div>
       </div>
-    </div>
-    <TokenSelectorModal
-    isOpen={isOpen}
-    setIsOpen={setIsOpen}
-    setTokenSelected={
-      tokenSelected === "tokenA"
-      ? setTokenASelected
-      : setTokenBSelected
-    }
-    />
-  </>
+      <TokenSelectorModal
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      setTokenSelected={
+        tokenSelected === "tokenA"
+        ? setTokenASelected
+        : setTokenBSelected
+      }
+      />
+    </>
   )
 }
 
