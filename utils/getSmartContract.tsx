@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { EtherscanProvider, Provider } from '@ethersproject/providers'
+import { Provider } from '@ethersproject/providers'
 import useNotification from '../hooks/useNotification'
 import { AccountInfo } from '../context/WalletContext'
 
@@ -12,24 +12,26 @@ const getSmartContract = async (
 ) => {
     const { notifyError, notifySuccess } = useNotification()
 
-    try {
-        if (!tokenBAddr) return null
+    if (!tokenBAddr) return null
 
+    try {
         const tokenAContract = new ethers.Contract(tokenAAddr, contractABI, provider as Provider)
         const tokenBContract = new ethers.Contract(tokenBAddr, contractABI, provider as Provider)
 
         if (accountInfo) {
             const tokenABalance = await tokenAContract.balanceOf(accountInfo.address)
+            const tokenBBalance = await tokenBContract.balanceOf(accountInfo.address)
+            console.log('tokenABalance: ', ethers.utils.formatEther(tokenABalance));
+            console.log('tokenBBalance: ', ethers.utils.formatEther(tokenBBalance));
 
-            console.log('tokenABalance: ', tokenABalance);
-            // const tokenBBalance = await tokenBContract.balanceOf(accountInfo.address)
-            // console.log('tokenBBalance: ', tokenBBalance);
         }
 
-        notifySuccess("WE MADE IT!")
+    } catch (error) {
+        let message
+        if (error instanceof Error) message = error.message
+        else message = String(error)
 
-    } catch (err) {
-        notifyError("Could not get token A or B balances!")
+        notifyError(message)
     }
 
 }
