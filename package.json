@@ -16,6 +16,7 @@
     "@headlessui/react": "^1.6.4",
     "@heroicons/react": "^1.0.6",
     "@uniswap/v2-core": "^1.0.1",
+    "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "@walletconnect/web3-provider": "^1.7.8",
     "dotenv": "^16.0.1",
     "erc-20-abi": "^1.0.0",

@@ -8,6 +8,7 @@ import Tokens, { Token } from '../../components/Tokens'
 import getSmartContract from '../../utils/getSmartContract'
 import { AccountInfo, WalletContext } from '../../context/WalletContext'
 import { Provider } from '@ethersproject/providers'
+import { Signer } from 'ethers'
 import { SmartContract } from '../../utils/getSmartContract'
 
 // TO CHANGE WHEN v1-sdk ON NPM IS IMPROVED
@@ -51,7 +52,7 @@ const AddLiquidity: NextPage = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   // holds global state of user info and ethers provider for contract calls
-  const { accountInfo, provider } = useContext(WalletContext)
+  const { accountInfo, provider, signer } = useContext(WalletContext)
 
   const [smartContract, setSmartContract] = useState<SmartContract>({} as SmartContract)
   
@@ -105,6 +106,7 @@ const AddLiquidity: NextPage = () => {
         process.env.ROPSTEN_TOKEN_B_ADDR as string,
         accountInfo as AccountInfo,
         provider as Provider,
+        signer as Signer,
       )
 
       if (!fetchedSmartContract) return

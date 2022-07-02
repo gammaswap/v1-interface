@@ -1,12 +1,12 @@
-import { Contract, ethers } from 'ethers'
+import { BigNumber, Contract, ethers, Signer } from 'ethers'
 import { Provider } from '@ethersproject/providers'
 import useNotification from '../hooks/useNotification'
 import { AccountInfo } from '../context/WalletContext'
-import { Token } from '../components/Tokens'
 
 // Uniswap contracts
 const { abi: IUniswapV2PairABI } = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
 const { abi: IUniswapV2FactoryABI } = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
+const { abi: IUniswapV2Router02ABI } = require('@uniswap/v2-periphery/build/IUniswapV2Router02.json')
 
 export type SmartContract = {
     tokenABalance: string
@@ -18,6 +18,7 @@ type InitializeSmartContractType = {
     tokenBContract: Contract
     IUniswapV2PairContract: Contract
     IUniswapV2FactoryContract: Contract
+    IUniswapV2Router02Contract: Contract
 }
 
 const getSmartContract = async (
@@ -26,6 +27,7 @@ const getSmartContract = async (
     tokenBAddr: string,
     accountInfo: AccountInfo,
     provider: Provider,
+    signer: Signer,
 ) => {
     const { notifyError, notifySuccess } = useNotification()
 
@@ -34,14 +36,20 @@ const getSmartContract = async (
             tokenAContract,
             tokenBContract,
             IUniswapV2PairContract,
-            IUniswapV2FactoryContract
+            IUniswapV2FactoryContract,
+            IUniswapV2Router02Contract,
         } = initializeSmartContracts(tokenAAddr, tokenBAddr, contractABI, provider as Provider)
 
         if (accountInfo) {
             const tokenABalance = await tokenAContract.balanceOf(accountInfo.address)
             const tokenBBalance = await tokenBContract.balanceOf(accountInfo.address)
             const liquidityPair = await getLiquidityPair(tokenAAddr, tokenBAddr, IUniswapV2FactoryContract)
-            
+
+
+            const amountOut = await IUniswapV2Router02Contract.getAmountsOut(ethers.utils.parseEther("1"), [tokenAAddr, tokenBAddr])
+            console.log(`1 TOKA = ${Number(formatEther(amountOut[1].toString())).toFixed(4)} TOKB`)
+            console.log(`1 TOKB = ${Number(formatEther(amountOut[0].toString())).toFixed(4)} TOKA`)
+
             const smartContractFuncs = {
                 tokenABalance: formatEther(tokenABalance),
                 tokenBBalance: formatEther(tokenBBalance),
@@ -86,12 +94,18 @@ const initializeSmartContracts = (
         IUniswapV2FactoryABI,
         provider
     )
+    const IUniswapV2Router02Contract = new ethers.Contract(
+        process.env.IUNISWAP_V2_ROUTER_02_ADDR as string,
+        IUniswapV2Router02ABI,
+        provider as Provider
+    )
     
     const smartContracts = {
         tokenAContract,
         tokenBContract,
         IUniswapV2PairContract,
         IUniswapV2FactoryContract,
+        IUniswapV2Router02Contract,
     }
     return smartContracts
 }
@@ -140,7 +154,7 @@ const ifPairExists = async (
  * @param weiNumber 
  * @returns the number in ethers of type string
  */
-const formatEther = (weiNumber: number): string => {
+const formatEther = (weiNumber: number | BigNumber): string => {
     return ethers.utils.formatEther(weiNumber)
 }
 
