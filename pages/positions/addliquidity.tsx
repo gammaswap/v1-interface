@@ -8,11 +8,10 @@ import Tokens, { Token } from '../../components/Tokens'
 import getSmartContract from '../../utils/getSmartContract'
 import { AccountInfo, WalletContext } from '../../context/WalletContext'
 import { Provider } from '@ethersproject/providers'
+import { SmartContract } from '../../utils/getSmartContract'
 
 // TO CHANGE WHEN v1-sdk ON NPM IS IMPROVED
 const erc20ABI = require('erc-20-abi')
-const { abi: IUniswapV2PairABI } = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
-const DEPOSIT_POOL_ADDR = "0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152"
 
 const style = {
   wrapper: "w-screen flex justify-center items-center",
@@ -22,10 +21,11 @@ const style = {
   tokenInput: "bg-transparent placeholder:text-gray-600 outline-none mb-6 w-full text-4xl text-gray-300 mt-4",
   nonSelectedTokenContainer: "flex items-center w-1/2 text-gray-200",
   nonSelectedTokenContent: "w-full h-min flex justify-center items-center bg-blue-500 rounded-2xl text-2xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30",
-  tokenSelectorContainer: "flex items-center w-1/4 text-gray-200",
+  tokenSelectorContainer: "flex flex-col items-center w-1/3 text-gray-200",
   tokenSelectorContent: "w-full h-min flex justify-between items-center bg-gray-700 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-gray-700/30 hover:bg-gray-900 hover:shadow-gray-900/30",
   tokenSelectorIcon: "flex items-center",
   tokenSelectorTicker: "mx-2",
+  tokenBalance: "self-end mt-2 text-sm text-gray-300 opacity-50",
   dropdownArrow: "w-12 h-8",
   invalidatedButton: "disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700",
   confirmButton: "bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300"
@@ -44,7 +44,7 @@ const AddLiquidity: NextPage = () => {
     address: "",
   })
 
-  // holds state of what token input field was selected
+  // holds state of what token input field was selected for modal opening
   const [tokenSelected, setTokenSelected] = useState<string>("")
 
   // holds state of modal open and close
@@ -52,6 +52,8 @@ const AddLiquidity: NextPage = () => {
 
   // holds global state of user info and ethers provider for contract calls
   const { accountInfo, provider } = useContext(WalletContext)
+
+  const [smartContract, setSmartContract] = useState<SmartContract>({} as SmartContract)
   
   // checks for non-numeric value inputs
   const validateTokenInput = (
@@ -96,13 +98,20 @@ const AddLiquidity: NextPage = () => {
    * TESTING
    */
   useEffect(() => {
-    getSmartContract(
-      erc20ABI,
-      process.env.ROPSTEN_TOKEN_A_ADDR as string,
-      process.env.ROPSTEN_TOKEN_B_ADDR as string,
-      accountInfo as AccountInfo,
-      provider as Provider,
-    )
+    const fetchSmartContract = async () => {
+      const fetchedSmartContract =  await getSmartContract(
+        erc20ABI,
+        process.env.ROPSTEN_TOKEN_A_ADDR as string,
+        process.env.ROPSTEN_TOKEN_B_ADDR as string,
+        accountInfo as AccountInfo,
+        provider as Provider,
+      )
+
+      if (!fetchedSmartContract) return
+      setSmartContract(fetchedSmartContract)
+    }
+
+    fetchSmartContract()
   }, [tokenASelected, tokenBSelected])
 
   return (
@@ -126,6 +135,7 @@ const AddLiquidity: NextPage = () => {
                 <div className={style.tokenSelectorTicker}>{tokenASelected.symbol}</div>
                 <ChevronDownIcon className={style.dropdownArrow}/>
               </div>
+              <div className={style.tokenBalance}>Balance: {smartContract.tokenABalance}</div>
             </div>
           </div>
           {/* slot for token B */}
@@ -159,6 +169,7 @@ const AddLiquidity: NextPage = () => {
                     <div className={style.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
                     <ChevronDownIcon className={style.dropdownArrow}/>
                   </div>
+                  <div className={style.tokenBalance}>Balance: {smartContract.tokenBBalance}</div>
                 </div>
               )
             }
