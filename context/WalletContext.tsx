@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useState, useEffect, ReactNode } from 'react'
 import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -11,7 +11,7 @@ export type AccountInfo = {
     balance: string | null
 }
 
-export type Provider  = ethers.providers.Web3Provider | null
+export type Provider  = Web3Provider | null
 
 interface WalletContextInterface {
     accountInfo: AccountInfo | null
@@ -72,7 +72,6 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
 
     const initializeProvider = async (provider: Web3Provider) => {
         const userAddress = await provider.getSigner().getAddress()
-        console.log('userAddress: ', userAddress);
 
         // if no accounts connected to wallet, ignore the provider
         if (!userAddress) return
@@ -97,9 +96,9 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
         if (web3Modal !== null) {
             try {
                 const connection = await web3Modal.connect()
-                const ethersProvider = new ethers.providers.Web3Provider(connection)
+                const provider = new Web3Provider(connection)
                 
-                initializeProvider(ethersProvider)
+                initializeProvider(provider)
             } catch (err: any) {
                 notifyError(err.message ||  "Failed to connect to wallet")
             }
