@@ -3,7 +3,6 @@ import { useState, useEffect,  Dispatch } from 'react'
 import { Token } from '../Tokens'
 import { CollateralType } from './CollateralType'
 import SelectCollateralModal from './SelectCollateralModal'
-import { useDisclosure } from "@chakra-ui/hooks"
 import { FieldValues, useForm } from 'react-hook-form'
 import {
     Box,
@@ -68,20 +67,13 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
         validate()
     }, [token0, token1])
 
-    const { 
-        isOpen: isOpenSelectCollateral, 
-        onOpen: onOpenSelectCollateral, 
-        onClose: onCloseSelectCollateral
-    } = useDisclosure()
-
-    const handleCollateralSelected = (type: CollateralType) => {
-        console.log("selected collateral type", CollateralType[type])
-        setCollateralType(type)
-        setCollateralButtonText(getCollateralTypeButtonText(type))
-        setShowToken1(type == CollateralType.Both)
-        onCloseSelectCollateral()
-        validate()
-    }
+    useEffect(() => {
+      setIsOpen(false)
+      console.log("selected collateral type", CollateralType[collateralType])
+      setCollateralButtonText(getCollateralTypeButtonText(collateralType))
+      setShowToken1(collateralType == CollateralType.Both)
+      validate()
+    }, [collateralType])
 
     function getCollateralTypeButtonText(collateralType: CollateralType) {
         switch(collateralType) {
@@ -210,15 +202,15 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
                                 </NumberInput>
                                 <Container display='inline-flex' p='0' m='0'>
                                     <FormLabel variant='openLoanFit' pr='20px' m='0'>Your Collateral</FormLabel>
-                                    <Button variant='select' size='tiny' h='20px' rightIcon={<ChevronDownIcon />} onClick={onOpenSelectCollateral}>
+                                    <Button variant='select' size='tiny' h='20px' rightIcon={<ChevronDownIcon />} onClick={() => setIsOpen(true)}>
                                         <Text ml='4px'>{collateralButtonText}</Text>
                                     </Button>
                                     <SelectCollateralModal 
                                         token0={token0} 
                                         token1={token1} 
-                                        handleCollateralSelected={handleCollateralSelected} 
-                                        isOpen={isOpenSelectCollateral} 
-                                        onClose={onCloseSelectCollateral}
+                                        isOpen={isOpen} 
+                                        setIsOpen={setIsOpen}
+                                        setCollateralType={setCollateralType} 
                                     />
                                 </Container>
                                 <NumberInput 
