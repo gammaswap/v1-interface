@@ -3,8 +3,6 @@ import { ethers, Contract } from 'ethers'
 import { Provider } from '@ethersproject/providers'
 import { WalletContext } from './WalletContext'
 
-const erc20ABI = require('erc-20-abi')
-
 // Uniswap contracts
 const { abi: IUniswapV2PairABI } = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
 const { abi: IUniswapV2FactoryABI } = require('@uniswap/v2-core/build/IUniswapV2Factory.json')

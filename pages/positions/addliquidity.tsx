@@ -1,18 +1,17 @@
-import { useState, useEffect, useContext, ChangeEvent, SetStateAction, Dispatch } from 'react'
+import { useState, useEffect, useContext, ChangeEvent, SetStateAction, Dispatch, useCallback } from 'react'
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import TokenSelectorModal from '../../components/TokenSelectorModal'
 import AddLiquiditySubmitButton from '../../components/AddLiquiditySubmitButton'
 import Tokens, { Token } from '../../components/Tokens'
-import getSmartContract from '../../utils/getSmartContract'
 import { AccountInfo, WalletContext } from '../../context/WalletContext'
 import { Provider } from '@ethersproject/providers'
-import { Signer } from 'ethers'
-import { SmartContract } from '../../utils/getSmartContract'
-
-// TO CHANGE WHEN v1-sdk ON NPM IS IMPROVED
-const erc20ABI = require('erc-20-abi')
+import { BigNumber, Contract } from 'ethers'
+import { getTokenContracts, getEstimatedOutput, TokenContracts, Misc, AmountsOut} from '../../utils/getSmartContract'
+import { BasicContractContext } from '../../context/BasicContractContext'
+import useNotification from '../../hooks/useNotification'
+import { formatEther } from 'ethers/lib/utils'
 
 const style = {
   wrapper: "w-screen flex justify-center items-center",
@@ -48,20 +47,29 @@ const AddLiquidity: NextPage = () => {
   // holds state of what token input field was selected for modal opening
   const [tokenSelected, setTokenSelected] = useState<string>("")
 
+  // holds state of token contracts from selected tokens
+  const [tokenContracts, setTokenContracts] = useState<TokenContracts | null>(null)
+
   // holds state of modal open and close
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   // holds global state of user info and ethers provider for contract calls
   const { accountInfo, provider, signer } = useContext(WalletContext)
 
-  const [smartContract, setSmartContract] = useState<SmartContract>({} as SmartContract)
+  // holds basic smart contracts for uniswap functions
+  const { IUniswapV2Router02Contract, IUniswapV2FactoryContract } = useContext(BasicContractContext)
+
+  // error-handling
+  const { notifyError, notifySuccess } = useNotification()
   
   // checks for non-numeric value inputs
   const validateTokenInput = (
-    e: ChangeEvent<HTMLInputElement>,
+    e: ChangeEvent<HTMLInputElement> | string,
     setToken: Dispatch<SetStateAction<string>>
   ): void => {
-    const tokenInput: string = (e.target as HTMLInputElement).value
+    let tokenInput: string
+    if (typeof e !== "string") tokenInput = (e.target as HTMLInputElement).value
+    else tokenInput = e
     setToken(tokenInput.replace(/[^0-9.]/g, ''))
   }
 
@@ -95,26 +103,64 @@ const AddLiquidity: NextPage = () => {
     return Object.values(tokenToCheck).every(tokenProp => tokenProp === "")
   }
 
-  /**
-   * TESTING
-   */
+  // every time token A or B selection changes,
+  // render new token A/B contracts, wallet balance, output value
   useEffect(() => {
-    const fetchSmartContract = async () => {
-      const fetchedSmartContract =  await getSmartContract(
-        erc20ABI,
-        process.env.ROPSTEN_TOKEN_A_ADDR as string,
-        process.env.ROPSTEN_TOKEN_B_ADDR as string,
-        accountInfo as AccountInfo,
-        provider as Provider,
-        signer as Signer,
-      )
-
-      if (!fetchedSmartContract) return
-      setSmartContract(fetchedSmartContract)
-    }
-
-    fetchSmartContract()
+    const fetchedTokenContracts = getTokenContracts(
+      process.env.ROPSTEN_TOKEN_A_ADDR as string,
+      process.env.ROPSTEN_TOKEN_B_ADDR as string,
+      provider as Provider,
+    )
+    setTokenContracts(fetchedTokenContracts)
+    console.log(tokenContracts)
+    // validates and gets new esimated output only on tokenAInputVal
+    handleTokenInput(tokenAInputVal, setTokenAInputVal, setTokenBInputVal)
   }, [tokenASelected, tokenBSelected])
+
+  // if called on change of token A or B input vals, validate and update estimated output value
+  const handleTokenInput = useCallback((
+    e: ChangeEvent<HTMLInputElement> | string,
+    setTokenInputVal: Dispatch<SetStateAction<string>>,
+    setCounterTokenInputVal: Dispatch<SetStateAction<string>>
+  ) => {
+    try {
+      if (e) {
+        validateTokenInput(e, setTokenInputVal)
+
+        const tokenAAddr = tokenContracts?.tokenAContract?.address
+        const tokenBAddr = tokenContracts?.tokenBContract?.address
+        handleEstimatedOutput(String(e), setCounterTokenInputVal, [tokenAAddr as string, tokenBAddr as string])
+      }
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+
+      notifyError(message)
+    }
+    return null
+  }, [validateTokenInput])
+
+  const handleEstimatedOutput = async (
+    inputVal: string,
+    setCounterTokenInputVal: Dispatch<SetStateAction<string>>,
+    tokenAddrs: Array<string>
+  ) => {
+    const misc = [IUniswapV2FactoryContract, provider]
+    const estimatedOutput = await getEstimatedOutput(
+      tokenAddrs,
+      inputVal,
+      IUniswapV2Router02Contract as Contract,
+      misc as Misc
+    )
+    if (estimatedOutput) {
+      const output = Number(formatEther(estimatedOutput[1].toString())).toFixed(4)
+      console.log(`1 TOKA = ${output} TOKB`)
+      setCounterTokenInputVal(output) // need to fix
+    }
+      
+  }
+
 
   return (
     <>
@@ -125,7 +171,7 @@ const AddLiquidity: NextPage = () => {
           </div>
           {/* slot for token A */}
           <div className={style.tokenContainer}>
-            <input type="text" onChange={e => validateTokenInput(e, setTokenAInputVal)} value={tokenAInputVal} placeholder="0.0" className={style.tokenInput} />
+            <input type="text" onChange={e => handleTokenInput(e, setTokenAInputVal, setTokenBInputVal)} value={tokenAInputVal} placeholder="0.0" className={style.tokenInput} />
             <div className={style.tokenSelectorContainer}>
               <div
               className={style.tokenSelectorContent}
@@ -137,12 +183,12 @@ const AddLiquidity: NextPage = () => {
                 <div className={style.tokenSelectorTicker}>{tokenASelected.symbol}</div>
                 <ChevronDownIcon className={style.dropdownArrow}/>
               </div>
-              <div className={style.tokenBalance}>Balance: {smartContract.tokenABalance}</div>
+              <div className={style.tokenBalance}>Balance: {0}</div>
             </div>
           </div>
           {/* slot for token B */}
           <div className={style.tokenContainer}>
-            <input type="text" onChange={e => validateTokenInput(e, setTokenBInputVal)} value={tokenBInputVal} placeholder="0.0" className={style.tokenInput} />
+            <input type="text" onChange={e => handleTokenInput(e, setTokenBInputVal, setTokenAInputVal)} value={tokenBInputVal} placeholder="0.0" className={style.tokenInput} />
             { /**
              * renders "select token" button by default 
              * when a token is selected, renders dropdown with selected token displayed
@@ -171,7 +217,7 @@ const AddLiquidity: NextPage = () => {
                     <div className={style.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
                     <ChevronDownIcon className={style.dropdownArrow}/>
                   </div>
-                  <div className={style.tokenBalance}>Balance: {smartContract.tokenBBalance}</div>
+                  <div className={style.tokenBalance}>Balance: {0}</div>
                 </div>
               )
             }
