@@ -5,8 +5,6 @@ import { CollateralType } from './CollateralType'
 import SelectCollateralModal from './SelectCollateralModal'
 import { useDisclosure } from "@chakra-ui/hooks"
 import { FieldValues, useForm } from 'react-hook-form'
-import TokenSelectorModal from '../../components/TokenSelectorModal'
-import Image from 'next/image'
 import {
     Box,
     Container,
@@ -26,6 +24,7 @@ import {
 import {
     ChevronDownIcon
 } from '@chakra-ui/icons'
+import PairsSelector from '../PairsSelector'
 
 const style = {
     wrapper: "w-screen flex justify-center items-center",
@@ -53,7 +52,6 @@ type OpenLoanProps = {
 }
 
 const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: OpenLoanProps) => {
-    const [tokenNumber, setTokenNumber] = useState<number>(0)
     const [collateralType, setCollateralType] = useState<CollateralType>(CollateralType.None)
     const [collateralButtonText, setCollateralButtonText] = useState<string>("Select collateral type")
     const [confirmVariant, setConfirmVariant] = useState<string>("confirmGrey")
@@ -83,11 +81,6 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
         setShowToken1(type == CollateralType.Both)
         onCloseSelectCollateral()
         validate()
-    }
-
-    function onOpenToken(tokenNumber: number) {
-        setTokenNumber(tokenNumber)
-        setIsOpen(true)
     }
 
     function getCollateralTypeButtonText(collateralType: CollateralType) {
@@ -186,44 +179,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
                         <FormControl p='10px 15px 0px 15px' boxShadow='lg'>
                             <VStack>
                                 <Heading color={'#e2e8f0'} marginBottom={'25px'}>Open Your Loan</Heading>
-                                <FormLabel variant='openLoan'>Select a Token Pair</FormLabel>
-                                <Container display='inline-block'>
-                                    <Container w='50%' display='inline-grid' >
-                                        <div className={style.tokenSelectorContainer}>
-                                            <div className={style.tokenSelectorContent} onClick={() => onOpenToken(0)} >
-                                                <div className={style.tokenSelectorIcon}>
-                                                    <Image src={token0.imgPath} alt="token logo" width={32} height={32}/>
-                                                </div>
-                                                <div className={style.tokenSelectorTicker}>{token0.symbol}</div>
-                                                <ChevronDownIcon className={style.dropdownArrow}/>
-                                            </div>
-                                        </div>
-                                    </Container>
-                                    <Container w='50%' display='inline-grid' >
-                                        {isTokenEmpty(token1) 
-                                            ? (
-                                                <div className={style.nonSelectedTokenContainer}>
-                                                    <div className={style.nonSelectedTokenContent} onClick={() => onOpenToken(1)} >
-                                                        <div className={style.tokenSelectorIcon}>
-                                                            <Image src={token0.imgPath} width={0} height={32}/>
-                                                        </div>
-                                                        Select Token
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className={style.tokenSelectorContainer}>
-                                                    <div className={style.tokenSelectorContent} onClick={() => onOpenToken(1)} >
-                                                        <div className={style.tokenSelectorIcon}>
-                                                            <Image src={token1.imgPath} alt="token logo" width={32} height={32}/>
-                                                        </div>
-                                                        <div className={style.tokenSelectorTicker}>{token1.symbol}</div>
-                                                        <ChevronDownIcon className={style.dropdownArrow}/>
-                                                    </div>
-                                                </div>
-                                            )
-                                        }
-                                    </Container>
-                                </Container>
+                                <PairsSelector token0={token0} token1={token1} setToken0={setToken0} setToken1={setToken1} />
                                 <Container textAlign='center'>
                                     <ButtonGroup variant='loanInfo' display='inline-block' size='tiny' >
                                         <Button leftIcon={<FaInfoCircle />}>
@@ -301,15 +257,6 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
                     </form>
                 </Box >
             </Container>
-            <TokenSelectorModal
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                setTokenSelected={
-                tokenNumber === 0
-                ? setToken0
-                : setToken1
-                }
-            />
         </>
     )
 }
