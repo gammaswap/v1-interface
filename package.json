@@ -27,7 +27,9 @@
     "react-dom": "18.1.0",
     "react-hook-form": "^7.33.0",
     "react-icons": "^4.4.0",
+    "react-slider-simple": "^4.0.5",
     "truncate-eth-address": "^1.0.2",
+    "web3": "^1.7.4",
     "web3modal": "^1.9.8"
   },
   "devDependencies": {
