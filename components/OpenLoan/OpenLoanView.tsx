@@ -166,11 +166,11 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
     return (
         <>
             <Container>
-                <Box m='auto' borderRadius={'2xl'} bg={'#1d2c52'} maxW='420px' boxShadow='dark-lg'>
+                <Box m='auto' borderRadius={'2xl'} bg={'#111827'} maxW='600px' boxShadow='dark-lg'>
                     <form onSubmit={handleSubmit(validateBeforeSubmit)}>
                         <FormControl p='10px 15px 0px 15px' boxShadow='lg'>
                             <VStack>
-                                <Heading color={'#e2e8f0'} marginBottom={'25px'}>Open Your Loan</Heading>
+                                <Heading color={'#e2e8f0'} fontSize={24} marginBottom={'25px'}>Open Your Loan</Heading>
                                 <PairsSelector token0={token0} token1={token1} setToken0={setToken0} setToken1={setToken1} />
                                 <Container textAlign='center'>
                                     <ButtonGroup variant='loanInfo' display='inline-block' size='tiny' >
