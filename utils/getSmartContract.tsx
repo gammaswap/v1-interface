@@ -9,8 +9,6 @@ const { abi: IUniswapV2FactoryABI } = require('@uniswap/v2-core/build/IUniswapV2
 const { abi: IUniswapV2Router02ABI } = require('@uniswap/v2-periphery/build/IUniswapV2Router02.json')
 const { notifyError, notifySuccess } = useNotification()
 
-export type Misc = (Contract | Provider)[]
-
 export type AmountsOut = Array<BigNumber>
 
 export type TokenContracts = {
@@ -44,29 +42,12 @@ export const getTokenContracts = (
 export const getEstimatedOutput = async (
     tokenAddrs: Array<string>,
     inputAmt: string,
-    contract: Contract,
-    misc: Misc
+    provider: Provider
 ): Promise<AmountsOut | undefined> => {
-
-    const FactoryContract = misc[0]
-    // console.log('FactoryContract: ', FactoryContract);
-    const routerContract = new ethers.Contract("0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", IUniswapV2Router02ABI, misc[1] as Provider)
-    const tokenAAddr = tokenAddrs[0]
-    const tokenBAddr = tokenAddrs[1]
-    const amountsOut = await routerContract.getAmountsOut(ethers.utils.parseEther("1"), [tokenAAddr, tokenBAddr])
+    const routerContract = new ethers.Contract(process.env.IUNISWAP_V2_ROUTER_02_ADDR as string, IUniswapV2Router02ABI, provider as Provider)
+    let convertedInput = ethers.utils.parseEther(inputAmt)
+    const amountsOut = await routerContract.getAmountsOut(convertedInput, [tokenAddrs[0], tokenAddrs[1]])
     return amountsOut
-    // try {
-    //     if (contract && inputAmt !== "") {
-    //         const amountsOut = await contract.getAmountsOut(1, tokenAddrs)
-    //     }
-    // } catch (error) {
-    //     let message
-    //     if (error instanceof Error) message = error.message
-    //     else message = String(error)
-
-    //     notifyError(message)
-    // }
-    // return
 }
 
 

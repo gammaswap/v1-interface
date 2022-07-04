@@ -8,7 +8,7 @@ import Tokens, { Token } from '../../components/Tokens'
 import { AccountInfo, WalletContext } from '../../context/WalletContext'
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, Contract } from 'ethers'
-import { getTokenContracts, getEstimatedOutput, TokenContracts, Misc, AmountsOut} from '../../utils/getSmartContract'
+import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut} from '../../utils/getSmartContract'
 import { BasicContractContext } from '../../context/BasicContractContext'
 import useNotification from '../../hooks/useNotification'
 import { formatEther } from 'ethers/lib/utils'
@@ -125,11 +125,18 @@ const AddLiquidity: NextPage = () => {
   ) => {
     try {
       if (e) {
-        validateTokenInput(e, setTokenInputVal)
+        const tokenInput = typeof e !== "string" ? e.target.value : e
+        if (tokenInput === "") {
+          setTokenInputVal("")
+          setCounterTokenInputVal("")
+          return
+        }
 
-        const tokenAAddr = tokenContracts?.tokenAContract?.address
-        const tokenBAddr = tokenContracts?.tokenBContract?.address
-        handleEstimatedOutput(String(e), setCounterTokenInputVal, [tokenAAddr as string, tokenBAddr as string])
+        validateTokenInput(tokenInput, setTokenInputVal)
+
+        const tokenAAddr = tokenContracts?.tokenAContract?.address as string
+        const tokenBAddr = tokenContracts?.tokenBContract?.address as string
+        handleEstimatedOutput(tokenInput, setCounterTokenInputVal, [tokenAAddr, tokenBAddr])
       }
     } catch (error) {
       let message
@@ -146,21 +153,18 @@ const AddLiquidity: NextPage = () => {
     setCounterTokenInputVal: Dispatch<SetStateAction<string>>,
     tokenAddrs: Array<string>
   ) => {
-    const misc = [IUniswapV2FactoryContract, provider]
     const estimatedOutput = await getEstimatedOutput(
       tokenAddrs,
       inputVal,
-      IUniswapV2Router02Contract as Contract,
-      misc as Misc
+      provider as Provider,
     )
     if (estimatedOutput) {
-      const output = Number(formatEther(estimatedOutput[1].toString())).toFixed(4)
-      console.log(`1 TOKA = ${output} TOKB`)
-      setCounterTokenInputVal(output) // need to fix
+      const output = Number(formatEther(estimatedOutput[1]))
+      console.log(`1 TOKB = ${Number(output / Number(inputVal)).toFixed(4)} TOKA`)
+      console.log(`1 TOKA = ${Number(Number(formatEther(estimatedOutput[0])) / Number(inputVal)).toFixed(4)} TOKB`)
+      setCounterTokenInputVal(output.toFixed(4).toString())
     }
-      
   }
-
 
   return (
     <>
