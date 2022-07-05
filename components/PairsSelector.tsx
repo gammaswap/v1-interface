@@ -7,7 +7,7 @@ import { ChevronDownIcon } from '@heroicons/react/solid'
 
 const style = {
   header: "w-full font-semibold text-gray-200",
-  pairContainer: "inline-flex w-full ",
+  pairContainer: "inline-flex w-full mt-3",
   tokenSelectorContainer: "px-6 text-gray-200 w-1/2",
   nonSelectedTokenContent: "flex justify-center items-center bg-blue-500 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30",
   tokenSelectorContent: "flex justify-between items-center bg-gray-700 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-gray-700/30 hover:bg-gray-900 hover:shadow-gray-900/30",

@@ -1,65 +1,69 @@
-import * as React from 'react'
-import { useState, useEffect,  Dispatch } from 'react'
+import { useState, useEffect,  Dispatch, SetStateAction, useCallback, ChangeEvent } from 'react'
 import { Token } from '../Tokens'
 import { CollateralType } from './CollateralType'
 import SelectCollateralModal from './SelectCollateralModal'
 import { FieldValues, useForm } from 'react-hook-form'
-import {
-    Box,
-    Container,
-    FormControl,
-    Heading,
-    FormLabel,
-    Button,
-    ButtonGroup,
-    Text,
-    VStack,
-    NumberInput,
-    NumberInputField,
-} from '@chakra-ui/react'
-import {
-    FaInfoCircle,
-} from 'react-icons/fa'
-import {
-    ChevronDownIcon
-} from '@chakra-ui/icons'
+import useNotification from '../../hooks/useNotification'
+import { FaInfoCircle } from 'react-icons/fa'
+import { ChevronDownIcon } from '@heroicons/react/solid'
 import PairsSelector from '../PairsSelector'
 
 const style = {
     wrapper: "w-screen flex justify-center items-center",
-    content: "bg-gray-900 w-[40rem] rounded-2xl p-4",
+    content: "bg-gray-900 w-[40rem] rounded-2xl p-4 max-w-lg",
+    vStack: "items-center flex-col",
+    vStackItem: "mt-3",
     formHeader: "px-2 flex justify-between items-center font-semibold text-xl text-gray-200",
-    tokenContainer: "bg-gray-800 my-3 rounded-2xl p-6 text-3xl border-2 border-gray-800 hover:border-gray-600 flex justify-between",
-    tokenInput: "bg-transparent placeholder:text-gray-600 outline-none mb-6 w-full text-4xl text-gray-300 mt-4",
+    numberInputContainer: "bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full",
+    numberInput: "bg-transparent placeholder:text-gray-600 outline-none w-full text-3xl text-gray-300",
     nonSelectedTokenContainer: "flex items-center text-gray-200",
     nonSelectedTokenContent: "w-full h-min flex justify-center items-center bg-blue-500 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30",
     tokenSelectorContainer: "flex items-center text-gray-200",
     tokenSelectorContent: "w-full h-min flex justify-between items-center bg-gray-700 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-gray-700/30 hover:bg-gray-900 hover:shadow-gray-900/30",
     tokenSelectorIcon: "flex items-center",
     tokenSelectorTicker: "mx-2",
-    dropdownArrow: "w-12 h-8",
+    dropdownArrow: "w-4 h-3",
     invalidatedButton: "disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700",
-    confirmButton: "bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300"
+    confirmButton: "bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300",
+    infoGroup: "inline-flex w-full place-content-center pt-1",
+    loanInfoButton: "bg-teal-900 rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex mr-2 px-2 py-1 items-center",
+    infoIcon: "mr-1",
+    sectionHeader: "font-semibold text-gray-200 w-full",
+    collateralHeader: "inline-flex w-full place-content-start",
+    collateralHeaderText: "font-semibold text-gray-200",
+    selectCollateralButton: "bg-[#274060] rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex px-2 py-1 items-center mx-4",
+    chrevronIcon: "ml-1",
+    confirmGrey: "bg-[#274060] w-full rounded-2xl text-gray-500 inline-flex place-content-center py-2 font-semibold",
+    confirmInsuffBal: "bg-red-400 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold",
+    confirmGreen: "bg-green-300 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold",
+    confirmButtonContainer: "pb-4 w-full",
+    interestRateText: "w-full text-right text-gray-200 pr-4",
+    spacer: "p-5",
 }
 
 type OpenLoanProps = {
     openLoanHandler: (data: FieldValues) => Promise<void>
     token0: Token
     token1: Token
-    setToken0: Dispatch<React.SetStateAction<Token>>
-    setToken1: Dispatch<React.SetStateAction<Token>>
+    setToken0: Dispatch<SetStateAction<Token>>
+    setToken1: Dispatch<SetStateAction<Token>>
 }
 
 const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: OpenLoanProps) => {
     const [collateralType, setCollateralType] = useState<CollateralType>(CollateralType.None)
     const [collateralButtonText, setCollateralButtonText] = useState<string>("Select collateral type")
-    const [confirmVariant, setConfirmVariant] = useState<string>("confirmGrey")
+  
+    const [confirmStyle, setConfirmStyle] = useState<string>(style.confirmGrey)
     const [loanAmt, setLoanAmt] = useState<number>(0)
+    const [loanAmtStr, setLoanAmtStr] = useState<string>('')
     const [collateralAmt0, setCollateralAmt0] = useState<number>(0)
+    const [collateralAmt0Str, setCollateralAmt0Str] = useState<string>('')
     const [collateralAmt1, setCollateralAmt1] = useState<number>(0)
+    const [collateralAmt1Str, setCollateralAmt1Str] = useState<string>('')
     const [showToken1, setShowToken1] = useState<boolean>(false)
     const { register, handleSubmit } = useForm()
     const [isOpen, setIsOpen] = useState<boolean>(false)
+    const { notifyError, notifySuccess } = useNotification()
     
     useEffect(() => {
         resetCollateralType()
@@ -96,7 +100,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
     function resetCollateralType() {
         setCollateralType(CollateralType.None)
         setCollateralButtonText(getCollateralTypeButtonText(CollateralType.None))
-        setConfirmVariant("confirmGrey")
+        setConfirmStyle(style.confirmGrey)
         setShowToken1(false)
         setCollateralAmt1(0)
     }
@@ -104,52 +108,37 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
     function validate() {
         if (token0 == token1) {
             console.log("Tokens must be different.", token0, token1)
-            setConfirmVariant("confirmGrey")
+            setConfirmStyle(style.confirmGrey)
             return false
         }
         if (isTokenEmpty(token1)) {
             console.log("Token must be selected.")
-            setConfirmVariant("confirmGrey")
+            setConfirmStyle(style.confirmGrey)
             return false
         }
         if (collateralType == CollateralType.None) {
             console.log("Collateral must be selected")
-            setConfirmVariant("confirmGrey")
+            setConfirmStyle(style.confirmGrey)
             return false
         }
         if (loanAmt <= 0) {
             console.log("Loan amount must be positive.")
-            setConfirmVariant("confirmGrey")
+            setConfirmStyle(style.confirmGrey)
             return false
         }
         if (collateralAmt0 <= 0) {
             console.log(token0.symbol, "collateral amount must be positive.")
-            setConfirmVariant("confirmGrey")
+            setConfirmStyle(style.confirmGrey)
             return false
         }
         if (collateralType == CollateralType.Both && collateralAmt1 <= 0) {
             console.log(token1.symbol, "collateral amount must be positive.")
-            setConfirmVariant("confirmGrey")
+            setConfirmStyle(style.confirmGrey)
             return false
         }
         console.log("Valid inputs.")
-        setConfirmVariant("confirmGreen")
+        setConfirmStyle(style.confirmGreen)
         return true
-    }
-
-    function loanAmtChanged(valString: string, valNum: number) {
-        setLoanAmt(valNum)
-        validate()
-    }
-
-    function collateralAmt0Changed(valString: string, valNum: number) {
-        setCollateralAmt0(valNum)
-        validate()
-    }
-
-    function collateralAmt1Changed(valString: string, valNum: number) {
-        setCollateralAmt1(valNum)
-        validate()
     }
 
     function isTokenEmpty(tokenToCheck: Token): boolean {
@@ -163,94 +152,154 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
         return openLoanHandler(data)
     }
 
-    return (
-        <>
-            <Container>
-                <Box m='auto' borderRadius={'2xl'} bg={'#111827'} maxW='600px' boxShadow='dark-lg'>
-                    <form onSubmit={handleSubmit(validateBeforeSubmit)}>
-                        <FormControl p='10px 15px 0px 15px' boxShadow='lg'>
-                            <VStack>
-                                <Heading color={'#e2e8f0'} fontSize={24} marginBottom={'25px'}>Open Your Loan</Heading>
-                                <PairsSelector token0={token0} token1={token1} setToken0={setToken0} setToken1={setToken1} />
-                                <Container textAlign='center'>
-                                    <ButtonGroup variant='loanInfo' display='inline-block' size='tiny' >
-                                        <Button leftIcon={<FaInfoCircle />}>
-                                            <Text pr='5px'>MaxLTV</Text>
-                                            <Text >--%</Text>
-                                        </Button>
-                                        <Button leftIcon={<FaInfoCircle />}>
-                                            <Text pr='5px'>Liquidation Threshold</Text>
-                                            <Text >--%</Text>
-                                        </Button>
-                                        <Button leftIcon={<FaInfoCircle />}>
-                                        <Text pr='5px'>Liquidation Penalty</Text>
-                                            <Text >--%</Text>
-                                        </Button>
-                                    </ButtonGroup>
-                                </Container>
-                                <FormLabel variant='openLoan'>Your Loan Amount</FormLabel>
-                                <NumberInput 
-                                    variant='openLoan' 
-                                    w='100%' 
-                                    defaultValue={0} 
-                                    min={0} 
-                                    clampValueOnBlur={true} 
-                                    keepWithinRange={true}
-                                    onChange={loanAmtChanged}
-                                    value={loanAmt}>
-                                    <NumberInputField {...register('loanAmt')}/>
-                                </NumberInput>
-                                <Container display='inline-flex' p='0' m='0'>
-                                    <FormLabel variant='openLoanFit' pr='20px' m='0'>Your Collateral</FormLabel>
-                                    <Button variant='select' size='tiny' h='20px' rightIcon={<ChevronDownIcon />} onClick={() => setIsOpen(true)}>
-                                        <Text ml='4px'>{collateralButtonText}</Text>
-                                    </Button>
-                                    <SelectCollateralModal 
-                                        token0={token0} 
-                                        token1={token1} 
-                                        isOpen={isOpen} 
-                                        setIsOpen={setIsOpen}
-                                        setCollateralType={setCollateralType} 
-                                    />
-                                </Container>
-                                <NumberInput 
-                                    variant='openLoan' 
-                                    w='100%' 
-                                    defaultValue={0} 
-                                    min={0} 
-                                    clampValueOnBlur={true} 
-                                    keepWithinRange={true}
-                                    onChange={collateralAmt0Changed}
-                                    value={collateralAmt0}>
-                                    <NumberInputField {...register('collateralAmt0')} />
-                                </NumberInput>
-                                { showToken1 ? 
-                                <NumberInput 
-                                    variant='openLoan' 
-                                    w='100%' 
-                                    defaultValue={0} 
-                                    min={0} 
-                                    clampValueOnBlur={true} 
-                                    keepWithinRange={true}
-                                    onChange={collateralAmt1Changed}
-                                    value={collateralAmt1}>
-                                    <NumberInputField {...register('collateralAmt1')} />
-                                </NumberInput> : null }
-                                <Container p='20px' />
-                                <Container textAlign='right'>
-                                    <Text variant='loanInfoRight' pr='5px'>Interest Rate</Text>
-                                    <Text variant='loanInfoRight' >--%</Text>
-                                </Container>
-                                <Container p='0 0 5px 0'>
-                                    <Button variant={confirmVariant} type="submit" >Confirm</Button>
-                                </Container>
-                            </VStack>
-                        </FormControl>
-                    </form>
-                </Box >
-            </Container>
-        </>
-    )
+  // checks for non-numeric value inputs
+  const validateNumberInput = (
+    e: ChangeEvent<HTMLInputElement> | string,
+    setNumberInputStr: Dispatch<SetStateAction<string>>,
+    setNumberInputval: Dispatch<SetStateAction<number>>
+
+  ): void => {
+    let numberInputStr: string
+    if (typeof e !== "string") numberInputStr = (e.target as HTMLInputElement).value
+    else numberInputStr = e
+    
+    var strToSet = ""
+    var i = numberInputStr.indexOf('.')
+    if (i >= 0 && i+1 < numberInputStr.length) {
+      strToSet = numberInputStr.substring(0, i+1) + numberInputStr.substring(i+1).replace(/[^0-9]/g, '')
+    } else {
+      strToSet = (numberInputStr.replace(/[^0-9\.]/g, ''))
+    }
+    setNumberInputStr(strToSet)
+
+    // clamp the value
+    var inputVal = parseFloat(strToSet)
+    if (!isNaN(inputVal)) {
+      setNumberInputval(inputVal)
+    }
+  }
+
+  const handleNumberInput = useCallback((
+    e: ChangeEvent<HTMLInputElement> | string,
+    setNumberInputStr: Dispatch<SetStateAction<string>>,
+    setNumberInputval: Dispatch<SetStateAction<number>>
+  ) => {
+    try {
+      if (e) {
+        const numberInput = typeof e !== "string" ? e.target.value : e
+        if (numberInput === "") {
+          setNumberInputStr('')
+          return
+        }
+        validateNumberInput(numberInput, setNumberInputStr, setNumberInputval)
+      }
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+
+      notifyError(message)
+    }
+    return null
+  }, [validateNumberInput])
+
+  return (
+    <>
+      <div className={style.wrapper}>
+        <div className= {style.content}>
+          <div className={style.vStack}>
+            <div className={style.formHeader}>Open Your Loan</div>
+            <div className={style.vStackItem}>
+              <PairsSelector token0={token0} token1={token1} setToken0={setToken0} setToken1={setToken1} />
+            </div>
+            <div className={style.vStackItem}>
+              <div className={style.infoGroup} >
+                <div className={style.loanInfoButton} onClick={() => setIsOpen(true)} >
+                  <div className={style.infoIcon}><FaInfoCircle /></div>
+                  MaxLTV --%
+                </div>
+                <div className={style.loanInfoButton} onClick={() => setIsOpen(true)} >
+                <div className={style.infoIcon}><FaInfoCircle /></div>
+                  Liquidation Threshold --%
+                </div>
+                <div className={style.loanInfoButton} onClick={() => setIsOpen(true)} >
+                  <div className={style.infoIcon}><FaInfoCircle /></div>
+                  Liquidation Penalty --%
+                </div>
+              </div>
+            </div>
+            <div className={style.vStackItem}>
+              <div className={style.sectionHeader}>Your Loan Amount</div>
+            </div>
+            <div className={style.vStackItem}>
+              <div className={style.numberInputContainer}>
+                <input 
+                  type="text" 
+                  onChange={e => handleNumberInput(e, setLoanAmtStr, setLoanAmt)} 
+                  value={loanAmtStr} 
+                  placeholder="0.0" 
+                  className={style.numberInput}
+                  onBlur={validate} />
+              </div>
+            </div>
+            <div className={style.vStackItem}>
+              <div className={style.collateralHeader}>
+                <div className={style.collateralHeaderText}>Your Collateral</div>
+                <div className={style.selectCollateralButton} onClick={() => setIsOpen(true)} >
+                  {collateralButtonText}
+                  <ChevronDownIcon className={style.dropdownArrow}/>
+                </div>
+                <SelectCollateralModal 
+                    token0={token0} 
+                    token1={token1} 
+                    isOpen={isOpen} 
+                    setIsOpen={setIsOpen}
+                    setCollateralType={setCollateralType} 
+                />
+              </div>
+            </div>
+            <div className={style.vStackItem}>
+              <div className={style.numberInputContainer}>
+                <input 
+                  type="text" 
+                  onChange={e => handleNumberInput(e, setCollateralAmt0Str, setCollateralAmt0)} 
+                  value={collateralAmt0Str} 
+                  placeholder="0.0" 
+                  className={style.numberInput}
+                  onBlur={validate} />
+              </div>
+            </div>
+            <div className={style.vStackItem}>
+              { showToken1 ? 
+              <div className={style.numberInputContainer}>
+                <input 
+                  type="text" 
+                  onChange={e => handleNumberInput(e, setCollateralAmt1Str, setCollateralAmt1)} 
+                  value={collateralAmt1Str} 
+                  placeholder="0.0" 
+                  className={style.numberInput}
+                  onBlur={validate} />
+              </div>
+              : null }
+            </div>
+            <div className={style.vStackItem}>
+              <div className={style.spacer} />
+            </div>
+            <div className={style.vStackItem}>
+              <div className={style.interestRateText}>
+                Interest Rate --%
+              </div>
+            </div>
+            <div className={style.vStackItem}>
+              <div className={confirmStyle} onClick={handleSubmit(validateBeforeSubmit)} >
+                Confirm
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }
 
 export default OpenLoanView
