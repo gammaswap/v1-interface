@@ -7,9 +7,10 @@ type WithdrawLiquidityProps = {
     changeSliderPercentage: (data: number) => Promise<void>,
     sliderPercentChange: (values: number[]) => void,
     withdrawLiquidity: (value: number) => Promise<void>
+    approveTransaction: () => Promise<void>
 }
 
-const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, sliderPercentChange, withdrawLiquidity}: WithdrawLiquidityProps) => {
+const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, sliderPercentChange, withdrawLiquidity, approveTransaction}: WithdrawLiquidityProps) => {
 
     const style = {
         wrapper: "w-screen flex justify-center items-center",
@@ -118,7 +119,7 @@ const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, sliderPerc
 
                 </div>
                 <div className={style.buttonDiv}>
-                    <div className={style.confirmButton}>
+                    <div className={style.confirmButton} onClick={() => {approveTransaction()}}>
                         Approve
                     </div>
                     <div className={style.invalidatedButton} onClick={() => {withdrawLiquidity(sliderPercentage[0])}}>
