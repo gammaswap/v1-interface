@@ -1,14 +1,16 @@
 import * as React from 'react'
-import Slider from 'react-slider-simple'
+import { useRanger } from 'react-ranger'
 import { ArrowDownIcon } from '@chakra-ui/icons'
 
 type WithdrawLiquidityProps = {
-    sliderPercentage: number,
+    sliderPercentage: number[],
     changeSliderPercentage: (data: number) => Promise<void>,
-    onDone: (data: number) => Promise<void>
+    sliderPercentChange: (values: number[]) => void,
+    withdrawLiquidity: (value: number) => Promise<void>
+    approveTransaction: () => Promise<void>
 }
 
-const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, onDone}: WithdrawLiquidityProps) => {
+const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, sliderPercentChange, withdrawLiquidity, approveTransaction}: WithdrawLiquidityProps) => {
 
     const style = {
         wrapper: "w-screen flex justify-center items-center",
@@ -33,6 +35,14 @@ const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, onDone}: W
         priceTag: "",
         totalPrice: "text-right"
       }
+  
+      const { getTrackProps, handles } = useRanger({
+        values: sliderPercentage,
+        onChange: sliderPercentChange,
+        min: 0,
+        max: 100,
+        stepSize: 1,
+      })
 
         return (
             <div className={style.wrapper}>
@@ -51,14 +61,30 @@ const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, onDone}: W
                   </div>
                   <div className={style.sliderStyle}>
                     <p className={style.sliderPercent}>{sliderPercentage}%</p>
-                    <Slider
-                      value={sliderPercentage}
-                      onChange={changeSliderPercentage}
-                      onDone={onDone}
-                      thumbColor="rgb(51, 81, 70)"
-                      shadowColor="rgb(31, 41, 55)"
-                      sliderPathColor="rgb(31, 41, 70)"
-                    />
+                    <div
+                      {...getTrackProps({
+                        style: {
+                          height: '4px',
+                          background: '#ddd',
+                          boxShadow: 'inset 0 1px 2px rgba(0,0,0,.6)',
+                          borderRadius: '2px',
+                        },
+                      })}
+                    >
+                      {handles.map(({ getHandleProps }) => (
+                        <div
+                          {...getHandleProps({
+                            style: {
+                              width: '12px',
+                              height: '12px',
+                              borderRadius: '100%',
+                              background: 'linear-gradient(to bottom, #eee 45%, #ddd 55%)',
+                              border: 'solid 1px #888',
+                            },
+                          })}
+                        />
+                      ))}
+                    </div>
                     <div className={style.percentageBox}>
                       <p className={style.percentages} onClick={() => {changeSliderPercentage(25)}}>25%</p>
                       <p className={style.percentages} onClick={() => {changeSliderPercentage(50)}}>50%</p>
@@ -93,10 +119,10 @@ const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, onDone}: W
 
                 </div>
                 <div className={style.buttonDiv}>
-                    <div className={style.confirmButton}>
+                    <div className={style.confirmButton} onClick={() => {approveTransaction()}}>
                         Approve
                     </div>
-                    <div className={style.invalidatedButton}>
+                    <div className={style.invalidatedButton} onClick={() => {withdrawLiquidity(sliderPercentage[0])}}>
                         Remove
                     </div>
                 </div>
