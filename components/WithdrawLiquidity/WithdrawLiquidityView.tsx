@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Slider from 'react-slider-simple'
-import { ArrowDownIcon } from '@chakra-ui/icons'
+import { AiOutlineArrowDown } from 'react-icons/ai'
 
 type WithdrawLiquidityProps = {
     sliderPercentage: number,
@@ -67,7 +67,7 @@ const WithdrawLiquidity = ({sliderPercentage, changeSliderPercentage, onDone}: W
                     </div>
                   </div>
                   <div className={style.downIcon}>
-                    <ArrowDownIcon className={style.dropdownArrow} style={{color: 'white'}} />
+                    <AiOutlineArrowDown className={style.dropdownArrow} style={{color: 'white'}} />
                   </div>
 
                   <div className={style.amountDiv}>
