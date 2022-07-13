@@ -135,10 +135,14 @@ const OpenLoanController = () => {
 
       // unpack
       console.log("data:", data)
-      var collateralAmt0 = data.collateralAmt0 ? data.collateralAmt0 : 0
-      var collateralAmt1 = data.collateralAmt1 ? data.collateralAmt1 : 0
+      var amt0BN = data.collateralAmt0 ? 
+        ethers.utils.parseUnits(data.collateralAmt0, token0.decimals) : 
+        BigNumber.from(0)
+      var amt1BN = data.collateralAmt1 ? 
+        ethers.utils.parseUnits(data.collateralAmt1, token1.decimals) : 
+        BigNumber.from(0)
+      var loanAmtBN = ethers.utils.parseUnits(data.loanAmt, 18) // 18 is from DepositPool.decimals
       var collateralType = data.collateralType
-      var loanAmt = data.loanAmt
       var accountAddress = accountInfo.address ? accountInfo.address : ""
 
       try {
@@ -149,20 +153,20 @@ const OpenLoanController = () => {
             break
           case CollateralType.Token0:
             var erc20 = new ethers.Contract(token0.address, IERC20.abi, provider)
-            await ensureAllowance(accountAddress, erc20, collateralAmt0, token0.decimals, token0.symbol)
+            await ensureAllowance(accountAddress, erc20, amt0BN, token0.decimals, token0.symbol)
             break
           case CollateralType.Token1:
             // switch the amounts because amount comes from first input
-            collateralAmt1 = collateralAmt0
-            collateralAmt0 = "0"
+            amt1BN = amt0BN
+            amt0BN = BigNumber.from(0)
             var erc20 = new ethers.Contract(token1.address, IERC20.abi, provider)
-            await ensureAllowance(accountAddress, erc20, collateralAmt1, token1.decimals, token1.symbol)
+            await ensureAllowance(accountAddress, erc20, amt1BN, token1.decimals, token1.symbol)
             break
           case CollateralType.Both:
             var erc20Token0 = new ethers.Contract(token0.address, IERC20.abi, provider)
             var erc20Token1 = new ethers.Contract(token1.address, IERC20.abi, provider)
-            await ensureAllowance(accountAddress, erc20Token0, collateralAmt0, token0.decimals, token0.symbol)
-            .then(() => ensureAllowance(accountAddress, erc20Token1, collateralAmt1, token1.decimals, token1.symbol))
+            await ensureAllowance(accountAddress, erc20Token0, amt0BN, token0.decimals, token0.symbol)
+            .then(() => ensureAllowance(accountAddress, erc20Token1, amt1BN, token1.decimals, token1.symbol))
             break
           default:
             toast.error("Invalid collateral type.")
@@ -172,9 +176,9 @@ const OpenLoanController = () => {
         var tx = await posManager.openPosition(
           token0.address,
           token1.address,
-          ethers.utils.parseUnits(collateralAmt0, token0.decimals),
-          ethers.utils.parseUnits(collateralAmt1, token1.decimals),
-          ethers.utils.parseUnits(loanAmt, 18), // 18 is from DepositPool.decimals
+          amt0BN,
+          amt1BN,
+          loanAmtBN,
           accountAddress
         )
         var loading = toast.loading("Waiting for block confirmation")
@@ -194,28 +198,28 @@ const OpenLoanController = () => {
       }
     }
 
-    async function ensureAllowance(account: string, erc20: Contract, amountStr: string, decimals: number, symbol: string) {
+    async function ensureAllowance(account: string, erc20: Contract, amountBN: BigNumber, decimals: number, symbol: string) {
       try {
+        var amountStr = ethers.utils.formatUnits(amountBN, decimals)
         console.log("checking allowance...", symbol, "spender", posManager?.address)
-        console.log('owner', accountInfo?.address, 'amount', amountStr)
-        var amountBg = ethers.utils.parseUnits(amountStr, decimals)
+        console.log('owner', account, 'amount', amountStr)
 
         // check enough balance
-        let balance = await erc20.balanceOf(accountInfo?.address)
-        if (balance < amountBg) {
-          Promise.reject("Not enough funds. Requested: " + amountStr 
-          + " Balance " + ethers.utils.formatUnits(amountBg, decimals))
+        let balanceBN = await erc20.balanceOf(account)
+        if (balanceBN < amountBN) {
+          toast.error("Not enough funds. Requested: " + amountStr
+          + " Balance " + ethers.utils.formatUnits(balanceBN, decimals))
         }
         // check enough allowance
-        let allowance = await erc20.allowance(accountInfo?.address, posManager?.address)
-        if (allowance < amountBg) {
+        let allowance = await erc20.allowance(account, posManager?.address)
+        if (allowance < amountBN) {
           return approve(erc20, posManager?._address)
         }
       } catch (e) {
         if (typeof e === "string") {
-          Promise.reject("checkAllowance: " + e)
+          toast.error("checkAllowance: " + e)
         } else if (e instanceof Error) {
-          Promise.reject("checkAllowance: " + e.message)
+          toast.error("checkAllowance: " + e.message)
         }
       }
     }
