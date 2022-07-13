@@ -35,18 +35,18 @@ const WithdrawLiquidity = () => {
     if (provider) {
       let address = "0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152"
       if (accountInfo  && accountInfo?.address) {
-          setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
+        setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
       } else {
-          setdepPool(new ethers.Contract(address, DepPool.abi, provider))
+        setdepPool(new ethers.Contract(address, DepPool.abi, provider))
       }
     } else {
-        console.log("Please connect wallet")
+      console.log("Please connect wallet")
     }
 
     if (!accountInfo || !accountInfo.address) {
       console.log("Wallet not connected.")
       return
-  }
+    }
 
     if (depPool === null) {
       return
@@ -63,12 +63,12 @@ const WithdrawLiquidity = () => {
     if (provider) {
       let address = "0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152"
       if (accountInfo  && accountInfo?.address) {
-          setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
+        setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
       } else {
-          setdepPool(new ethers.Contract(address, DepPool.abi, provider))
+        setdepPool(new ethers.Contract(address, DepPool.abi, provider))
       }
     } else {
-        console.log("Please connect wallet")
+      console.log("Please connect wallet")
     }
 
     if (!accountInfo || !accountInfo.address) {
@@ -99,7 +99,7 @@ const WithdrawLiquidity = () => {
     if (!accountInfo || !accountInfo.address) {
       console.log("Wallet not connected.")
       return
-  }
+    }
     if (depPool === null) {
       return null;
     } else {
@@ -118,29 +118,29 @@ const WithdrawLiquidity = () => {
 
   async function approve(fromToken: string, toAddr: string) {
     if (!provider) {
-        console.log("provider or accountInfo not set")
-        return
+      console.log("provider or accountInfo not set")
+      return
     }
     if (!accountInfo || !accountInfo.address) {
       console.log("Wallet not connected.")
       return
-  }
-  if (depPool === null) {
-    return
-  }
+    }
+    if (depPool === null) {
+      return
+    }
     var erc20 = new ethers.Contract(fromToken, IERC20.abi, provider.getSigner(accountInfo?.address))
     let allowance = await erc20.allowance(accountInfo.address, toAddr)
-            .then((res: string) => {
-                console.log("check allowance ", res.toString())
-                return res
-            })
-            .catch((err: Error) => {
-                console.error("checkAllowance", err)
-            })
+    .then((res: string) => {
+      console.log("check allowance ", res.toString())
+      return res
+    })
+    .catch((err: Error) => {
+      console.error("checkAllowance", err)
+    })
     if (parseFloat(allowance.toString()) <= 0) {
       await erc20.approve(toAddr, constants.MaxUint256)
     }
-}
+  }
 
   useEffect(() => {
     async function fetchContract() {
@@ -187,13 +187,15 @@ function pretty(num: number) {
 
 useEffect(() => {
   async function fetchData() {
-    if(depPool) {
+    if(!depPool) {
+      return
+    }
       const liqBal = await depPool.balanceOf(accountInfo?.address);
       setLiquidityAmt(parseFloat(pretty(liqBal.toString())));
 
       const uniPair = await depPool.getUniPair();
       if (!provider) {
-          return
+        return
       }
 
       const uniPairContract = new ethers.Contract(uniPair, IUniswapV2Pair.abi, provider)
@@ -209,24 +211,23 @@ useEffect(() => {
           setLiqInTokB(0);
       }
     }
-  }
-  fetchData()
-}, [depPool])
+    fetchData()
+  }, [depPool])
 
-function sqrt(y: any){
-  let z;
-  if (y.gt(3)) {
+  function sqrt(y: any){
+    let z;
+    if (y.gt(3)) {
       z = y;
       let x = (y.div(2)).add(1);
       while (x.lt(z)) {
-          z = x;
-          x = ((y.div(x)).add(x)).div(2);
+        z = x;
+        x = ((y.div(x)).add(x)).div(2);
       }
-  } else if (!y.isZero()) {
+    } else if (!y.isZero()) {
       z = BigNumber.from(1);
+    }
+    return z;
   }
-  return z;
-}
 
     return (
         <WithdrawLiquidityView
