@@ -224,14 +224,16 @@ const OpenLoanController = () => {
       }
     }
 
-    async function approve(fromTokenContract: Contract, toAddr: string) {
-      if (!provider || !accountInfo) {
-        console.log("provider or accountInfo not set")
+    async function approve(fromTokenContract: Contract, spender: string) {
+      var tx = await fromTokenContract.approve(spender, constants.MaxUint256)
+      var loading = toast.loading("Waiting for approval")
+      var receipt = await tx.wait()
+      toast.dismiss(loading)
+      if(receipt.status == 1) {
+        toast.success("Approval completed")
         return
       }
-      var res = await fromTokenContract.approve(toAddr, constants.MaxUint256).send({ from: accountInfo.address })
-      console.log("approve: ", fromTokenContract.symbol, res)
-      return res
+      toast.success("Approval failed")
     }
 
     function getPosMgr() {
