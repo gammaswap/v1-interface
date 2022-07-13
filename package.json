@@ -24,6 +24,7 @@
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-hook-form": "^7.33.0",
+    "react-hot-toast": "^2.3.0",
     "react-icons": "^4.4.0",
     "react-slider-simple": "^4.0.5",
     "truncate-eth-address": "^1.0.2",

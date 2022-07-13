@@ -10,6 +10,7 @@ import { ethers, Contract, BigNumber, constants } from 'ethers'
 import { FieldValues } from 'react-hook-form'
 import OpenLoan from './OpenLoanView'
 import { CollateralType } from './CollateralType'
+import toast from 'react-hot-toast';
 
 const OpenLoanController = () => {
   const { provider, accountInfo } = useContext(WalletContext)
@@ -117,18 +118,18 @@ const OpenLoanController = () => {
     async function openLoanHandler(data: FieldValues) {
       console.log(data)
       if (!accountInfo || !accountInfo.address) {
-        Promise.reject("Wallet not connected.")
+        toast.error("Wallet not connected.")
         return
       }
 
       getPosMgr()
       if (!posManager) {
-        Promise.reject("Position manager not found.")
+        toast.error("Position manager not found.")
         return
       }
 
       if (!provider ) {
-        Promise.reject("Provider not set.")
+        toast.error("Provider not set.")
         return
       }
 
@@ -164,7 +165,8 @@ const OpenLoanController = () => {
             .then(() => ensureAllowance(accountAddress, erc20Token1, collateralAmt1, token1.decimals, token1.symbol))
             break
           default:
-            Promise.reject("Invalid collateral type.")
+            toast.error("Invalid collateral type.")
+            return
         }
         // TODO: wait for contract to handle collateral
         var tx = await posManager.openPosition(
@@ -174,11 +176,21 @@ const OpenLoanController = () => {
           ethers.utils.parseUnits(collateralAmt1, token1.decimals),
           ethers.utils.parseUnits(loanAmt, 18), // 18 is from DepositPool.decimals
           accountAddress
-        ).wait()
-        await tx.wait()
-        console.log("Position opened successfully")
+        )
+        var loading = toast.loading("Waiting for block confirmation")
+        var receipt = await tx.wait()
+        if(receipt.status == 1) {
+          toast.dismiss(loading)
+          toast.success("Position opened successfully.")
+          return
+        }
+        toast.error("Open position was unsuccessful.")
       } catch (e) {
-        console.error(e)
+        if (typeof e === "string") {
+          toast.error(e)
+        } else if (e instanceof Error) {
+          toast.error(e.message)
+        }
       }
     }
 
