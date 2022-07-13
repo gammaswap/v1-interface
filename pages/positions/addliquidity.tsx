@@ -42,6 +42,7 @@ const AddLiquidity: NextPage = () => {
     imgPath: "",
     symbol: "",
     address: "",
+    decimals: 18
   })
 
   // holds state of what token input field was selected
@@ -89,7 +90,7 @@ const AddLiquidity: NextPage = () => {
 
   // checks if token selected object is empty
   const isTokenEmpty = (tokenToCheck: Token): boolean => {
-    return Object.values(tokenToCheck).every(tokenProp => tokenProp === "")
+    return Object.values(tokenToCheck).every(tokenProp => tokenProp === "" || tokenProp === 0)
   }
 
   /**
