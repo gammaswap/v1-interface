@@ -1,19 +1,19 @@
-import * as React from "react";
-import { useRanger } from "react-ranger";
-import { ArrowDownIcon } from "@chakra-ui/icons";
+import * as React from "react"
+import { useRanger } from "react-ranger"
+import { ArrowDownIcon } from "@chakra-ui/icons"
 
 type WithdrawLiquidityProps = {
-  sliderPercentage: number[];
-  changeSliderPercentage: (data: number) => Promise<void>;
-  sliderPercentChange: (values: number[]) => void;
-  withdrawLiquidity: (value: number) => Promise<void>;
-  approveTransaction: () => Promise<void>;
-  token0: any;
-  token1: any;
-  liquidityAmt: number;
-  liqInTokB: number;
-  enableRemove: Boolean;
-};
+  sliderPercentage: number[]
+  changeSliderPercentage: (data: number) => Promise<void>
+  sliderPercentChange: (values: number[]) => void
+  withdrawLiquidity: (value: number) => Promise<void>
+  approveTransaction: () => Promise<void>
+  token0: any
+  token1: any
+  liquidityAmt: number
+  liqInTokB: number
+  enableRemove: Boolean
+}
 
 const WithdrawLiquidity = ({
   sliderPercentage,
@@ -51,7 +51,7 @@ const WithdrawLiquidity = ({
     totalPriceDiv: "flex justify-between px-6 py-4 text-white text-2xl",
     priceTag: "",
     totalPrice: "text-right",
-  };
+  }
 
   const { getTrackProps, handles } = useRanger({
     values: sliderPercentage,
@@ -59,17 +59,17 @@ const WithdrawLiquidity = ({
     min: 0,
     max: 100,
     stepSize: 1,
-  });
+  })
 
   const withdraw = (amount: number) => {
     withdrawLiquidity(amount)
       .then((res) => {
-        console.log(res);
+        console.log(res)
       })
       .catch((err) => {
-        console.log(err);
-      });
-  };
+        console.log(err)
+      })
+  }
 
   return (
     <div className={style.wrapper}>
@@ -112,7 +112,7 @@ const WithdrawLiquidity = ({
               <p
                 className={style.percentages}
                 onClick={() => {
-                  changeSliderPercentage(25);
+                  changeSliderPercentage(25)
                 }}
               >
                 25%
@@ -120,7 +120,7 @@ const WithdrawLiquidity = ({
               <p
                 className={style.percentages}
                 onClick={() => {
-                  changeSliderPercentage(50);
+                  changeSliderPercentage(50)
                 }}
               >
                 50%
@@ -128,7 +128,7 @@ const WithdrawLiquidity = ({
               <p
                 className={style.percentages}
                 onClick={() => {
-                  changeSliderPercentage(75);
+                  changeSliderPercentage(75)
                 }}
               >
                 75%
@@ -136,7 +136,7 @@ const WithdrawLiquidity = ({
               <p
                 className={style.percentages}
                 onClick={() => {
-                  changeSliderPercentage(100);
+                  changeSliderPercentage(100)
                 }}
               >
                 Max
@@ -187,7 +187,7 @@ const WithdrawLiquidity = ({
           <div
             className={style.confirmButton}
             onClick={() => {
-              approveTransaction();
+              approveTransaction()
             }}
           >
             Approve
@@ -196,7 +196,7 @@ const WithdrawLiquidity = ({
             <div
               className={style.successButton}
               onClick={() => {
-                withdraw(sliderPercentage[0]);
+                withdraw(sliderPercentage[0])
               }}
             >
               Remove
@@ -207,7 +207,7 @@ const WithdrawLiquidity = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default WithdrawLiquidity;
+export default WithdrawLiquidity
