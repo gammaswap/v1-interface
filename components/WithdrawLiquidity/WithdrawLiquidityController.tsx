@@ -1,21 +1,21 @@
-import * as React from "react"
-import { useState, useEffect, useContext } from "react"
-import WithdrawLiquidityView from "./WithdrawLiquidityView"
-import { WalletContext } from "../../context/WalletContext"
-import { ethers, Contract, BigNumber, constants } from "ethers"
-import DepPool from "../../abis/DepositPool.json"
-import IUniswapV2Pair from "../../abis/IUniswapV2Pair.json"
-import IERC20 from "../../abis/ERC20.json"
-import Tokens, { Token } from "../Tokens"
-import IERC20Metadata from "../../abis/IERC20Metadata.json"
+import * as React from 'react'
+import {useState, useEffect, useContext} from 'react'
+import WithdrawLiquidityView from './WithdrawLiquidityView'
+import {WalletContext} from '../../context/WalletContext'
+import {ethers, Contract, BigNumber, constants} from 'ethers'
+import DepPool from '../../abis/DepositPool.json'
+import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
+import IERC20 from '../../abis/ERC20.json'
+import Tokens, {Token} from '../Tokens'
+import IERC20Metadata from '../../abis/IERC20Metadata.json'
 
 const ZEROMIN = 0
 
 const WithdrawLiquidity = () => {
   const [depPool, setdepPool] = useState<Contract | null>(null)
   const [sliderPercentage, setsliderPercentage] = useState([0])
-  const { provider, accountInfo } = useContext(WalletContext)
-  const [uniPrice, setUniPrice] = useState<string>("0")
+  const {provider, accountInfo} = useContext(WalletContext)
+  const [uniPrice, setUniPrice] = useState<string>('0')
   const [liquidityAmt, setLiquidityAmt] = useState<number>(0)
   const [liqInTokB, setLiqInTokB] = useState<number>(0)
   const [token0, setToken0] = useState({})
@@ -33,18 +33,18 @@ const WithdrawLiquidity = () => {
 
   async function approveTransaction() {
     if (provider) {
-      let address = "0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152"
+      let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
       if (accountInfo && accountInfo?.address) {
         setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
       } else {
         setdepPool(new ethers.Contract(address, DepPool.abi, provider))
       }
     } else {
-      console.log("Please connect wallet")
+      console.log('Please connect wallet')
     }
 
     if (!accountInfo || !accountInfo.address) {
-      console.log("Wallet not connected.")
+      console.log('Wallet not connected.')
       return
     }
 
@@ -63,18 +63,18 @@ const WithdrawLiquidity = () => {
   async function withdrawLiquidity(balance: number) {
     let amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
     if (provider) {
-      let address = "0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152"
+      let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
       if (accountInfo && accountInfo?.address) {
         setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
       } else {
         setdepPool(new ethers.Contract(address, DepPool.abi, provider))
       }
     } else {
-      console.log("Please connect wallet")
+      console.log('Please connect wallet')
     }
 
     if (!accountInfo || !accountInfo.address) {
-      console.log("Wallet not connected.")
+      console.log('Wallet not connected.')
       return
     }
 
@@ -94,7 +94,7 @@ const WithdrawLiquidity = () => {
 
   async function approveWithdraw(depPool: Contract | null, depPoolAddr: string) {
     if (!accountInfo || !accountInfo.address) {
-      console.log("Wallet not connected.")
+      console.log('Wallet not connected.')
       return
     }
     if (depPool === null) {
@@ -108,18 +108,18 @@ const WithdrawLiquidity = () => {
           return e
         }
       } else {
-        console.log("Please connect wallet")
+        console.log('Please connect wallet')
       }
     }
   }
 
   async function approve(fromToken: string, toAddr: string) {
     if (!provider) {
-      console.log("provider or accountInfo not set")
+      console.log('provider or accountInfo not set')
       return
     }
     if (!accountInfo || !accountInfo.address) {
-      console.log("Wallet not connected.")
+      console.log('Wallet not connected.')
       return
     }
     if (depPool === null) {
@@ -129,11 +129,11 @@ const WithdrawLiquidity = () => {
     let allowance = await erc20
       .allowance(accountInfo.address, toAddr)
       .then((res: string) => {
-        console.log("check allowance ", res.toString())
+        console.log('check allowance ', res.toString())
         return res
       })
       .catch((err: Error) => {
-        console.error("checkAllowance", err)
+        console.error('checkAllowance', err)
       })
     if (parseFloat(allowance.toString()) <= 0) {
       await erc20.approve(toAddr, constants.MaxUint256)
@@ -143,12 +143,12 @@ const WithdrawLiquidity = () => {
   useEffect(() => {
     async function fetchContract() {
       if (!provider) {
-        console.log("Please connect wallet.")
+        console.log('Please connect wallet.')
         return
       }
 
       if (provider) {
-        let address = "0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152"
+        let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
         if (accountInfo && accountInfo?.address) {
           let _depPool = new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address))
           setdepPool(_depPool)
@@ -158,8 +158,8 @@ const WithdrawLiquidity = () => {
           const _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, provider.getSigner(accountInfo?.address))
           const symbol0 = await _token0.symbol()
           const symbol1 = await _token1.symbol()
-          setToken0({ address: token0Addr, symbol: symbol0, contract: _token0 })
-          setToken1({ address: token1Addr, symbol: symbol1, contract: _token1 })
+          setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
+          setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
         } else {
           let _depPool = new ethers.Contract(address, DepPool.abi, provider)
           setdepPool(_depPool)
@@ -169,11 +169,11 @@ const WithdrawLiquidity = () => {
           const _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, provider)
           const symbol0 = await _token0.symbol()
           const symbol1 = await _token1.symbol()
-          setToken0({ address: token0Addr, symbol: symbol0, contract: _token0 })
-          setToken1({ address: token1Addr, symbol: symbol1, contract: _token1 })
+          setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
+          setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
         }
       } else {
-        console.log("Please connect wallet")
+        console.log('Please connect wallet')
       }
     }
     fetchContract()
