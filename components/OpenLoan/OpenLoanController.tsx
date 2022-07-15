@@ -8,19 +8,7 @@ import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
 import IERC20 from '../../abis/ERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import { FieldValues } from 'react-hook-form'
-import { ChakraProvider } from '@chakra-ui/react'
-import { Button, FormLabel, Text, NumberInput } from './OpenLoanStyle'
 import OpenLoan from './OpenLoanView'
-import { extendTheme } from '@chakra-ui/react'
-
-const theme = extendTheme({
-    components: {
-        Button,
-        FormLabel,
-        Text,
-        NumberInput
-    },
-})
 
 const OpenLoanController = () => {
     const { provider, accountInfo } = useContext(WalletContext)
@@ -236,15 +224,13 @@ const OpenLoanController = () => {
     }
 
     return (
-        <ChakraProvider theme={theme}>
-            <OpenLoan 
-                openLoanHandler={openLoanHandler}
-                token0={token0}
-                token1={token1}
-                setToken0={setToken0}
-                setToken1={setToken1}
-            />
-        </ChakraProvider>
+      <OpenLoan 
+          openLoanHandler={openLoanHandler}
+          token0={token0}
+          token1={token1}
+          setToken0={setToken0}
+          setToken1={setToken1}
+      />
     )
 }
 
