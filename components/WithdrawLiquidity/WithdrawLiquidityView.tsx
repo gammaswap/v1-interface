@@ -94,7 +94,7 @@ const WithdrawLiquidity = ({
                 },
               })}
             >
-              {handles.map(({getHandleProps}) => (
+              {handles.map(({getHandleProps}: any) => (
                 <div
                   {...getHandleProps({
                     style: {
