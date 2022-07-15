@@ -1,6 +1,6 @@
 import * as React from 'react'
-import {useRanger} from 'react-ranger'
-import {ArrowDownIcon} from '@chakra-ui/icons'
+import {RangerHandle, useRanger} from 'react-ranger'
+import {BsArrowDownShort} from 'react-icons/bs'
 
 type WithdrawLiquidityProps = {
   sliderPercentage: number[]
@@ -94,7 +94,7 @@ const WithdrawLiquidity = ({
                 },
               })}
             >
-              {handles.map(({getHandleProps}) => (
+              {handles.map(({getHandleProps}: RangerHandle) => (
                 <div
                   {...getHandleProps({
                     style: {
@@ -144,7 +144,7 @@ const WithdrawLiquidity = ({
             </div>
           </div>
           <div className={style.downIcon}>
-            <ArrowDownIcon className={style.dropdownArrow} style={{color: 'white'}} />
+            <BsArrowDownShort className={style.dropdownArrow} style={{color: 'white'}} />
           </div>
 
           <div className={style.amountDiv}>
