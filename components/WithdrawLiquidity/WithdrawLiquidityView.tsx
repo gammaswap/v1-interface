@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {useRanger} from 'react-ranger'
+import {RangerHandle, useRanger} from 'react-ranger'
 import {BsArrowDownShort} from 'react-icons/bs'
 
 type WithdrawLiquidityProps = {
@@ -94,7 +94,7 @@ const WithdrawLiquidity = ({
                 },
               })}
             >
-              {handles.map(({getHandleProps}: any) => (
+              {handles.map(({getHandleProps}: RangerHandle) => (
                 <div
                   {...getHandleProps({
                     style: {
