@@ -8,7 +8,7 @@ import Tokens, { Token } from '../../components/Tokens'
 import { AccountInfo, WalletContext } from '../../context/WalletContext'
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, Contract } from 'ethers'
-import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut} from '../../utils/getSmartContract'
+import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } from '../../utils/getSmartContract'
 import { BasicContractContext } from '../../context/BasicContractContext'
 import useNotification from '../../hooks/useNotification'
 import { formatEther } from 'ethers/lib/utils'
@@ -101,7 +101,8 @@ const AddLiquidity: NextPage = () => {
 
   // checks if token selected object is empty
   const isTokenEmpty = (tokenToCheck: Token): boolean => {
-    return Object.values(tokenToCheck).every(tokenProp => tokenProp === "" || tokenProp === 0)
+
+    return Object.values(tokenToCheck).every(tokenProp => tokenProp === "" || tokenProp === 18)
   }
 
   // every time token A or B selection changes,
@@ -183,7 +184,7 @@ const AddLiquidity: NextPage = () => {
               onClick={() => handleTokenSelector("tokenA")}
               >
                 <div className={style.tokenSelectorIcon}>
-                  <Image src={tokenASelected.imgPath} alt="token logo" width={32} height={32}/>
+                  <Image src={tokenASelected.imgPath} width={32} height={32}/>
                 </div>
                 <div className={style.tokenSelectorTicker}>{tokenASelected.symbol}</div>
                 <ChevronDownIcon className={style.dropdownArrow}/>
@@ -208,16 +209,14 @@ const AddLiquidity: NextPage = () => {
                     Select Token
                   </div>
                 </div>
-              )
-              
-              : (
+              ) : (
                 <div className={style.tokenSelectorContainer}>
                   <div
                   className={style.tokenSelectorContent}
                   onClick={() => handleTokenSelector("tokenB")}
                   >
                     <div className={style.tokenSelectorIcon}>
-                      <Image src={tokenBSelected.imgPath} alt="token logo" width={32} height={32}/>
+                      <Image src={tokenBSelected.imgPath} width={32} height={32}/>
                     </div>
                     <div className={style.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
                     <ChevronDownIcon className={style.dropdownArrow}/>
