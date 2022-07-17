@@ -17,6 +17,7 @@ const WithdrawLiquidity = () => {
   const {provider, accountInfo} = useContext(WalletContext)
   const [uniPrice, setUniPrice] = useState<string>('0')
   const [liquidityAmt, setLiquidityAmt] = useState<number>(0)
+  const [totalLiquidityAmt, settotalLiquidityAmt] = useState<string>('0')
   const [liqInTokB, setLiqInTokB] = useState<number>(0)
   const [token0, setToken0] = useState({})
   const [token1, setToken1] = useState({})
@@ -61,7 +62,12 @@ const WithdrawLiquidity = () => {
   }
 
   async function withdrawLiquidity(balance: number) {
-    let amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
+    let amt = '0'
+    if (balance === 100) {
+      amt = totalLiquidityAmt.toString()
+    } else {
+      amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
+    }
     if (provider) {
       let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
       if (accountInfo && accountInfo?.address) {
@@ -180,7 +186,10 @@ const WithdrawLiquidity = () => {
   }, [provider])
 
   function pretty(num: number) {
-    return parseFloat(ethers.utils.formatEther(num.toString()).toString()).toFixed(2)
+    return ethers.utils
+      .formatEther(num.toString())
+      .toString()
+      ?.match(/^-?\d+(?:\.\d{0,2})?/)![0]
   }
 
   useEffect(() => {
@@ -189,6 +198,7 @@ const WithdrawLiquidity = () => {
         return
       }
       const liqBal = await depPool.balanceOf(accountInfo?.address)
+      settotalLiquidityAmt(liqBal.toString())
       setLiquidityAmt(parseFloat(pretty(liqBal.toString())))
 
       const uniPair = await depPool.getUniPair()
