@@ -1,23 +1,45 @@
 import * as React from 'react'
+import {RangerHandle, useRanger} from 'react-ranger'
+import {BsArrowDownShort} from 'react-icons/bs'
 
 type RepayLoanProps = {
-  repayAmt: number
-  setrepayAmt: any
+  repayAmt: number[]
+  repayAmtChange: (data: number[]) => void
+  changeSliderPercentage: (data: number) => void
+  percentages: number[]
+  approveTransaction: () => void
+  repayTransaction: () => void
+  enableRepay: Boolean
 }
 
-const RepayLoanView = ({repayAmt, setrepayAmt}: RepayLoanProps) => {
+const RepayLoanView = ({repayAmt, repayAmtChange, changeSliderPercentage, percentages, approveTransaction, repayTransaction, enableRepay}: RepayLoanProps) => {
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
-    content: 'bg-gray-900 w-[40rem] rounded-2xl py-4',
+    content: 'bg-gray-900 w-[40rem] rounded-2xl p-4',
     formHeader: 'flex justify-between items-center font-semibold text-xl text-gray-200 text-center',
-    inputMainDiv: 'flex mt-5 mx-5',
     withdrawHeading: 'w-screen',
-    horizontalLine: 'mt-2',
-    inputBox: 'w-full border-2 border-gray-800 bg-transparent mt-1 rounded-md py-2 pl-2 pr-20 text-white outline-none',
-    inputHeading: 'text-md text-white p-0 m-0',
-    inputBoxSpan: 'absolute right-0 text-white bg-gray-100/[.2] py-1 px-2 mr-3 mt-1 rounded-sm cursor-pointer',
-    inputSpanMainDiv: 'flex items-center relative',
+    formLabel: 'flex pt-3 px-2 font-regular text-sm text-gray-200',
+    sliderStyle: 'border-2 border-gray-800 shadow-lg my-4 p-4 rounded-2xl',
+    sliderPercent: 'mb-5 text-7xl text-white',
+    percentageBox: 'flex justify-between p-4',
+    percentages: 'bg-gray-800 text-white text-center w-full mx-5 py-2 cursor-pointer rounded-sm font-semibold',
+    buttonDiv: 'flex justify-center',
+    approveBtn: 'w-full bg-blue-400 m-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
+    repayBtn: 'w-full bg-green-400 m-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-green-400 hover:border-green-300',
+    invalidBtn: 'w-full my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
+    allAmountsDiv: 'flex flex-col border-2 border-gray-800 shadow-lg p-4 rounded-2xl',
+    amountsDiv: 'flex justify-between py-2 text-white',
+    downIcon: 'flex justify-center',
+    dropDownIcon: 'w-12 h-8',
   }
+
+  const {getTrackProps, handles} = useRanger({
+    values: repayAmt,
+    onChange: repayAmtChange,
+    min: 0,
+    max: 100,
+    stepSize: 1,
+  })
 
   return (
     <div className={style.wrapper}>
@@ -25,25 +47,85 @@ const RepayLoanView = ({repayAmt, setrepayAmt}: RepayLoanProps) => {
         <div className={style.formHeader}>
           <div className={style.withdrawHeading}>Repay Loan</div>
         </div>
-        <hr className={style.horizontalLine} />
 
-        <div className={style.inputMainDiv}>
-          <div className={style.withdrawHeading}>
-            <p className={style.inputHeading}>Repay Amount</p>
-            <div className={style.inputSpanMainDiv}>
-              <input
-                type="text"
-                onKeyPress={(event) => {
-                  if (!/^(\d*)\.{0,1}(\d){0,1}$/.test(event.key)) {
-                    event.preventDefault()
-                  }
-                }}
-                onChange={(e) => setrepayAmt(e.target.value)}
-                value={repayAmt}
-                className={style.inputBox}
-              />
-              <span className={style.inputBoxSpan}>Max</span>
+        <div>
+          <div className={style.formLabel}>
+            <p>Amount</p>
+          </div>
+          <div className={style.sliderStyle}>
+            <p className={style.sliderPercent}>{repayAmt}%</p>
+            <div
+              {...getTrackProps({
+                style: {
+                  height: '4px',
+                  background: '#ddd',
+                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,.6)',
+                  borderRadius: '2px',
+                },
+              })}
+            >
+              {handles.map(({getHandleProps}: RangerHandle) => (
+                <div
+                  {...getHandleProps({
+                    style: {
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '100%',
+                      background: 'linear-gradient(to bottom, #eee 45%, #ddd 55%)',
+                      border: 'solid 1px #888',
+                    },
+                  })}
+                />
+              ))}
             </div>
+            <div className={style.percentageBox}>
+              {percentages && percentages.length > 0
+                ? percentages.map((percent) => {
+                    return (
+                      <p
+                        key={percent}
+                        className={style.percentages}
+                        onClick={() => {
+                          changeSliderPercentage(percent)
+                        }}
+                      >
+                        {percent === 100 ? 'Max' : `${percent}%`}
+                      </p>
+                    )
+                  })
+                : null}
+            </div>
+          </div>
+
+          <div className={style.downIcon}>
+            <BsArrowDownShort className={style.dropDownIcon} style={{color: 'white'}} />
+          </div>
+
+          <div className={style.allAmountsDiv}>
+            <div className={style.amountsDiv}>
+              <p>Loan Amount</p>
+              <p>100 TokA</p>
+            </div>
+            <div className={style.amountsDiv}>
+              <p>Repay Amount</p>
+              <p>100 TokA</p>
+            </div>
+            <div className={style.amountsDiv}>
+              <p>Remaining Amount</p>
+              <p>0 TokA</p>
+            </div>
+          </div>
+          <div className={style.buttonDiv}>
+            <div className={style.approveBtn} onClick={approveTransaction}>
+              Approve
+            </div>
+            {enableRepay ? (
+              <div className={style.repayBtn} onClick={repayTransaction}>
+                Repay
+              </div>
+            ) : (
+              <div className={style.invalidBtn}>Repay</div>
+            )}
           </div>
         </div>
       </div>
