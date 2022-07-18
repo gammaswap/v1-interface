@@ -159,10 +159,11 @@ const WithdrawLiquidity = ({
 
           <div className={style.totalPriceContainer}>
               <div className={style.unitTokenConversion}>
-                4295.45 {token1.symbol || '-'} = 1 {token0.symbol || '-'}
+              {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}
+                1 {token1.symbol || '-'} = 1 {token0.symbol || '-'}
               </div>
               <div className={style.unitTokenConversion}>
-                0.000232804 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
+                1 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
               </div>
           </div>
         </div>
