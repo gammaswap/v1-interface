@@ -36,12 +36,29 @@ const AddLiquidity: NextPage = () => {
     tokenSelected,
     isOpen,
     setIsOpen,
-    submitStyles,
     handleTokenSelector,
-    validateSubmit,
     isTokenEmpty,
     handleTokenInput
   } = useAddLiquidityHandlers()
+
+  // validates add liquidity submit transaction button
+  const validateSubmit = (): JSX.Element | undefined => {
+    if (isTokenEmpty(tokenBSelected)) {
+      return (
+        <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={"Select Token"}/>
+      )
+    }
+    if (tokenAInputVal === "" || tokenBInputVal === "") {
+      return (
+        <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={"Enter an Amount"}/>
+      )
+    }
+    if (!isTokenEmpty(tokenBSelected) && tokenAInputVal !== "" && tokenBInputVal !== "") {
+      return (
+        <AddLiquiditySubmitButton buttonStyle={style.confirmButton} buttonText={"Confirm"}/>
+      )
+    }
+  }
   
   return (
     <>
@@ -101,12 +118,7 @@ const AddLiquidity: NextPage = () => {
               )
             }
           </div>
-          <div>
-            <AddLiquiditySubmitButton
-              buttonStyle={submitStyles.buttonStyle === "invalidated" ? style.invalidatedButton : style.confirmButton}
-              buttonText={submitStyles.buttonText}
-            />
-          </div>
+          {validateSubmit()}
         </div>
       </div>
       <TokenSelectorModal

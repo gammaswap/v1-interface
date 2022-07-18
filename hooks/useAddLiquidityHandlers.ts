@@ -67,19 +67,6 @@ export const useAddLiquidityHandlers = () => {
         setIsOpen(true)
     }
 
-    // validates add liquidity submit transaction button
-    const validateSubmit = (): void => {
-        if (isTokenEmpty(tokenBSelected)) {
-            setSubmitStyles({ buttonStyle: "invalidated", buttonText: "Select a Token" })
-        }
-        else if (tokenAInputVal === "" || tokenBInputVal === "") {
-            setSubmitStyles({ buttonStyle: "invalidated", buttonText: "Enter an Amount" })
-        }
-        else if (!isTokenEmpty(tokenBSelected) && tokenAInputVal !== "" && tokenBInputVal !== "") {
-            setSubmitStyles({ buttonStyle: "confirm", buttonText: "Confirm" })
-        }
-    }
-
     // checks if token selected object is empty
     const isTokenEmpty = (tokenToCheck: Token): boolean => {
         return Object.values(tokenToCheck).every(tokenProp => tokenProp === "" || tokenProp === 18)
@@ -161,7 +148,6 @@ export const useAddLiquidityHandlers = () => {
         setIsOpen,
         submitStyles,
         handleTokenSelector,
-        validateSubmit,
         isTokenEmpty,
         handleTokenInput,
     }
