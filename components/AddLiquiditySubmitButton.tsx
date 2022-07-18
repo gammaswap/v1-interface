@@ -1,9 +1,9 @@
-type ButtonSubmitProps = {
+export type ButtonSubmitProps = {
     buttonStyle: string
     buttonText: string
 }
 
-const AddLiquiditySubmitValidator = ({ buttonStyle, buttonText }: ButtonSubmitProps): JSX.Element => {
+const AddLiquiditySubmitButton = ({ buttonStyle, buttonText }: ButtonSubmitProps): JSX.Element => {
     return (
         <div className={buttonStyle}>
             {buttonText}
@@ -11,4 +11,4 @@ const AddLiquiditySubmitValidator = ({ buttonStyle, buttonText }: ButtonSubmitPr
     )
 }
 
-export default AddLiquiditySubmitValidator
+export default AddLiquiditySubmitButton
