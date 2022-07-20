@@ -8,7 +8,7 @@ import {BigNumber, constants, Contract, ethers} from 'ethers'
 import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
 
 const RepayLoanController = () => {
-  const [repayAmt, setrepayAmt] = useState<number[]>([0])
+  const [repayAmt, setrepayAmt] = useState<number>(0)
   const [enableRepay, setenableRepay] = useState<Boolean>(false)
   const [posManager, setPosManager] = useState<Contract | null>(null)
   const [pos, setpos] = useState('')
@@ -19,11 +19,13 @@ const RepayLoanController = () => {
   let percentages = [25, 50, 75, 100]
 
   function changeSliderPercentage(value: number) {
-    setrepayAmt([value])
+    setrepayAmt(value)
   }
 
-  function repayAmtChange(values: number[]) {
-    setrepayAmt(values)
+  function repayAmtChange(values: number | number[]) {
+    if (typeof values === 'number') {
+      setrepayAmt(values)
+    }
   }
 
   function approveTransaction() {
@@ -62,10 +64,10 @@ const RepayLoanController = () => {
         const positions = await posManager.getPositionsByOwner(accountInfo?.address)
         if (positionCount > 0) {
           const position = await posManager.positions(positionCount)
-          console.log("-------------------")
-          console.log((position.tokensHeld0).toString())
-          console.log((position.tokensHeld1).toString())
-          console.log("-------------------")
+          console.log('-------------------')
+          console.log(position.tokensHeld0.toString())
+          console.log(position.tokensHeld1.toString())
+          console.log('-------------------')
           setpos(position)
           setposId(positionCount.toString())
           const uniPair = position.uniPair
