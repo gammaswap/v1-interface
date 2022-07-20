@@ -1,11 +1,13 @@
 import * as React from 'react'
-import {RangerHandle, useRanger} from 'react-ranger'
 import {BsArrowDownShort} from 'react-icons/bs'
+import Slider from 'rc-slider'
+import 'rc-slider/assets/index.css'
+import {AriaValueFormat} from 'rc-slider/lib/interface'
 
 type WithdrawLiquidityProps = {
-  sliderPercentage: number[]
+  sliderPercentage: number
   changeSliderPercentage: (data: number) => Promise<void>
-  sliderPercentChange: (values: number[]) => void
+  sliderPercentChange: (values: number | number[]) => Promise<void>
   withdrawLiquidity: (value: number) => Promise<void>
   approveTransaction: () => Promise<void>
   token0: any
@@ -53,14 +55,6 @@ const WithdrawLiquidity = ({
     amountHeader: 'text-gray-300 font-medium',
   }
 
-  const {getTrackProps, handles} = useRanger({
-    values: sliderPercentage,
-    onChange: sliderPercentChange,
-    min: 0,
-    max: 100,
-    stepSize: 1,
-  })
-
   const withdraw = (amount: number) => {
     withdrawLiquidity(amount)
       .then((res) => {
@@ -78,35 +72,11 @@ const WithdrawLiquidity = ({
           <div className={style.withdrawHeading}>Withdraw Liquidity</div>
         </div>
         <div>
-          <div className={style.formLabel}>
-          </div>
+          <div className={style.formLabel}></div>
           <div className={style.sliderStyle}>
             <div className={style.amountHeader}>Amount</div>
             <p className={style.sliderPercent}>{sliderPercentage}%</p>
-            <div
-              {...getTrackProps({
-                style: {
-                  height: '4px',
-                  background: '#ddd',
-                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,.6)',
-                  borderRadius: '2px',
-                },
-              })}
-            >
-              {handles.map(({getHandleProps}: RangerHandle) => (
-                <div
-                  {...getHandleProps({
-                    style: {
-                      width: '12px',
-                      height: '12px',
-                      borderRadius: '100%',
-                      background: 'linear-gradient(to bottom, #eee 45%, #ddd 55%)',
-                      border: 'solid 1px #888',
-                    },
-                  })}
-                />
-              ))}
-            </div>
+            <Slider onChange={sliderPercentChange} value={sliderPercentage} />
             <div className={style.percentageBox}>
               <p
                 className={style.percentages}
@@ -158,13 +128,12 @@ const WithdrawLiquidity = ({
           </div>
 
           <div className={style.totalPriceContainer}>
-              <div className={style.unitTokenConversion}>
-              {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}
-                1 {token1.symbol || '-'} = 1 {token0.symbol || '-'}
-              </div>
-              <div className={style.unitTokenConversion}>
-                1 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
-              </div>
+            <div className={style.unitTokenConversion}>
+              {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}1 {token1.symbol || '-'} = 1 {token0.symbol || '-'}
+            </div>
+            <div className={style.unitTokenConversion}>
+              1 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
+            </div>
           </div>
         </div>
         <div className={style.buttonDiv}>
@@ -180,7 +149,7 @@ const WithdrawLiquidity = ({
             <div
               className={style.successButton}
               onClick={() => {
-                withdraw(sliderPercentage[0])
+                withdraw(sliderPercentage)
               }}
             >
               Remove

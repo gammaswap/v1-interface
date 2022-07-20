@@ -13,7 +13,7 @@ const ZEROMIN = 0
 
 const WithdrawLiquidity = () => {
   const [depPool, setdepPool] = useState<Contract | null>(null)
-  const [sliderPercentage, setsliderPercentage] = useState([0])
+  const [sliderPercentage, setsliderPercentage] = useState(0)
   const {provider, accountInfo} = useContext(WalletContext)
   const [uniPrice, setUniPrice] = useState<string>('0')
   const [liquidityAmt, setLiquidityAmt] = useState<number>(0)
@@ -24,12 +24,13 @@ const WithdrawLiquidity = () => {
   const [enableRemove, setenableRemove] = useState<Boolean>(false)
 
   async function changeSliderPercentage(percentage: number) {
-    let data: number = parseInt(percentage.toFixed(0))
-    setsliderPercentage([data])
+    setsliderPercentage(percentage)
   }
 
-  function sliderPercentChange(values: number[]) {
-    setsliderPercentage(values)
+  async function sliderPercentChange(value: number | number[]) {
+    if (typeof value === 'number') {
+      setsliderPercentage(value)
+    }
   }
 
   async function approveTransaction() {
