@@ -2,7 +2,6 @@ import * as React from 'react'
 import {BsArrowDownShort} from 'react-icons/bs'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
-import {AriaValueFormat} from 'rc-slider/lib/interface'
 
 type WithdrawLiquidityProps = {
   sliderPercentage: number
