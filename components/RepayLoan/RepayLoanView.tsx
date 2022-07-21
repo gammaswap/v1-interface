@@ -1,10 +1,11 @@
 import * as React from 'react'
-import {RangerHandle, useRanger} from 'react-ranger'
 import {BsArrowDownShort} from 'react-icons/bs'
+import Slider from 'rc-slider'
+import 'rc-slider/assets/index.css'
 
 type RepayLoanProps = {
-  repayAmt: number[]
-  repayAmtChange: (data: number[]) => void
+  repayAmt: number
+  repayAmtChange: (data: number | number[]) => void
   changeSliderPercentage: (data: number) => void
   percentages: number[]
   approveTransaction: () => void
@@ -33,14 +34,6 @@ const RepayLoanView = ({repayAmt, repayAmtChange, changeSliderPercentage, percen
     dropDownIcon: 'w-12 h-8',
   }
 
-  const {getTrackProps, handles} = useRanger({
-    values: repayAmt,
-    onChange: repayAmtChange,
-    min: 0,
-    max: 100,
-    stepSize: 1,
-  })
-
   return (
     <div className={style.wrapper}>
       <div className={style.content}>
@@ -54,30 +47,16 @@ const RepayLoanView = ({repayAmt, repayAmtChange, changeSliderPercentage, percen
           </div>
           <div className={style.sliderStyle}>
             <p className={style.sliderPercent}>{repayAmt}%</p>
-            <div
-              {...getTrackProps({
-                style: {
-                  height: '4px',
-                  background: '#ddd',
-                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,.6)',
-                  borderRadius: '2px',
-                },
-              })}
-            >
-              {handles.map(({getHandleProps}: RangerHandle) => (
-                <div
-                  {...getHandleProps({
-                    style: {
-                      width: '12px',
-                      height: '12px',
-                      borderRadius: '100%',
-                      background: 'linear-gradient(to bottom, #eee 45%, #ddd 55%)',
-                      border: 'solid 1px #888',
-                    },
-                  })}
-                />
-              ))}
-            </div>
+            <Slider
+              onChange={repayAmtChange}
+              value={repayAmt}
+              handleStyle={{
+                borderColor: 'white',
+                borderWidth: '2px',
+                backgroundColor: '#abe2fb',
+                opacity: 1,
+              }}
+            />
             <div className={style.percentageBox}>
               {percentages && percentages.length > 0
                 ? percentages.map((percent) => {

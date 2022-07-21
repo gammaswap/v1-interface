@@ -13,27 +13,29 @@ const ZEROMIN = 0
 
 const WithdrawLiquidity = () => {
   const [depPool, setdepPool] = useState<Contract | null>(null)
-  const [sliderPercentage, setsliderPercentage] = useState([0])
+  const [sliderPercentage, setsliderPercentage] = useState(0)
   const {provider, accountInfo} = useContext(WalletContext)
   const [uniPrice, setUniPrice] = useState<string>('0')
   const [liquidityAmt, setLiquidityAmt] = useState<number>(0)
-  const [totalLiquidityAmt, settotalLiquidityAmt] = useState<string>('0')
+  const [totalLiquidityAmt, setTotalLiquidityAmt] = useState<string>('0')
   const [liqInTokB, setLiqInTokB] = useState<number>(0)
   const [token0, setToken0] = useState({})
   const [token1, setToken1] = useState({})
   const [enableRemove, setenableRemove] = useState<Boolean>(false)
 
   async function changeSliderPercentage(percentage: number) {
-    let data: number = parseInt(percentage.toFixed(0))
-    setsliderPercentage([data])
+    setsliderPercentage(percentage)
   }
 
-  function sliderPercentChange(values: number[]) {
-    setsliderPercentage(values)
+  async function sliderPercentChange(value: number | number[]) {
+    if (typeof value === 'number') {
+      setsliderPercentage(value)
+    }
   }
 
   async function approveTransaction() {
     if (provider) {
+      // Deposit poll contract address
       let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
       if (accountInfo && accountInfo?.address) {
         setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
@@ -69,6 +71,7 @@ const WithdrawLiquidity = () => {
       amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
     }
     if (provider) {
+      // Deposit poll contract address
       let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
       if (accountInfo && accountInfo?.address) {
         setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
@@ -154,6 +157,7 @@ const WithdrawLiquidity = () => {
       }
 
       if (provider) {
+        // Deposit poll contract address
         let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
         if (accountInfo && accountInfo?.address) {
           let _depPool = new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address))
@@ -198,7 +202,7 @@ const WithdrawLiquidity = () => {
         return
       }
       const liqBal = await depPool.balanceOf(accountInfo?.address)
-      settotalLiquidityAmt(liqBal.toString())
+      setTotalLiquidityAmt(liqBal.toString())
       setLiquidityAmt(parseFloat(pretty(liqBal.toString())))
 
       const uniPair = await depPool.getUniPair()
