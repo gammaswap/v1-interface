@@ -15,6 +15,7 @@ const style = {
   vStackItem: "mt-3",
   formHeader: "px-2 flex justify-between items-center font-semibold text-xl text-gray-200",
   numberInputContainer: "bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full",
+  numberInputHidden: "p-4 border-2 invisible",
   numberInput: "bg-transparent placeholder:text-gray-600 outline-none w-full text-3xl text-gray-300",
   nonSelectedTokenContainer: "flex items-center text-gray-200",
   nonSelectedTokenContent: "w-full h-min flex justify-center items-center bg-blue-500 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30",
@@ -59,22 +60,25 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
   const [collateralAmt0Str, setCollateralAmt0Str] = useState<string>('')
   const [collateralAmt1, setCollateralAmt1] = useState<number>(0)
   const [collateralAmt1Str, setCollateralAmt1Str] = useState<string>('')
-  const [showToken1, setShowToken1] = useState<boolean>(false)
   const { register, handleSubmit, setValue } = useForm()
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const { notifyError, notifySuccess } = useNotification()
+  const [buttonText, setButtonText] = useState<string>("Confirm")
+  const [collateral1Class, setCollateral1Class] = useState<string>("")
     
   useEffect(() => {
       resetCollateralType()
-      console.log("before validate", token0, token1)
       validate()
   }, [token0, token1])
 
   useEffect(() => {
     setIsOpen(false)
-    console.log("selected collateral type", CollateralType[collateralType])
+    // console.log("selected collateral type", CollateralType[collateralType])
     setCollateralButtonText(getCollateralTypeButtonText(collateralType))
-    setShowToken1(collateralType == CollateralType.Both)
+    setCollateralAmt1(0)
+    setCollateralAmt1Str('')
+    setCollateral1Class(collateralType == CollateralType.Both ?
+      style.numberInputContainer : style.numberInputHidden)
     validate()
   }, [collateralType])
 
@@ -100,42 +104,42 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
     setCollateralType(CollateralType.None)
     setCollateralButtonText(getCollateralTypeButtonText(CollateralType.None))
     setConfirmStyle(style.confirmGrey)
-    setShowToken1(false)
+    setCollateral1Class(style.numberInputHidden)
     setCollateralAmt1(0)
   }
 
   function validate() {
     if (token0 == token1) {
-      console.log("Tokens must be different.", token0, token1)
+      setButtonText("Tokens must be different")
       setConfirmStyle(style.confirmGrey)
       return false
     }
     if (isTokenEmpty(token1)) {
-      console.log("Token must be selected.")
+      setButtonText("Token must be selected")
       setConfirmStyle(style.confirmGrey)
       return false
     }
     if (collateralType == CollateralType.None) {
-      console.log("Collateral must be selected")
+      setButtonText("Collateral must be selected")
       setConfirmStyle(style.confirmGrey)
       return false
     }
     if (loanAmt <= 0) {
-      console.log("Loan amount must be positive.")
+      setButtonText("Loan amount must be positive")
       setConfirmStyle(style.confirmGrey)
       return false
     }
     if (collateralAmt0 <= 0) {
-      console.log(token0.symbol, "collateral amount must be positive.")
+      setButtonText(token0.symbol + " collateral amount must be positive")
       setConfirmStyle(style.confirmGrey)
       return false
     }
     if (collateralType == CollateralType.Both && collateralAmt1 <= 0) {
-      console.log(token1.symbol, "collateral amount must be positive.")
+      setButtonText(token1.symbol + " collateral amount must be positive")
       setConfirmStyle(style.confirmGrey)
       return false
     }
-    console.log("Valid inputs.")
+    setButtonText("Confirm")
     setConfirmStyle(style.confirmGreen)
     return true
   }
@@ -178,7 +182,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
     }
   }
 
-  const handleNumberInput = useCallback((
+  const handleNumberInput = (
     e: ChangeEvent<HTMLInputElement> | string,
     setNumberInputStr: Dispatch<SetStateAction<string>>,
     setNumberInputval: Dispatch<SetStateAction<number>>
@@ -188,10 +192,11 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
         const numberInput = typeof e !== "string" ? e.target.value : e
         if (numberInput === "") {
           setNumberInputStr('')
-          return
+        } else {
+          validateNumberInput(numberInput, setNumberInputStr, setNumberInputval)
         }
-        validateNumberInput(numberInput, setNumberInputStr, setNumberInputval)
       }
+      validate()
     } catch (error) {
       let message
       if (error instanceof Error) message = error.message
@@ -199,8 +204,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
 
       notifyError(message)
     }
-    return null
-  }, [validateNumberInput])
+  }
 
   setValue('collateralType', collateralType)
   return (
@@ -239,8 +243,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
                   placeholder="0.0" 
                   className={style.numberInput}
                   {...register('loanAmt', {
-                    onChange: (e) => handleNumberInput(e, setLoanAmtStr, setLoanAmt),
-                    onBlur: (e) => validate()
+                    onChange: (e) => handleNumberInput(e, setLoanAmtStr, setLoanAmt)
                   })}/>
               </div>
             </div>
@@ -268,28 +271,21 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
                   placeholder="0.0" 
                   className={style.numberInput}
                   {...register('collateralAmt0', {
-                    onChange: (e) => handleNumberInput(e, setCollateralAmt0Str, setCollateralAmt0),
-                    onBlur: (e) => validate()
+                    onChange: (e) => handleNumberInput(e, setCollateralAmt0Str, setCollateralAmt0)
                   })} />
               </div>
             </div>
             <div className={style.vStackItem}>
-              { showToken1 ? 
-              <div className={style.numberInputContainer}>
+              <div className={collateral1Class} >
                 <input 
                   type="text" 
                   value={collateralAmt1Str} 
                   placeholder="0.0" 
                   className={style.numberInput}
                   {...register('collateralAmt1', {
-                    onChange: (e) => handleNumberInput(e, setCollateralAmt1Str, setCollateralAmt1),
-                    onBlur: (e) => validate()
+                    onChange: (e) => handleNumberInput(e, setCollateralAmt1Str, setCollateralAmt1)
                   })} />
               </div>
-              : null }
-            </div>
-            <div className={style.vStackItem}>
-              <div className={style.spacer} />
             </div>
             <div className={style.vStackItem}>
               <div className={style.interestRateText}>
@@ -298,7 +294,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
             </div>
             <div className={style.vStackItem}>
               <button className={confirmStyle} type="submit">
-                Confirm
+                {buttonText}
               </button>
             </div>
           </div>
