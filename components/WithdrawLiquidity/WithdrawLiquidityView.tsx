@@ -32,7 +32,7 @@ const WithdrawLiquidity = ({
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
     content: 'bg-gray-900 w-[30rem] rounded-2xl p-4',
-    formHeader: 'px-2 flex justify-between items-center font-semibold text-xl text-gray-200 text-center',
+    formHeader: 'px-2 justify-between items-center font-semibold text-xl text-gray-200 text-center',
     formLabel: ' flex justify-between pt-3 px-2',
     tokenContainer: 'bg-gray-800 my-3 rounded-2xl p-6 text-3xl border-2 border-gray-800 hover:border-gray-600 flex justify-between',
     tokenInput: 'bg-transparent placeholder:text-gray-600 outline-none mb-6 w-full text-4xl text-gray-300 mt-4',
@@ -52,7 +52,7 @@ const WithdrawLiquidity = ({
     eachAmount: 'flex justify-between p-2',
     totalPriceContainer: 'flex flex-col items-end text-gray-500 text-sm mt-2',
     unitTokenConversion: 'font-semibold',
-    amountHeader: 'text-gray-300 font-medium',
+    sectionHeader: "font-semibold text-gray-200 w-full",
   }
 
   const withdraw = (amount: number) => {
@@ -68,13 +68,11 @@ const WithdrawLiquidity = ({
   return (
     <div className={style.wrapper}>
       <div className={style.content}>
-        <div className={style.formHeader}>
-          <div className={style.withdrawHeading}>Withdraw Liquidity</div>
-        </div>
+        <div className={style.formHeader}>Withdraw Liquidity</div>
         <div>
           <div className={style.formLabel}></div>
           <div className={style.sliderStyle}>
-            <div className={style.amountHeader}>Amount</div>
+            <div className={style.sectionHeader}>Amount</div>
             <p className={style.sliderPercent}>{sliderPercentage}%</p>
             <Slider
               onChange={sliderPercentChange}

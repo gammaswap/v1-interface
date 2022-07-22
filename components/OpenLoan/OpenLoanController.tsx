@@ -8,7 +8,7 @@ import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
 import IERC20 from '../../abis/ERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import { FieldValues } from 'react-hook-form'
-import OpenLoan from './OpenLoanView'
+import OpenLoanView from './OpenLoanView'
 
 const OpenLoanController = () => {
     const { provider, accountInfo } = useContext(WalletContext)
@@ -224,7 +224,7 @@ const OpenLoanController = () => {
     }
 
     return (
-      <OpenLoan 
+      <OpenLoanView
           openLoanHandler={openLoanHandler}
           token0={token0}
           token1={token1}
