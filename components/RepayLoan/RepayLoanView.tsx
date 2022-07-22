@@ -1,10 +1,11 @@
 import * as React from 'react'
-import {RangerHandle, useRanger} from 'react-ranger'
 import {BsArrowDownShort} from 'react-icons/bs'
+import Slider from 'rc-slider'
+import 'rc-slider/assets/index.css'
 
 type RepayLoanProps = {
-  repayAmt: number[]
-  repayAmtChange: (data: number[]) => void
+  repayAmt: number
+  repayAmtChange: (data: number | number[]) => void
   changeSliderPercentage: (data: number) => void
   percentages: number[]
   approveTransaction: () => void
@@ -15,14 +16,14 @@ type RepayLoanProps = {
 const RepayLoanView = ({repayAmt, repayAmtChange, changeSliderPercentage, percentages, approveTransaction, repayTransaction, enableRepay}: RepayLoanProps) => {
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
-    content: 'bg-gray-900 w-[40rem] rounded-2xl p-4',
+    content: 'bg-gray-900 w-[30rem] rounded-2xl p-4',
     formHeader: 'flex justify-between items-center font-semibold text-xl text-gray-200 text-center',
     withdrawHeading: 'w-screen',
     formLabel: 'flex pt-3 px-2 font-regular text-sm text-gray-200',
     sliderStyle: 'border-2 border-gray-800 shadow-lg my-4 p-4 rounded-2xl',
     sliderPercent: 'mb-5 text-7xl text-white',
     percentageBox: 'flex justify-between p-4',
-    percentages: 'bg-gray-800 text-white text-center w-full mx-5 py-2 cursor-pointer rounded-sm font-semibold',
+    percentages: 'bg-gray-800 text-white text-center py-3 px-6 cursor-pointer rounded-lg font-semibold',
     buttonDiv: 'flex justify-center',
     approveBtn: 'w-full bg-blue-400 m-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
     repayBtn: 'w-full bg-green-400 m-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-green-400 hover:border-green-300',
@@ -31,15 +32,8 @@ const RepayLoanView = ({repayAmt, repayAmtChange, changeSliderPercentage, percen
     amountsDiv: 'flex justify-between py-2 text-white',
     downIcon: 'flex justify-center',
     dropDownIcon: 'w-12 h-8',
+    sectionHeader: "font-semibold text-gray-200 w-full",
   }
-
-  const {getTrackProps, handles} = useRanger({
-    values: repayAmt,
-    onChange: repayAmtChange,
-    min: 0,
-    max: 100,
-    stepSize: 1,
-  })
 
   return (
     <div className={style.wrapper}>
@@ -49,35 +43,19 @@ const RepayLoanView = ({repayAmt, repayAmtChange, changeSliderPercentage, percen
         </div>
 
         <div>
-          <div className={style.formLabel}>
-            <p>Amount</p>
-          </div>
           <div className={style.sliderStyle}>
+            <div className={style.sectionHeader}>Amount</div>
             <p className={style.sliderPercent}>{repayAmt}%</p>
-            <div
-              {...getTrackProps({
-                style: {
-                  height: '4px',
-                  background: '#ddd',
-                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,.6)',
-                  borderRadius: '2px',
-                },
-              })}
-            >
-              {handles.map(({getHandleProps}: RangerHandle) => (
-                <div
-                  {...getHandleProps({
-                    style: {
-                      width: '12px',
-                      height: '12px',
-                      borderRadius: '100%',
-                      background: 'linear-gradient(to bottom, #eee 45%, #ddd 55%)',
-                      border: 'solid 1px #888',
-                    },
-                  })}
-                />
-              ))}
-            </div>
+            <Slider
+              onChange={repayAmtChange}
+              value={repayAmt}
+              handleStyle={{
+                borderColor: 'white',
+                borderWidth: '2px',
+                backgroundColor: '#abe2fb',
+                opacity: 1,
+              }}
+            />
             <div className={style.percentageBox}>
               {percentages && percentages.length > 0
                 ? percentages.map((percent) => {

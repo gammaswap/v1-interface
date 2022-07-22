@@ -1,11 +1,13 @@
 import * as React from 'react'
-import {RangerHandle, useRanger} from 'react-ranger'
 import {BsArrowDownShort} from 'react-icons/bs'
+import Slider from 'rc-slider'
+import 'rc-slider/assets/index.css'
+import {AriaValueFormat} from 'rc-slider/lib/interface'
 
 type WithdrawLiquidityProps = {
-  sliderPercentage: number[]
+  sliderPercentage: number
   changeSliderPercentage: (data: number) => Promise<void>
-  sliderPercentChange: (values: number[]) => void
+  sliderPercentChange: (values: number | number[]) => Promise<void>
   withdrawLiquidity: (value: number) => Promise<void>
   approveTransaction: () => Promise<void>
   token0: any
@@ -30,7 +32,7 @@ const WithdrawLiquidity = ({
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
     content: 'bg-gray-900 w-[30rem] rounded-2xl p-4',
-    formHeader: 'px-2 flex justify-between items-center font-semibold text-xl text-gray-200 text-center',
+    formHeader: 'px-2 justify-between items-center font-semibold text-xl text-gray-200 text-center',
     formLabel: ' flex justify-between pt-3 px-2',
     tokenContainer: 'bg-gray-800 my-3 rounded-2xl p-6 text-3xl border-2 border-gray-800 hover:border-gray-600 flex justify-between',
     tokenInput: 'bg-transparent placeholder:text-gray-600 outline-none mb-6 w-full text-4xl text-gray-300 mt-4',
@@ -50,16 +52,8 @@ const WithdrawLiquidity = ({
     eachAmount: 'flex justify-between p-2',
     totalPriceContainer: 'flex flex-col items-end text-gray-500 text-sm mt-2',
     unitTokenConversion: 'font-semibold',
-    amountHeader: 'text-gray-300 font-medium',
+    sectionHeader: "font-semibold text-gray-200 w-full",
   }
-
-  const {getTrackProps, handles} = useRanger({
-    values: sliderPercentage,
-    onChange: sliderPercentChange,
-    min: 0,
-    max: 100,
-    stepSize: 1,
-  })
 
   const withdraw = (amount: number) => {
     withdrawLiquidity(amount)
@@ -74,39 +68,22 @@ const WithdrawLiquidity = ({
   return (
     <div className={style.wrapper}>
       <div className={style.content}>
-        <div className={style.formHeader}>
-          <div className={style.withdrawHeading}>Withdraw Liquidity</div>
-        </div>
+        <div className={style.formHeader}>Withdraw Liquidity</div>
         <div>
-          <div className={style.formLabel}>
-          </div>
+          <div className={style.formLabel}></div>
           <div className={style.sliderStyle}>
-            <div className={style.amountHeader}>Amount</div>
+            <div className={style.sectionHeader}>Amount</div>
             <p className={style.sliderPercent}>{sliderPercentage}%</p>
-            <div
-              {...getTrackProps({
-                style: {
-                  height: '4px',
-                  background: '#ddd',
-                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,.6)',
-                  borderRadius: '2px',
-                },
-              })}
-            >
-              {handles.map(({getHandleProps}: RangerHandle) => (
-                <div
-                  {...getHandleProps({
-                    style: {
-                      width: '12px',
-                      height: '12px',
-                      borderRadius: '100%',
-                      background: 'linear-gradient(to bottom, #eee 45%, #ddd 55%)',
-                      border: 'solid 1px #888',
-                    },
-                  })}
-                />
-              ))}
-            </div>
+            <Slider
+              onChange={sliderPercentChange}
+              value={sliderPercentage}
+              handleStyle={{
+                borderColor: 'white',
+                borderWidth: '2px',
+                backgroundColor: '#abe2fb',
+                opacity: 1,
+              }}
+            />
             <div className={style.percentageBox}>
               <p
                 className={style.percentages}
@@ -158,12 +135,12 @@ const WithdrawLiquidity = ({
           </div>
 
           <div className={style.totalPriceContainer}>
-              <div className={style.unitTokenConversion}>
-                4295.45 {token1.symbol || '-'} = 1 {token0.symbol || '-'}
-              </div>
-              <div className={style.unitTokenConversion}>
-                0.000232804 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
-              </div>
+            <div className={style.unitTokenConversion}>
+              {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}1 {token1.symbol || '-'} = 1 {token0.symbol || '-'}
+            </div>
+            <div className={style.unitTokenConversion}>
+              1 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
+            </div>
           </div>
         </div>
         <div className={style.buttonDiv}>
@@ -179,7 +156,7 @@ const WithdrawLiquidity = ({
             <div
               className={style.successButton}
               onClick={() => {
-                withdraw(sliderPercentage[0])
+                withdraw(sliderPercentage)
               }}
             >
               Remove
