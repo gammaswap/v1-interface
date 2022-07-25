@@ -81,9 +81,9 @@ const PoolView = ({poolData}: PoolProps) => {
           </thead>
           <tbody>
             {poolData && poolData.length > 0
-              ? poolData.map((pool) => {
+              ? poolData.map((pool, index) => {
                   return (
-                    <tr className={style.tableBodyRow}>
+                    <tr className={style.tableBodyRow} key={index}>
                       <td className={style.tableBodyDefinition}>{pool.asset}</td>
                       <td className={style.tableBodyDefinition}>{pool.totalSupply}M</td>
                       <td className={style.tableBodyDefinition}>{pool.supplyApy}%</td>

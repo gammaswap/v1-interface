@@ -6,7 +6,7 @@ interface Props {
 }
 
 const style = {
-    wrapper: "h-screen max-h-screen h-min-screen w-screen flex flex-col justify-between",
+    wrapper: "h-screen max-h-screen h-min-screen w-screen flex flex-col",
 }
 
 const Layout = ({ children }: Props) => {
