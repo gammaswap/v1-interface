@@ -6,8 +6,8 @@ import {ethers, Contract, BigNumber, constants} from 'ethers'
 import DepPool from '../../abis/DepositPool.json'
 import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
 import IERC20 from '../../abis/ERC20.json'
-import Tokens, {Token} from '../Tokens'
 import IERC20Metadata from '../../abis/IERC20Metadata.json'
+import {sqrt, weiToEther} from '../../utils/mathFunctions'
 
 const ZEROMIN = 0
 
@@ -159,27 +159,44 @@ const WithdrawLiquidity = () => {
       if (provider) {
         // Deposit poll contract address
         let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
-        if (accountInfo && accountInfo?.address) {
-          let _depPool = new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address))
+
+        // Variable to hold deposit pool contract
+        let _depPool = null
+
+        // Variable to hold address of token0
+        let token0Addr = null
+
+        // Variable to hold address of token1
+        let token1Addr = null
+
+        // Variable to hold contract token0
+        let _token0 = null
+
+        // Variable to hold contract token0
+        let _token1 = null
+
+        // Variable to hold symbol of token0
+        let symbol0 = null
+
+        // Variable to hold symbol of token1
+        let symbol1 = null
+
+        _depPool = new ethers.Contract(address, DepPool.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
+        if (_depPool) {
           setdepPool(_depPool)
-          const token0Addr = await _depPool.token0()
-          const token1Addr = await _depPool.token1()
-          const _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, provider.getSigner(accountInfo?.address))
-          const _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, provider.getSigner(accountInfo?.address))
-          const symbol0 = await _token0.symbol()
-          const symbol1 = await _token1.symbol()
+          token0Addr = await _depPool.token0()
+          token1Addr = await _depPool.token1()
+        }
+
+        if (token0Addr) {
+          _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
+          symbol0 = await _token0.symbol()
           setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
-          setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
-        } else {
-          let _depPool = new ethers.Contract(address, DepPool.abi, provider)
-          setdepPool(_depPool)
-          const token0Addr = await _depPool.token0()
-          const token1Addr = await _depPool.token1()
-          const _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, provider)
-          const _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, provider)
-          const symbol0 = await _token0.symbol()
-          const symbol1 = await _token1.symbol()
-          setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
+        }
+
+        if (token1Addr) {
+          _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
+          symbol1 = await _token1.symbol()
           setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
         }
       } else {
@@ -189,12 +206,12 @@ const WithdrawLiquidity = () => {
     fetchContract()
   }, [provider])
 
-  function pretty(num: number) {
-    return ethers.utils
-      .formatEther(num.toString())
-      .toString()
-      ?.match(/^-?\d+(?:\.\d{0,2})?/)![0]
-  }
+  // function pretty(num: number) {
+  //   return ethers.utils
+  //     .formatEther(num.toString())
+  //     .toString()
+  //     ?.match(/^-?\d+(?:\.\d{0,2})?/)![0]
+  // }
 
   useEffect(() => {
     async function fetchData() {
@@ -203,7 +220,7 @@ const WithdrawLiquidity = () => {
       }
       const liqBal = await depPool.balanceOf(accountInfo?.address)
       setTotalLiquidityAmt(liqBal.toString())
-      setLiquidityAmt(parseFloat(pretty(liqBal.toString())))
+      setLiquidityAmt(parseFloat(weiToEther(liqBal.toString())))
 
       const uniPair = await depPool.getUniPair()
       if (!provider) {
@@ -219,7 +236,7 @@ const WithdrawLiquidity = () => {
       if (liqBalNum.gt(constants.Zero) && _uniPrice.gt(constants.Zero)) {
         setLiqInTokB(
           parseFloat(
-            pretty(
+            weiToEther(
               sqrt(_uniPrice.mul(BigNumber.from(10).pow(18)))
                 .mul(liqBalNum)
                 .div(BigNumber.from(10).pow(18))
@@ -234,21 +251,6 @@ const WithdrawLiquidity = () => {
     }
     fetchData()
   }, [depPool])
-
-  function sqrt(y: any) {
-    let z
-    if (y.gt(3)) {
-      z = y
-      let x = y.div(2).add(1)
-      while (x.lt(z)) {
-        z = x
-        x = y.div(x).add(x).div(2)
-      }
-    } else if (!y.isZero()) {
-      z = BigNumber.from(1)
-    }
-    return z
-  }
 
   return (
     <WithdrawLiquidityView
