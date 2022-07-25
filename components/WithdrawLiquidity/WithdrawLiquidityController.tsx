@@ -206,13 +206,6 @@ const WithdrawLiquidity = () => {
     fetchContract()
   }, [provider])
 
-  // function pretty(num: number) {
-  //   return ethers.utils
-  //     .formatEther(num.toString())
-  //     .toString()
-  //     ?.match(/^-?\d+(?:\.\d{0,2})?/)![0]
-  // }
-
   useEffect(() => {
     async function fetchData() {
       if (!depPool) {
