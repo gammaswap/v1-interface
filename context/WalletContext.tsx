@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
-import { Web3Provider } from '@ethersproject/providers'
+import { Web3Provider, JsonRpcSigner } from '@ethersproject/providers'
 import useNotification from '../hooks/useNotification'
 
 export type AccountInfo = {
@@ -16,6 +16,7 @@ export type Provider  = Web3Provider | null
 interface WalletContextInterface {
     accountInfo: AccountInfo | null
     provider: Provider | null
+    signer: JsonRpcSigner | null
     connectWallet: () => Promise<Provider>
 }
 
@@ -27,6 +28,7 @@ export const WalletContext = createContext<WalletContextInterface>({} as WalletC
 
 const WalletProvider = ({ children }: WalletProviderProps) => {
     const [provider, setProvider] = useState<Provider | null>(null)
+    const [signer, setSigner] = useState<JsonRpcSigner | null>(null)
     const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null)
     const [web3Modal, setweb3Modal] = useState<Web3Modal | null>(null)
 
@@ -72,6 +74,7 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
 
     const initializeProvider = async (provider: Web3Provider) => {
         const userAddress = await provider.getSigner().getAddress()
+        const signer = provider.getSigner()
 
         // if no accounts connected to wallet, ignore the provider
         if (!userAddress) return
@@ -85,6 +88,7 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
         }
 
         setProvider(provider)
+        setSigner(signer)
         setAccountInfo({
             address: userAddress,
             balance: ethers.utils.formatEther(userBalance)
@@ -111,6 +115,7 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
         value={{
             accountInfo,
             provider,
+            signer,
             connectWallet,
         }}
         >

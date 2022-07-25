@@ -60,7 +60,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
   const [collateralAmt1, setCollateralAmt1] = useState<number>(0)
   const [collateralAmt1Str, setCollateralAmt1Str] = useState<string>('')
   const [showToken1, setShowToken1] = useState<boolean>(false)
-  const { register, handleSubmit } = useForm()
+  const { register, handleSubmit, setValue } = useForm()
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const { notifyError, notifySuccess } = useNotification()
     
@@ -202,6 +202,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
     return null
   }, [validateNumberInput])
 
+  setValue('collateralType', collateralType)
   return (
     <>
       <div className={style.wrapper}>
@@ -255,7 +256,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
                     token1={token1} 
                     isOpen={isOpen} 
                     setIsOpen={setIsOpen}
-                    setCollateralType={setCollateralType} 
+                    setCollateralType={setCollateralType}
                 />
               </div>
             </div>
