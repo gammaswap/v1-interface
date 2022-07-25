@@ -33,7 +33,7 @@ const PairsSelector = ({token0, token1, setToken0, setToken1}: PairsSelectorProp
     }
 
     function isTokenEmpty(tokenToCheck: Token): boolean {
-      return Object.values(tokenToCheck).every(tokenProp => tokenProp === "")
+      return Object.values(tokenToCheck).every(tokenProp => tokenProp === "" || tokenProp === 0)
     }
 
     return (
