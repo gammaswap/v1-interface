@@ -7,7 +7,7 @@ import PositionMgr from '../../abis/PositionManager.json'
 import IERC20 from '../../abis/ERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import { FieldValues } from 'react-hook-form'
-import OpenLoan from './OpenLoanView'
+import OpenLoanView from './OpenLoanView'
 import { CollateralType } from './CollateralType'
 import toast from 'react-hot-toast';
 import { FcInfo } from 'react-icons/fc'
@@ -174,7 +174,7 @@ const OpenLoanController = () => {
   }
 
   return (
-    <OpenLoan
+    <OpenLoanView
       openLoanHandler={openLoanHandler}
       token0={token0}
       token1={token1}
