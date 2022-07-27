@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {useState, useEffect} from 'react'
-import PoolView from './PoolView'
+import PoolsView from './PoolsView'
 
-const PoolController = () => {
+const PoolsController = () => {
   const [poolData, setPoolData] = useState<{asset: string; totalSupply: string; supplyApy: string; totalBorrowed: string; borrowApyVariable: string; borrowApyStable: string}[]>()
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const PoolController = () => {
     setPoolData(data)
   }, [])
 
-  return <PoolView poolData={poolData} />
+  return <PoolsView poolData={poolData} />
 }
 
-export default PoolController
+export default PoolsController

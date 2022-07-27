@@ -6,7 +6,7 @@ type PoolProps = {
   poolData: {asset: string; totalSupply: string; supplyApy: string; totalBorrowed: string; borrowApyVariable: string; borrowApyStable: string}[] | undefined
 }
 
-const PoolView = ({poolData}: PoolProps) => {
+const PoolsView = ({poolData}: PoolProps) => {
   const style = {
     wrapper: 'w-screen flex flex-col',
     topBar: 'w-screen flex flex-col bg-gray-800 h-48 py-4 px-16 justify-center',
@@ -29,14 +29,14 @@ const PoolView = ({poolData}: PoolProps) => {
     detailsBtn: 'bg-slate-100 py-2 px-4 text-gray-600 font-semibold hover:bg-slate-200',
     topHeading: 'flex justify-between',
     createPool: 'flex justify-center items-center',
-    createPoolBtn: 'p-3 bg-red-400 font-semibold rounded-xl text-white cursor-pointer',
+    createPoolBtn: 'p-3 bg-red-400 font-semibold rounded-xl text-md cursor-pointer',
   }
 
   return (
     <div className={style.wrapper}>
       <div className={style.topBar}>
         <div className={style.topBarHead}>
-          <p className={style.heading}>Gammaswap Pools</p>
+          <p className={style.heading}>GammaSwap Pools</p>
         </div>
         <div className={style.topBarListings}>
           <div className={style.topBarSingleListings}>
@@ -115,4 +115,4 @@ const PoolView = ({poolData}: PoolProps) => {
   )
 }
 
-export default PoolView
+export default PoolsView
