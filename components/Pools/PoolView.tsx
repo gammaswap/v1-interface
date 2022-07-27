@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import * as React from 'react'
 import {HiOutlineInformationCircle} from 'react-icons/hi'
 
@@ -26,6 +27,9 @@ const PoolView = ({poolData}: PoolProps) => {
     infoSvg: 'ml-2 text-lg',
     poolHeading: 'pb-12 pt-6 pl-3 text-xl',
     detailsBtn: 'bg-slate-100 py-2 px-4 text-gray-600 font-semibold hover:bg-slate-200',
+    topHeading: 'flex justify-between',
+    createPool: 'flex justify-center items-center',
+    createPoolBtn: 'p-3 bg-red-400 font-semibold rounded-xl text-white cursor-pointer',
   }
 
   return (
@@ -56,8 +60,15 @@ const PoolView = ({poolData}: PoolProps) => {
         </div>
       </div>
       <div className={style.tableView}>
-        <div className={style.poolHeading}>
-          <p>Gammaswap assets</p>
+        <div className={style.topHeading}>
+          <div className={style.poolHeading}>
+            <p>Gammaswap assets</p>
+          </div>
+          <div className={style.createPool}>
+            <Link href={'/pools/createpool'}>
+              <div className={style.createPoolBtn}>Create Pool</div>
+            </Link>
+          </div>
         </div>
         <table className={style.tableData}>
           <thead className={style.tableHead}>
