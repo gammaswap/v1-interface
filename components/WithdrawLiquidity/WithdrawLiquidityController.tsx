@@ -7,7 +7,7 @@ import DepPool from '../../abis/DepositPool.json'
 import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
 import IERC20 from '../../abis/ERC20.json'
 import IERC20Metadata from '../../abis/IERC20Metadata.json'
-import {sqrt, weiToEther} from '../../utils/mathFunctions'
+import {sqrt} from '../../utils/mathFunctions'
 
 const ZEROMIN = 0
 
@@ -163,6 +163,55 @@ const WithdrawLiquidity = () => {
         // Variable to hold deposit pool contract
         let _depPool = null
 
+        _depPool = new ethers.Contract(address, DepPool.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
+        if (_depPool) {
+          setdepPool(_depPool)
+        }
+      } else {
+        console.log('Please connect wallet')
+      }
+    }
+    fetchContract()
+  }, [provider])
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!depPool) {
+        return
+      }
+      const liqBal = await depPool.balanceOf(accountInfo?.address)
+      setTotalLiquidityAmt(liqBal.toString())
+      setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
+
+      const uniPair = await depPool.getUniPair()
+      if (!provider) {
+        return
+      }
+
+      const uniPairContract = new ethers.Contract(uniPair, IUniswapV2Pair.abi, provider)
+      const reserves = await uniPairContract.getReserves()
+      const _uniPrice = BigNumber.from(reserves.reserve1).mul(BigNumber.from(10).pow(18)).div(reserves.reserve0)
+      setUniPrice(_uniPrice.toString())
+      const liqBalNum = BigNumber.from(liqBal.toString())
+
+      if (liqBalNum.gt(constants.Zero) && _uniPrice.gt(constants.Zero)) {
+        setLiqInTokB(
+          parseFloat(
+            ethers.utils.formatEther(
+              sqrt(_uniPrice.mul(BigNumber.from(10).pow(18)))
+                .mul(liqBalNum)
+                .div(BigNumber.from(10).pow(18))
+                .mul(2)
+            )
+          )
+        )
+      } else {
+        setLiqInTokB(0)
+      }
+    }
+
+    async function initializeTokens() {
+      if (depPool !== null && provider !== null) {
         // Variable to hold address of token0
         let token0Addr = null
 
@@ -181,12 +230,8 @@ const WithdrawLiquidity = () => {
         // Variable to hold symbol of token1
         let symbol1 = null
 
-        _depPool = new ethers.Contract(address, DepPool.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
-        if (_depPool) {
-          setdepPool(_depPool)
-          token0Addr = await _depPool.token0()
-          token1Addr = await _depPool.token1()
-        }
+        token0Addr = await depPool.token0()
+        token1Addr = await depPool.token1()
 
         if (token0Addr) {
           _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
@@ -199,49 +244,10 @@ const WithdrawLiquidity = () => {
           symbol1 = await _token1.symbol()
           setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
         }
-      } else {
-        console.log('Please connect wallet')
       }
     }
-    fetchContract()
-  }, [provider])
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!depPool) {
-        return
-      }
-      const liqBal = await depPool.balanceOf(accountInfo?.address)
-      setTotalLiquidityAmt(liqBal.toString())
-      setLiquidityAmt(parseFloat(weiToEther(liqBal.toString())))
-
-      const uniPair = await depPool.getUniPair()
-      if (!provider) {
-        return
-      }
-
-      const uniPairContract = new ethers.Contract(uniPair, IUniswapV2Pair.abi, provider)
-      const reserves = await uniPairContract.getReserves()
-      const _uniPrice = BigNumber.from(reserves.reserve1).mul(BigNumber.from(10).pow(18)).div(reserves.reserve0)
-      setUniPrice(_uniPrice.toString())
-      const liqBalNum = BigNumber.from(liqBal.toString())
-
-      if (liqBalNum.gt(constants.Zero) && _uniPrice.gt(constants.Zero)) {
-        setLiqInTokB(
-          parseFloat(
-            weiToEther(
-              sqrt(_uniPrice.mul(BigNumber.from(10).pow(18)))
-                .mul(liqBalNum)
-                .div(BigNumber.from(10).pow(18))
-                .mul(2)
-                .toString()
-            )
-          )
-        )
-      } else {
-        setLiqInTokB(0)
-      }
-    }
+    initializeTokens()
     fetchData()
   }, [depPool])
 

@@ -15,11 +15,3 @@ export function sqrt(y: any) {
   }
   return z
 }
-
-// This function will return an ether value for a wei value provided as a parameter. match will convert the value to two decimal points without rounding the value to nearest big integer
-export function weiToEther(num: number) {
-  return ethers.utils
-    .formatEther(num.toString())
-    .toString()
-    ?.match(/^-?\d+(?:\.\d{0,2})?/)![0]
-}
