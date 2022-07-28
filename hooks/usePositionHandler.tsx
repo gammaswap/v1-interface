@@ -1,8 +1,6 @@
-import * as React from 'react'
 import {useState, useEffect} from 'react'
-import PositionView from './PositionView'
 
-const PositionController = () => {
+export const usePositionHandler = () => {
   const [positions, setPositions] = useState<{asset: string; amountOfLiquidity: string; amountOfCollateral: string; profit: string; loss: string}[]>()
 
   useEffect(() => {
@@ -31,7 +29,5 @@ const PositionController = () => {
     ])
   }, [])
 
-  return <PositionView positions={positions} />
+  return {positions}
 }
-
-export default PositionController
