@@ -52,7 +52,7 @@ const Header = () => {
                         Positions
                         </div>
                     </Link>
-                    <Link href={'/pools'}>
+                    <Link href={'/pools/pools'}>
                         <div
                         onClick={() => setSelectedNavItem("pools")}
                         className={`${style.navItem} ${
