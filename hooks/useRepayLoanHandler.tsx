@@ -1,8 +1,6 @@
-import * as React from 'react'
 import {useState} from 'react'
-import RepayLoanView from './RepayLoanView'
 
-const RepayLoanController = () => {
+export const useRepayLoanHandler = () => {
   const [repayAmt, setRepayAmt] = useState<number>(0)
   const [enableRepay, setEnableRepay] = useState<Boolean>(false)
   let percentages = [25, 50, 75, 100]
@@ -22,17 +20,13 @@ const RepayLoanController = () => {
 
   function repayTransaction() {}
 
-  return (
-    <RepayLoanView
-      repayAmt={repayAmt}
-      repayAmtChange={repayAmtChange}
-      changeSliderPercentage={changeSliderPercentage}
-      percentages={percentages}
-      approveTransaction={approveTransaction}
-      repayTransaction={repayTransaction}
-      enableRepay={enableRepay}
-    />
-  )
+  return {
+    repayAmt,
+    repayAmtChange,
+    changeSliderPercentage,
+    percentages,
+    approveTransaction,
+    repayTransaction,
+    enableRepay,
+  }
 }
-
-export default RepayLoanController

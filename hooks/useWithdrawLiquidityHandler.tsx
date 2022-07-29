@@ -1,17 +1,17 @@
 import * as React from 'react'
 import {useState, useEffect, useContext} from 'react'
-import WithdrawLiquidityView from './WithdrawLiquidityView'
-import {WalletContext} from '../../context/WalletContext'
+import {WalletContext} from '../context/WalletContext'
 import {ethers, Contract, BigNumber, constants} from 'ethers'
-import DepPool from '../../abis/DepositPool.json'
-import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
-import IERC20 from '../../abis/ERC20.json'
-import IERC20Metadata from '../../abis/IERC20Metadata.json'
-import {sqrt} from '../../utils/mathFunctions'
+import DepPool from '../abis/DepositPool.json'
+import IUniswapV2Pair from '../abis/IUniswapV2Pair.json'
+import IERC20 from '../abis/ERC20.json'
+import IERC20Metadata from '../abis/IERC20Metadata.json'
+import {sqrt} from '../utils/mathFunctions'
+import Tokens, {Token} from '../components/Tokens'
 
 const ZEROMIN = 0
 
-const WithdrawLiquidity = () => {
+export const useWithdrawLiquidityHandler = () => {
   const [depPool, setdepPool] = useState<Contract | null>(null)
   const [sliderPercentage, setsliderPercentage] = useState(0)
   const {provider, accountInfo} = useContext(WalletContext)
@@ -19,8 +19,13 @@ const WithdrawLiquidity = () => {
   const [liquidityAmt, setLiquidityAmt] = useState<number>(0)
   const [totalLiquidityAmt, setTotalLiquidityAmt] = useState<string>('0')
   const [liqInTokB, setLiqInTokB] = useState<number>(0)
-  const [token0, setToken0] = useState({})
-  const [token1, setToken1] = useState({})
+  const [token0, setToken0] = useState<Token>(Tokens[0])
+  const [token1, setToken1] = useState<Token>({
+    imgPath: '',
+    symbol: '',
+    address: '',
+    decimals: 0,
+  })
   const [enableRemove, setenableRemove] = useState<Boolean>(false)
 
   async function changeSliderPercentage(percentage: number) {
@@ -59,6 +64,7 @@ const WithdrawLiquidity = () => {
         setenableRemove(true)
       })
       .catch((err: any) => {
+        setenableRemove(false)
         console.log(err)
       })
   }
@@ -114,7 +120,7 @@ const WithdrawLiquidity = () => {
           let tx = await depPool.approve(depPoolAddr, constants.MaxUint256.toString())
           return await tx.wait()
         } catch (e) {
-          return e
+          throw e
         }
       } else {
         console.log('Please connect wallet')
@@ -219,10 +225,10 @@ const WithdrawLiquidity = () => {
         let token1Addr = null
 
         // Variable to hold contract token0
-        let _token0 = null
+        let _token0: Contract
 
         // Variable to hold contract token0
-        let _token1 = null
+        let _token1: Contract
 
         // Variable to hold symbol of token0
         let symbol0 = null
@@ -251,20 +257,16 @@ const WithdrawLiquidity = () => {
     fetchData()
   }, [depPool])
 
-  return (
-    <WithdrawLiquidityView
-      sliderPercentage={sliderPercentage}
-      changeSliderPercentage={changeSliderPercentage}
-      sliderPercentChange={sliderPercentChange}
-      withdrawLiquidity={withdrawLiquidity}
-      approveTransaction={approveTransaction}
-      token0={token0}
-      token1={token1}
-      liquidityAmt={liquidityAmt}
-      liqInTokB={liqInTokB}
-      enableRemove={enableRemove}
-    />
-  )
+  return {
+    sliderPercentage,
+    changeSliderPercentage,
+    sliderPercentChange,
+    withdrawLiquidity,
+    approveTransaction,
+    token0,
+    token1,
+    liquidityAmt,
+    liqInTokB,
+    enableRemove,
+  }
 }
-
-export default WithdrawLiquidity
