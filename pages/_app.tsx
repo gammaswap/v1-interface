@@ -1,6 +1,6 @@
 import '../styles/globals.css'
-import Layout from '../components/Layout'
-import Header from '../components/Header'
+import Layout from '../src/components/Layout'
+import Header from '../src/components/Header'
 import type { AppProps } from 'next/app'
 import { Toaster } from 'react-hot-toast';
 
