@@ -158,11 +158,11 @@ const OpenLoanController = () => {
       toast("Token values must be different", { icon: <FcInfo /> })
       return
     }
-    var pairsAddress = "0xC6CB7f8c046756Bd33ad6b322a3b88B0CA9ceC1b"
+    var pairsAddress = process.env.POSITION_MANAGER_ADDRESS
 
     //TODO: when the factory is available need to call it to get the pair's pool address to set
 
-    if (provider) {
+    if (provider && pairsAddress) {
       if (accountInfo && accountInfo?.address) {
         setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
       } else {

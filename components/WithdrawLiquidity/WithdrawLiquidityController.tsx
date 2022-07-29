@@ -34,9 +34,9 @@ const WithdrawLiquidity = () => {
   }
 
   async function approveTransaction() {
-    if (provider) {
-      // Deposit poll contract address
-      let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+    // Deposit poll contract address
+    let address = process.env.DEPOSIT_POOL_ADDRESS
+    if (provider && address) {
       if (accountInfo && accountInfo?.address) {
         setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
       } else {
@@ -70,9 +70,9 @@ const WithdrawLiquidity = () => {
     } else {
       amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
     }
-    if (provider) {
-      // Deposit poll contract address
-      let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+    // Deposit poll contract address
+    let address = process.env.DEPOSIT_POOL_ADDRESS
+    if (provider && address) {
       if (accountInfo && accountInfo?.address) {
         setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
       } else {
@@ -156,10 +156,10 @@ const WithdrawLiquidity = () => {
         return
       }
 
-      if (provider) {
-        // Deposit poll contract address
-        let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+      // Deposit poll contract address
+      let address = process.env.DEPOSIT_POOL_ADDRESS || '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
 
+      if (provider && address) {
         // Variable to hold deposit pool contract
         let _depPool = null
 
