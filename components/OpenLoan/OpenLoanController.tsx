@@ -24,6 +24,7 @@ const OpenLoanController = () => {
   const [posManager, setPosManager] = useState<Contract | null>(null)
 
   useEffect(() => {
+    console.log(process.env.MY_NEXT_PUBLIC_ETH_CHAIN_ID)
     if (!provider) {
       toast("Please connect wallet.", { icon: <FcInfo /> })
       return
@@ -158,7 +159,7 @@ const OpenLoanController = () => {
       toast("Token values must be different", { icon: <FcInfo /> })
       return
     }
-    var pairsAddress = process.env.POSITION_MANAGER_ADDRESS
+    var pairsAddress = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
 
     //TODO: when the factory is available need to call it to get the pair's pool address to set
 
