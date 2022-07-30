@@ -21,11 +21,11 @@ const style = {
   tokenInput: "bg-transparent placeholder:text-gray-600 outline-none mb-6 w-full text-4xl text-gray-300 mt-4",
   nonSelectedTokenContainer: "flex items-center w-2/3 text-gray-200",
   nonSelectedTokenContent: "w-full h-min flex justify-center items-center bg-blue-500 rounded-2xl text-2xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30",
-  tokenSelectorContainer: "flex items-center w-1/ text-gray-200",
+  tokenSelectorContainer: "items-center w-1/ text-gray-200",
   tokenSelectorContent: "w-full h-min flex justify-between items-center bg-gray-700 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-gray-700/30 hover:bg-gray-900 hover:shadow-gray-900/30",
   tokenSelectorIcon: "flex items-center",
   tokenSelectorTicker: "mx-2",
-  tokenBalance: "self-end mt-2 text-sm text-gray-300 opacity-50",
+  tokenBalance: "self-end mt-2 text-sm text-gray-300 opacity-50 text-right",
   dropdownArrow: "w-12 h-8",
   invalidatedButton: "disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700",
   confirmButton: "bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300"
