@@ -34,7 +34,7 @@ const WithdrawLiquidity = () => {
   }
 
   async function approveTransaction() {
-    // Deposit poll contract address
+    // Deposit pool contract address
     let address = process.env.NEXT_PUBLIC_DEPOSIT_POOL_ADDRESS
     if (provider && address) {
       if (accountInfo && accountInfo?.address) {
@@ -70,7 +70,7 @@ const WithdrawLiquidity = () => {
     } else {
       amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
     }
-    // Deposit poll contract address
+    // Deposit pool contract address
     let address = process.env.NEXT_PUBLIC_DEPOSIT_POOL_ADDRESS
     if (provider && address) {
       if (accountInfo && accountInfo?.address) {
@@ -156,7 +156,7 @@ const WithdrawLiquidity = () => {
         return
       }
 
-      // Deposit poll contract address
+      // Deposit pool contract address
       let address = process.env.NEXT_PUBLIC_DEPOSIT_POOL_ADDRESS
 
       if (provider && address) {
