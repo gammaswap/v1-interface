@@ -44,7 +44,7 @@ export const getEstimatedOutput = async (
     inputAmt: string,
     provider: Provider
 ): Promise<AmountsOut | undefined> => {
-    const routerContract = new ethers.Contract(process.env.IUNISWAP_V2_ROUTER_02_ADDR as string, IUniswapV2Router02ABI, provider as Provider)
+    const routerContract = new ethers.Contract(process.env.NEXT_PUBLIC_IUNISWAP_V2_ROUTER_02_ADDR as string, IUniswapV2Router02ABI, provider as Provider)
     let convertedInput = ethers.utils.parseEther(inputAmt)
     const amountsOut = await routerContract.getAmountsOut(convertedInput, [tokenAddrs[0], tokenAddrs[1]])
     return amountsOut

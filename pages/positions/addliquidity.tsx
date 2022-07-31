@@ -109,8 +109,8 @@ const AddLiquidity: NextPage = () => {
   // render new token A/B contracts, wallet balance, output value
   useEffect(() => {
     const fetchedTokenContracts = getTokenContracts(
-      process.env.ROPSTEN_TOKEN_A_ADDR as string,
-      process.env.ROPSTEN_TOKEN_B_ADDR as string,
+      process.env.NEXT_PUBLIC_TOKEN_A_ADDR as string,
+      process.env.NEXT_PUBLIC_TOKEN_B_ADDR as string,
       provider as Provider,
     )
     setTokenContracts(fetchedTokenContracts)

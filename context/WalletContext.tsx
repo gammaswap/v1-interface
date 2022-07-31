@@ -48,7 +48,7 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
                 options: {
                     appName: "GammaSwap",
                     infuraId: process.env.INFURA_ID,
-                    chainId: process.env.ETH_CHAIN_ID
+                    chainId: process.env.NEXT_PUBLIC_ETH_CHAIN_ID
                 }
             },
             binancechainwallet: {
@@ -57,7 +57,7 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
         }
         
         const newWeb3Modal = new Web3Modal({
-            network: process.env.ETH_CHAIN,
+            network: process.env.NEXT_PUBLIC_ETH_CHAIN,
             cacheProvider: true,
             providerOptions
         })
@@ -83,7 +83,7 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
 
         const network = await provider.getNetwork()
 
-        if (network.chainId !== parseInt(process.env.ETH_CHAIN_ID || "3")) {
+        if (network.chainId !== parseInt(process.env.NEXT_PUBLIC_ETH_CHAIN_ID || "3")) {
             notifyError("Please switch to the Ropsten network to use the app.")
         }
 
