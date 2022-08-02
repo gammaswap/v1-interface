@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
 
+type PoolType = { asset: string; totalSupply: string; supplyApy: string; totalBorrowed: string; borrowApyVariable: string; borrowApyStable: string }
+
 export const usePoolsHandler = () => {
-  const [poolData, setPoolData] = useState<{ asset: string; totalSupply: string; supplyApy: string; totalBorrowed: string; borrowApyVariable: string; borrowApyStable: string }[]>()
+  const [poolData, setPoolData] = useState<PoolType[]>()
 
   useEffect(() => {
     setPoolData([

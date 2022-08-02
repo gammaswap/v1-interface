@@ -1,10 +1,9 @@
 import type { NextPage } from "next"
 import { HiOutlineInformationCircle } from "react-icons/hi"
 import Link from "next/link"
-import { usePoolsHandler } from "../../hooks/usePoolsHandler"
+import PoolTableRow from "../../components/Pools/PoolTableRow"
 
 const Pools: NextPage = () => {
-  const { poolData } = usePoolsHandler()
   const style = {
     wrapper: "w-screen flex flex-col",
     topBar: "w-screen flex flex-col bg-gray-800 h-48 py-4 px-16 justify-center",
@@ -16,18 +15,20 @@ const Pools: NextPage = () => {
     topBarData: "text-sm text-gray-400",
     topBarSingleValue: "text-2xl text-slate-100",
     tableView: "overflow-x-auto relative bg-white mx-20",
-    tableData: "w-full text-sm text-left text-gray-500 dark:text-gray-400",
-    tableHead: "text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400",
-    tableHeading: "py-3 px-6",
-    tableBodyRow: "bg-white border-b dark:bg-gray-800 dark:border-gray-700",
-    tableBodyDefinition: "py-4 px-6",
-    tableHeadDiv: "flex items-center",
+    tableContainer: "p-4 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-400",
+    tableHead: "flex text-xs text-gray-700 uppercase pl-2 pr-4 border-b border-gray-500",
+    tableHeading: "flex align-center py-3",
     infoSvg: "ml-2 text-lg",
     poolHeading: "pb-12 pt-6 pl-3 text-xl",
-    detailsBtn: "bg-slate-100 py-2 px-4 text-gray-600 font-semibold hover:bg-slate-200",
     topHeading: "flex justify-between",
     createPool: "flex justify-center items-center",
     createPoolBtn: "p-3 bg-red-400 font-semibold rounded-xl text-md cursor-pointer",
+    assetHead: "w-[20%] justify-start font-medium text-white",
+    totalSupplyHead: "w-[16%] justify-end font-medium text-white",
+    supplyApyHead: "w-[16%] justify-end font-medium text-white",
+    totalBorrowedHead: "w-[16%] justify-end font-medium text-white",
+    borrowApyVariableHead: "w-[16%] justify-end font-medium text-white",
+    borrowApyStableHead: "w-[16%] justify-end font-medium text-white",
   }
 
   return (
@@ -68,46 +69,31 @@ const Pools: NextPage = () => {
             </Link>
           </div>
         </div>
-        <table className={style.tableData}>
-          <thead className={style.tableHead}>
-            <tr>
-              <th className={style.tableHeading}>Asset</th>
-              <th className={style.tableHeading}>Total Supply</th>
-              <th className={style.tableHeading}>Supply APY</th>
-              <th className={style.tableHeading}>Total Borrowed</th>
-              <th className={style.tableHeading}>
-                <div className={style.tableHeadDiv}>
-                  Borrow APY, variable <HiOutlineInformationCircle className={style.infoSvg} />
-                </div>
-              </th>
-              <th className={style.tableHeading}>
-                <div className={style.tableHeadDiv}>
-                  Borrow APY, stable <HiOutlineInformationCircle className={style.infoSvg} />
-                </div>
-              </th>
-              <th className={style.tableHeading}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {poolData && poolData.length > 0
-              ? poolData.map((pool, index) => {
-                  return (
-                    <tr className={style.tableBodyRow} key={index}>
-                      <td className={style.tableBodyDefinition}>{pool.asset}</td>
-                      <td className={style.tableBodyDefinition}>{pool.totalSupply}M</td>
-                      <td className={style.tableBodyDefinition}>{pool.supplyApy}%</td>
-                      <td className={style.tableBodyDefinition}>{pool.totalBorrowed}M</td>
-                      <td className={style.tableBodyDefinition}>{pool.borrowApyVariable}%</td>
-                      <td className={style.tableBodyDefinition}>{pool.borrowApyStable}%</td>
-                      <td className={style.tableBodyDefinition}>
-                        <button className={style.detailsBtn}>Details</button>
-                      </td>
-                    </tr>
-                  )
-                })
-              : null}
-          </tbody>
-        </table>
+        <div className={style.tableContainer}>
+          <div className={style.tableHead}>
+            <div className={style.tableHeading + " " + style.assetHead}>
+              <p>Asset</p>
+            </div>
+            <div className={style.tableHeading + " " + style.totalSupplyHead}>
+              <p>Total Supply</p>
+            </div>
+            <div className={style.tableHeading + " " + style.supplyApyHead}>
+              <p>Supply APY</p>
+            </div>
+            <div className={style.tableHeading + " " + style.totalBorrowedHead}>
+              <p>Total Borrowed</p>
+            </div>
+            <div className={style.tableHeading + " " + style.borrowApyVariableHead}>
+              <p>Borrow APY, variable</p>
+              <HiOutlineInformationCircle className={style.infoSvg} />
+            </div>
+            <div className={style.tableHeading + " " + style.borrowApyStableHead}>
+              <p>Borrow APY, stable</p>
+              <HiOutlineInformationCircle className={style.infoSvg} />
+            </div>
+          </div>
+          <PoolTableRow />
+        </div>
       </div>
     </div>
   )
