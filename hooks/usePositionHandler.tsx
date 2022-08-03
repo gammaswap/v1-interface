@@ -1,7 +1,15 @@
-import {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
+
+type PositionType = {
+  asset: string
+  amountOfLiquidity: string
+  amountOfCollateral: string
+  profit: string
+  loss: string
+}
 
 export const usePositionHandler = () => {
-  const [positions, setPositions] = useState<{asset: string; amountOfLiquidity: string; amountOfCollateral: string; profit: string; loss: string}[]>()
+  const [positions, setPositions] = useState<PositionType[]>()
 
   useEffect(() => {
     setPositions([
@@ -29,5 +37,5 @@ export const usePositionHandler = () => {
     ])
   }, [])
 
-  return {positions}
+  return { positions }
 }

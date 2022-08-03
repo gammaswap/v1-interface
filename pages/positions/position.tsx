@@ -1,52 +1,56 @@
-import type {NextPage} from 'next'
-import {usePositionHandler} from '../../hooks/usePositionHandler'
-
-type PositionProps = {
-  positions: {asset: string; amountOfLiquidity: string; amountOfCollateral: string; profit: string; loss: string}[] | undefined
-}
+import type { NextPage } from 'next'
+import { usePositionHandler } from '../../hooks/usePositionHandler'
+import PositionTableRow from '../../components/Positions/PositionTableRow'
+import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs'
 
 const PositionPage: NextPage = () => {
-  const {positions} = usePositionHandler()
+  const { positions } = usePositionHandler()
 
   const style = {
-    wrapper: 'w-screen flex justify-center items-center',
-    tableView: 'w-screen overflow-x-auto relative bg-white mx-20',
+    wrapper: 'w-screen flex flex-col',
+    tableContainer:
+      'flex flex-col overflow-x-auto relative bg-white mx-20 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-400',
     tableData: 'w-full text-sm text-left text-gray-500 datk:text-gray-400',
-    tableHead: 'text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400',
-    tableHeading: 'py-3 px-6',
+    tableHead: 'flex text-xs text-gray-700 uppercase pl-2 pr-4 border-b border-gray-500',
+    tableHeading: 'py-3 w-[20%] font-medium text-white flex align-center',
     tableBodyRow: 'bg-white border-b dark:bg-gray-800 dark:border-gray-700',
     tableBodyDefinition: 'py-4 px-6',
+    arrow: 'mt-2 text-2xl cursor-pointer',
+    allArrows: 'flex justify-end',
+    rightAlign: 'justify-end',
+    leftAlign: 'justify-start',
   }
 
   return (
     <div className={style.wrapper}>
-      <div className={style.tableView}>
-        <table className={style.tableData}>
-          <thead className={style.tableHead}>
-            <tr>
-              <th className={style.tableHeading}>Liquidity Pool</th>
-              <th className={style.tableHeading}>Amount of Liquidity</th>
-              <th className={style.tableHeading}>Amount of Collateral</th>
-              <th className={style.tableHeading}>Profit</th>
-              <th className={style.tableHeading}>Loss</th>
-            </tr>
-          </thead>
-          <tbody>
-            {positions && positions.length > 0
-              ? positions.map((pos, index) => {
-                  return (
-                    <tr className={style.tableBodyRow} key={index}>
-                      <td className={style.tableBodyDefinition}>{pos.asset}</td>
-                      <td className={style.tableBodyDefinition}>{pos.amountOfLiquidity}</td>
-                      <td className={style.tableBodyDefinition}>{pos.amountOfCollateral}</td>
-                      <td className={style.tableBodyDefinition}>{pos.profit}</td>
-                      <td className={style.tableBodyDefinition}>{pos.loss}</td>
-                    </tr>
-                  )
-                })
-              : null}
-          </tbody>
-        </table>
+      <div className={style.tableContainer}>
+        <div className={style.tableHead}>
+          <div className={style.tableHeading + ' ' + style.leftAlign}>
+            <p>Liquidity Pool</p>
+          </div>
+          <div className={style.tableHeading + ' ' + style.rightAlign}>
+            <p>Amount of Liquidity</p>
+          </div>
+          <div className={style.tableHeading + ' ' + style.rightAlign}>
+            <p>Amount of Collateral</p>
+          </div>
+          <div className={style.tableHeading + ' ' + style.rightAlign}>
+            <p>Profit</p>
+          </div>
+          <div className={style.tableHeading + ' ' + style.rightAlign}>
+            <p>Loss</p>
+          </div>
+        </div>
+        {positions && positions.length > 0
+          ? positions.map((pos, index) => {
+              return <PositionTableRow key={index} position={pos} />
+            })
+          : null}
+
+        <div className={style.allArrows}>
+          <BsArrowLeftShort className={style.arrow} />
+          <BsArrowRightShort className={style.arrow} />
+        </div>
       </div>
     </div>
   )
