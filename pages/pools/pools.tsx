@@ -2,6 +2,8 @@ import type { NextPage } from "next"
 import { HiOutlineInformationCircle } from "react-icons/hi"
 import Link from "next/link"
 import PoolTableRow from "../../components/Pools/PoolTableRow"
+import { BsArrowLeftShort, BsArrowRightShort } from "react-icons/bs"
+import { usePoolsHandler } from "../../hooks/usePoolsHandler"
 
 const Pools: NextPage = () => {
   const style = {
@@ -29,7 +31,11 @@ const Pools: NextPage = () => {
     totalBorrowedHead: "w-[16%] justify-end font-medium text-white",
     borrowApyVariableHead: "w-[16%] justify-end font-medium text-white",
     borrowApyStableHead: "w-[16%] justify-end font-medium text-white",
+    arrow: "mt-2 text-2xl cursor-pointer",
+    allArrows: "flex justify-end",
   }
+
+  const { poolData } = usePoolsHandler()
 
   return (
     <div className={style.wrapper}>
@@ -92,7 +98,11 @@ const Pools: NextPage = () => {
               <HiOutlineInformationCircle className={style.infoSvg} />
             </div>
           </div>
-          <PoolTableRow />
+          {poolData && poolData.length > 0 ? poolData.map((pool, index) => <PoolTableRow key={index} pool={pool} />) : null}
+          <div className={style.allArrows}>
+            <BsArrowLeftShort className={style.arrow} />
+            <BsArrowRightShort className={style.arrow} />
+          </div>
         </div>
       </div>
     </div>
