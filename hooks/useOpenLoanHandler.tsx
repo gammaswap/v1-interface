@@ -1,15 +1,19 @@
 import * as React from 'react'
-import {useState, useEffect, useContext} from 'react'
+import {useState, useEffect, useContext, Dispatch, SetStateAction, useCallback, ChangeEvent} from 'react'
 import Tokens, {Token} from '../components/Tokens'
 import {WalletContext} from '../context/WalletContext'
 // TODO: import Factory from '../../abis/Factory.json'
 import PositionMgr from '../abis/PositionManager.json'
 import IERC20 from '../abis/ERC20.json'
 import {ethers, Contract, BigNumber, constants} from 'ethers'
-import {FieldValues} from 'react-hook-form'
 import {CollateralType} from '../components/OpenLoan/CollateralType'
 import toast from 'react-hot-toast'
 import {FcInfo} from 'react-icons/fc'
+import {FieldValues, useForm} from 'react-hook-form'
+import useNotification from './useNotification'
+import {OpenLoanStyles} from '../styles/OpenLoanStyles'
+
+const style = OpenLoanStyles()
 
 export const useOpenLoanHandler = () => {
   const {provider, accountInfo} = useContext(WalletContext)
@@ -22,13 +26,28 @@ export const useOpenLoanHandler = () => {
   })
   const [posManager, setPosManager] = useState<Contract | null>(null)
 
+  const [collateralType, setCollateralType] = useState<CollateralType>(CollateralType.None)
+  const [collateralButtonText, setCollateralButtonText] = useState<string>('Select collateral type')
+  const [confirmStyle, setConfirmStyle] = useState<string>(style.invalidatedButton)
+  const [loanAmt, setLoanAmt] = useState<number>(0)
+  const [loanAmtStr, setLoanAmtStr] = useState<string>('')
+  const [collateralAmt0, setCollateralAmt0] = useState<number>(0)
+  const [collateralAmt0Str, setCollateralAmt0Str] = useState<string>('')
+  const [collateralAmt1, setCollateralAmt1] = useState<number>(0)
+  const [collateralAmt1Str, setCollateralAmt1Str] = useState<string>('')
+  const {register, handleSubmit, setValue} = useForm()
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const {notifyError, notifySuccess} = useNotification()
+  const [buttonText, setButtonText] = useState<string>('Confirm')
+  const [collateral1Class, setCollateral1Class] = useState<string>('')
+
   useEffect(() => {
     if (!provider) {
       toast('Please connect wallet.', {icon: <FcInfo />})
       return
     }
 
-    var signer = provider.getSigner()
+    let signer = provider.getSigner()
   }, [provider])
 
   async function openLoanHandler(data: FieldValues) {
@@ -49,33 +68,33 @@ export const useOpenLoanHandler = () => {
     }
 
     // unpack
-    // console.log("data:", data)
-    var amt0BN = data.collateralAmt0 ? ethers.utils.parseUnits(data.collateralAmt0, token0.decimals) : BigNumber.from(0)
-    var amt1BN = data.collateralAmt1 ? ethers.utils.parseUnits(data.collateralAmt1, token1.decimals) : BigNumber.from(0)
-    var loanAmtBN = ethers.utils.parseUnits(data.loanAmt, 18) // 18 is from DepositPool.decimals
-    var collateralType = data.collateralType
-    var accountAddress = accountInfo.address ? accountInfo.address : ''
+    let amt0BN = data.collateralAmt0 ? ethers.utils.parseUnits(data.collateralAmt0, token0.decimals) : BigNumber.from(0)
+    let amt1BN = data.collateralAmt1 ? ethers.utils.parseUnits(data.collateralAmt1, token1.decimals) : BigNumber.from(0)
+    let loanAmtBN = ethers.utils.parseUnits(data.loanAmt, 18) // 18 is from DepositPool.decimals
+    let collateralType = data.collateralType
+    let accountAddress = accountInfo.address ? accountInfo.address : ''
 
     try {
+      let erc20
       switch (collateralType) {
         case CollateralType.LPToken:
           // TODO: currently no way to know get uniPair without factory
           // can't get it from position because there's no position yet
           break
         case CollateralType.Token0:
-          var erc20 = new ethers.Contract(token0.address, IERC20.abi, provider)
+          erc20 = new ethers.Contract(token0.address, IERC20.abi, provider)
           await ensureAllowance(accountAddress, erc20, amt0BN, token0.decimals, token0.symbol)
           break
         case CollateralType.Token1:
           // switch the amounts because amount comes from first input
           amt1BN = amt0BN
           amt0BN = BigNumber.from(0)
-          var erc20 = new ethers.Contract(token1.address, IERC20.abi, provider)
+          erc20 = new ethers.Contract(token1.address, IERC20.abi, provider)
           await ensureAllowance(accountAddress, erc20, amt1BN, token1.decimals, token1.symbol)
           break
         case CollateralType.Both:
-          var erc20Token0 = new ethers.Contract(token0.address, IERC20.abi, provider)
-          var erc20Token1 = new ethers.Contract(token1.address, IERC20.abi, provider)
+          let erc20Token0 = new ethers.Contract(token0.address, IERC20.abi, provider)
+          let erc20Token1 = new ethers.Contract(token1.address, IERC20.abi, provider)
           await ensureAllowance(accountAddress, erc20Token0, amt0BN, token0.decimals, token0.symbol).then(() => ensureAllowance(accountAddress, erc20Token1, amt1BN, token1.decimals, token1.symbol))
           break
         default:
@@ -83,9 +102,9 @@ export const useOpenLoanHandler = () => {
           return
       }
       // TODO: wait for contract to handle collateral
-      var tx = await posManager.openPosition(token0.address, token1.address, amt0BN, amt1BN, loanAmtBN, accountAddress)
-      var loading = toast.loading('Waiting for block confirmation')
-      var receipt = await tx.wait()
+      let tx = await posManager.openPosition(token0.address, token1.address, amt0BN, amt1BN, loanAmtBN, accountAddress)
+      let loading = toast.loading('Waiting for block confirmation')
+      let receipt = await tx.wait()
       if (receipt.status == 1) {
         toast.dismiss(loading)
         toast.success('Position opened successfully.')
@@ -103,9 +122,7 @@ export const useOpenLoanHandler = () => {
 
   async function ensureAllowance(account: string, erc20: Contract, amountBN: BigNumber, decimals: number, symbol: string) {
     try {
-      var amountStr = ethers.utils.formatUnits(amountBN, decimals)
-      // console.log("checking allowance...", symbol, "spender", posManager?.address)
-      // console.log('owner', account, 'amount', amountStr)
+      let amountStr = ethers.utils.formatUnits(amountBN, decimals)
 
       // check enough balance
       let balanceBN = await erc20.balanceOf(account)
@@ -127,9 +144,9 @@ export const useOpenLoanHandler = () => {
   }
 
   async function approve(fromTokenContract: Contract, spender: string) {
-    var tx = await fromTokenContract.approve(spender, constants.MaxUint256)
-    var loading = toast.loading('Waiting for approval')
-    var receipt = await tx.wait()
+    let tx = await fromTokenContract.approve(spender, constants.MaxUint256)
+    let loading = toast.loading('Waiting for approval')
+    let receipt = await tx.wait()
     toast.dismiss(loading)
     if (receipt.status == 1) {
       toast.success('Approval completed')
@@ -139,12 +156,11 @@ export const useOpenLoanHandler = () => {
   }
 
   function getPosMgr() {
-    // console.log("Looking up pair address", token0.symbol, token1.symbol)
     if (token0 == token1) {
       toast('Token values must be different', {icon: <FcInfo />})
       return
     }
-    var pairsAddress = '0xC6CB7f8c046756Bd33ad6b322a3b88B0CA9ceC1b'
+    let pairsAddress = '0xC6CB7f8c046756Bd33ad6b322a3b88B0CA9ceC1b'
 
     //TODO: when the factory is available need to call it to get the pair's pool address to set
 
@@ -159,5 +175,161 @@ export const useOpenLoanHandler = () => {
     }
   }
 
-  return {openLoanHandler, token0, token1, setToken0, setToken1}
+  function getCollateralTypeButtonText(collateralType: CollateralType) {
+    switch (collateralType) {
+      case CollateralType.None:
+        return 'Select collateral type'
+      case CollateralType.LPToken:
+        return 'Liquidity pool tokens'
+      case CollateralType.Token0:
+        return token0.symbol
+      case CollateralType.Token1:
+        return token1.symbol
+      case CollateralType.Both:
+        return 'Both'
+      default:
+        return 'Select collateral type'
+    }
+    return ''
+  }
+
+  useEffect(() => {
+    resetCollateralType()
+    validate()
+  }, [token0, token1])
+
+  useEffect(() => {
+    setIsOpen(false)
+    setCollateralButtonText(getCollateralTypeButtonText(collateralType))
+    setCollateralAmt1(0)
+    setCollateralAmt1Str('')
+    setCollateral1Class(collateralType == CollateralType.Both ? style.numberInputContainer : style.numberInputHidden)
+    validate()
+  }, [collateralType])
+
+  function resetCollateralType() {
+    setCollateralType(CollateralType.None)
+    setCollateralButtonText(getCollateralTypeButtonText(CollateralType.None))
+    setConfirmStyle(style.invalidatedButton)
+    setCollateral1Class(style.numberInputHidden)
+    setCollateralAmt1(0)
+  }
+
+  function validate() {
+    if (token0 == token1) {
+      setButtonText('Tokens must be different')
+      setConfirmStyle(style.confirmGrey)
+      return false
+    }
+    if (isTokenEmpty(token1)) {
+      setButtonText('Token must be selected')
+      setConfirmStyle(style.confirmGrey)
+      return false
+    }
+    if (collateralType == CollateralType.None) {
+      setButtonText('Collateral must be selected')
+      setConfirmStyle(style.confirmGrey)
+      return false
+    }
+    if (loanAmt <= 0) {
+      setButtonText('Loan amount must be positive')
+      setConfirmStyle(style.confirmGrey)
+      return false
+    }
+    if (collateralAmt0 <= 0) {
+      setButtonText(token0.symbol + ' collateral amount must be positive')
+      setConfirmStyle(style.confirmGrey)
+      return false
+    }
+    if (collateralType == CollateralType.Both && collateralAmt1 <= 0) {
+      setButtonText(token1.symbol + ' collateral amount must be positive')
+      setConfirmStyle(style.confirmGrey)
+      return false
+    }
+    setButtonText('Confirm')
+    setConfirmStyle(style.confirmGreen)
+    return true
+  }
+
+  function isTokenEmpty(tokenToCheck: Token): boolean {
+    return Object.values(tokenToCheck).every((tokenProp) => tokenProp === '')
+  }
+
+  async function validateBeforeSubmit(data: FieldValues): Promise<void> {
+    if (!validate()) {
+      return
+    }
+    return openLoanHandler(data)
+  }
+
+  // checks for non-numeric value inputs
+  const validateNumberInput = (e: ChangeEvent<HTMLInputElement> | string, setNumberInputStr: Dispatch<SetStateAction<string>>, setNumberInputval: Dispatch<SetStateAction<number>>): void => {
+    let numberInputStr: string
+    if (typeof e !== 'string') numberInputStr = (e.target as HTMLInputElement).value
+    else numberInputStr = e
+
+    let strToSet = ''
+    let i = numberInputStr.indexOf('.')
+    if (i >= 0 && i + 1 < numberInputStr.length) {
+      strToSet = numberInputStr.substring(0, i + 1) + numberInputStr.substring(i + 1).replace(/[^0-9]/g, '')
+    } else {
+      strToSet = numberInputStr.replace(/[^0-9\.]/g, '')
+    }
+    setNumberInputStr(strToSet)
+
+    // clamp the value
+    let inputVal = parseFloat(strToSet)
+    if (!isNaN(inputVal)) {
+      setNumberInputval(inputVal)
+    }
+  }
+
+  const handleNumberInput = (e: ChangeEvent<HTMLInputElement> | string, setNumberInputStr: Dispatch<SetStateAction<string>>, setNumberInputval: Dispatch<SetStateAction<number>>) => {
+    try {
+      if (e) {
+        const numberInput = typeof e !== 'string' ? e.target.value : e
+        if (numberInput === '') {
+          setNumberInputStr('')
+        } else {
+          validateNumberInput(numberInput, setNumberInputStr, setNumberInputval)
+        }
+      }
+      validate()
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+
+      notifyError(message)
+    }
+  }
+
+  setValue('collateralType', collateralType)
+
+  return {
+    token0,
+    token1,
+    setToken0,
+    setToken1,
+    validateBeforeSubmit,
+    handleNumberInput,
+    handleSubmit,
+    register,
+    setIsOpen,
+    loanAmtStr,
+    setLoanAmtStr,
+    setLoanAmt,
+    collateralButtonText,
+    isOpen,
+    setCollateralType,
+    collateralAmt0Str,
+    setCollateralAmt0Str,
+    setCollateralAmt0,
+    collateral1Class,
+    collateralAmt1Str,
+    setCollateralAmt1Str,
+    setCollateralAmt1,
+    confirmStyle,
+    buttonText,
+  }
 }

@@ -13,7 +13,7 @@ const ZEROMIN = 0
 
 export const useWithdrawLiquidityHandler = () => {
   const [depPool, setdepPool] = useState<Contract | null>(null)
-  const [sliderPercentage, setsliderPercentage] = useState(0)
+  const [sliderPercentage, setsliderPercentage] = useState<number>(0)
   const {provider, accountInfo} = useContext(WalletContext)
   const [uniPrice, setUniPrice] = useState<string>('0')
   const [liquidityAmt, setLiquidityAmt] = useState<number>(0)
@@ -26,7 +26,7 @@ export const useWithdrawLiquidityHandler = () => {
     address: '',
     decimals: 0,
   })
-  const [enableRemove, setenableRemove] = useState<Boolean>(false)
+  const [enableRemove, setEnableRemove] = useState<Boolean>(false)
 
   async function changeSliderPercentage(percentage: number) {
     setsliderPercentage(percentage)
@@ -61,10 +61,10 @@ export const useWithdrawLiquidityHandler = () => {
     }
     approveWithdraw(depPool, depPool.address)
       .then(() => {
-        setenableRemove(true)
+        setEnableRemove(true)
       })
       .catch((err: any) => {
-        setenableRemove(false)
+        setEnableRemove(false)
         console.log(err)
       })
   }
@@ -140,7 +140,7 @@ export const useWithdrawLiquidityHandler = () => {
     if (depPool === null) {
       return
     }
-    var erc20 = new ethers.Contract(fromToken, IERC20.abi, provider.getSigner(accountInfo?.address))
+    let erc20 = new ethers.Contract(fromToken, IERC20.abi, provider.getSigner(accountInfo?.address))
     let allowance = await erc20
       .allowance(accountInfo.address, toAddr)
       .then((res: string) => {
