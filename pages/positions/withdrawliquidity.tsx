@@ -1,10 +1,8 @@
-import type { NextPage } from 'next'
-import WithdrawLiquidityController from '../../components/WithdrawLiquidity/WithdrawLiquidityController'
+import type {NextPage} from 'next'
+import WithdrawLiquidityController from '../../src/components/WithdrawLiquidity/WithdrawLiquidityController'
 
 const WithdrawLiquidity: NextPage = () => {
-  return (
-    <WithdrawLiquidityController />
-  )
+  return <WithdrawLiquidityController />
 }
 
 export default WithdrawLiquidity

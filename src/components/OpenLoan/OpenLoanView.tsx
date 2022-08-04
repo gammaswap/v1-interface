@@ -10,10 +10,10 @@ import PairsSelector from '../PairsSelector'
 
 const style = {
   wrapper: "w-screen flex justify-center items-center",
-  formContent: "bg-gray-900 w-[40rem] rounded-2xl p-4 max-w-lg",
+  formContent: "bg-gray-900 w-[30rem] rounded-2xl p-4 max-w-lg",
   vStack: "items-center flex-col",
   vStackItem: "mt-3",
-  formHeader: "px-2 flex justify-between items-center font-semibold text-xl text-gray-200",
+  formHeader: "justify-between items-center font-semibold text-xl text-gray-200 text-center",
   numberInputContainer: "bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full",
   numberInputHidden: "p-4 border-2 invisible",
   numberInput: "bg-transparent placeholder:text-gray-600 outline-none w-full text-3xl text-gray-300",
@@ -24,8 +24,8 @@ const style = {
   tokenSelectorIcon: "flex items-center",
   tokenSelectorTicker: "mx-2",
   dropdownArrow: "w-4 h-3",
-  invalidatedButton: "disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700",
-  confirmButton: "bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300",
+  invalidatedButton: " w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700",
+  confirmButton: "w-full bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300",
   infoGroup: "inline-flex w-full place-content-center pt-1",
   loanInfoButton: "bg-teal-900 rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex mr-2 px-2 py-1 items-center",
   infoIcon: "mr-1",
@@ -53,7 +53,7 @@ type OpenLoanProps = {
 const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: OpenLoanProps) => {
   const [collateralType, setCollateralType] = useState<CollateralType>(CollateralType.None)
   const [collateralButtonText, setCollateralButtonText] = useState<string>("Select collateral type")
-  const [confirmStyle, setConfirmStyle] = useState<string>(style.confirmGrey)
+  const [confirmStyle, setConfirmStyle] = useState<string>(style.invalidatedButton)
   const [loanAmt, setLoanAmt] = useState<number>(0)
   const [loanAmtStr, setLoanAmtStr] = useState<string>('')
   const [collateralAmt0, setCollateralAmt0] = useState<number>(0)
@@ -103,7 +103,7 @@ const OpenLoanView = ({openLoanHandler, token0, token1, setToken0, setToken1}: O
   function resetCollateralType() {
     setCollateralType(CollateralType.None)
     setCollateralButtonText(getCollateralTypeButtonText(CollateralType.None))
-    setConfirmStyle(style.confirmGrey)
+    setConfirmStyle(style.invalidatedButton)
     setCollateral1Class(style.numberInputHidden)
     setCollateralAmt1(0)
   }
