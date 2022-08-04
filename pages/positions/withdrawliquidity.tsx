@@ -2,7 +2,7 @@ import type {NextPage} from 'next'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 import {BsArrowDownShort} from 'react-icons/bs'
-import {useWithdrawLiquidityHandler} from '../../hooks/useWithdrawLiquidityHandler'
+import {useWithdrawLiquidityHandler} from '../../src/hooks/useWithdrawLiquidityHandler'
 
 const WithdrawLiquidity: NextPage = () => {
   const {sliderPercentage, changeSliderPercentage, sliderPercentChange, withdrawLiquidity, approveTransaction, token0, token1, liquidityAmt, liqInTokB, enableRemove} = useWithdrawLiquidityHandler()

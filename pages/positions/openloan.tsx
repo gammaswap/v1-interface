@@ -3,7 +3,7 @@ import SelectCollateralModal from '../../src/components/OpenLoan/SelectCollatera
 import {FaInfoCircle} from 'react-icons/fa'
 import {ChevronDownIcon} from '@heroicons/react/solid'
 import PairsSelector from '../../src/components/PairsSelector'
-import {useOpenLoanHandler} from '../../hooks/useOpenLoanHandler'
+import {useOpenLoanHandler} from '../../src/hooks/useOpenLoanHandler'
 import {OpenLoanStyles} from '../../styles/OpenLoanStyles'
 
 const style = OpenLoanStyles()

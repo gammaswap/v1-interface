@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
-import { usePositionHandler } from '../../hooks/usePositionHandler'
-import PositionTableRow from '../../components/Positions/PositionTableRow'
+import { usePositionHandler } from '../../src/hooks/usePositionHandler'
+import PositionTableRow from '../../src/components/Positions/PositionTableRow'
 import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs'
 
 const PositionPage: NextPage = () => {
