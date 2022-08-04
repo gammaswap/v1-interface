@@ -1,9 +1,9 @@
 import type { NextPage } from "next"
 import { HiOutlineInformationCircle } from "react-icons/hi"
 import Link from "next/link"
-import PoolTableRow from "../../components/Pools/PoolTableRow"
+import PoolTableRow from "../../src/components/Pools/PoolTableRow"
 import { BsArrowLeftShort, BsArrowRightShort } from "react-icons/bs"
-import { usePoolsHandler } from "../../hooks/usePoolsHandler"
+import { usePoolsHandler } from "../../src/hooks/usePoolsHandler"
 
 const Pools: NextPage = () => {
   const style = {

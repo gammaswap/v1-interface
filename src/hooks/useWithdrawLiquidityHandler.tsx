@@ -1,13 +1,13 @@
 import * as React from 'react'
 import {useState, useEffect, useContext} from 'react'
-import {WalletContext} from '../../context/WalletContext'
+import {WalletContext} from '../context/WalletContext'
 import {ethers, Contract, BigNumber, constants} from 'ethers'
-import DepPool from '../../../abis/v0-hackathon/DepositPool.json'
-import IUniswapV2Pair from '../../../abis/v0-hackathon/IUniswapV2Pair.json'
-import IERC20 from '../../../abis/v0-hackathon/ERC20.json'
-import IERC20Metadata from '../../../abis/v0-hackathon/IERC20Metadata.json'
-import {sqrt} from '../../utils/mathFunctions'
-import Tokens, {Token} from '../../components/Tokens'
+import DepPool from '../../abis/v0-hackathon/DepositPool.json'
+import IUniswapV2Pair from '../../abis/v0-hackathon/IUniswapV2Pair.json'
+import IERC20 from '../../abis/v0-hackathon/ERC20.json'
+import IERC20Metadata from '../../abis/v0-hackathon/IERC20Metadata.json'
+import {sqrt} from '../utils/mathFunctions'
+import Tokens, {Token} from '../components/Tokens'
 
 const ZEROMIN = 0
 
