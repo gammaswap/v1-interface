@@ -17,7 +17,7 @@ const Pools: NextPage = () => {
     topBarData: "text-sm text-gray-400",
     topBarSingleValue: "text-2xl text-slate-100",
     tableView: "overflow-x-auto relative bg-white mx-20",
-    tableContainer: "p-4 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-400",
+    tableContainer: "p-4 rounded-lg bg-gray-50 bg-gray-700 text-gray-400",
     tableHead: "flex text-xs text-gray-700 uppercase pl-2 pr-4 border-b border-gray-500",
     tableHeading: "flex align-center py-3",
     infoSvg: "ml-2 text-lg",
