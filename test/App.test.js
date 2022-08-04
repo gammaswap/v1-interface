@@ -1,9 +1,9 @@
 
-const PosManager = require('../abis/PositionManager.json');
-const DepPool = require('../abis/DepositPool.json');
-const IERC20Metadata = require('../abis/IERC20Metadata.json');
+const PosManager = require('../abis/v0-hackathon/PositionManager.json');
+const DepPool = require('../abis/v0-hackathon/DepositPool.json');
+const IERC20Metadata = require('../abis/v0-hackathon/IERC20Metadata.json');
 const Web3 = require('web3');
-const IERC20 = require('../abis/ERC20.json');
+const IERC20 = require('../abis/v0-hackathon/ERC20.json');
 const { BigNumber, constants, ethers } = require('ethers')
 
 contract('GammaSwap', ([deployer, investor, developer, governor, account4]) => {

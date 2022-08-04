@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react'
 import Head from 'next/head'
 import WalletProvider from '../context/WalletContext'
 import BasicContractProvider from '../context/BasicContractContext'
+
 interface Props {
     children?: ReactNode
 }

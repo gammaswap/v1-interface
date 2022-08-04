@@ -1,8 +1,8 @@
 import type {NextPage} from 'next'
-import SelectCollateralModal from '../../components/OpenLoan/SelectCollateralModal'
+import SelectCollateralModal from '../../src/components/OpenLoan/SelectCollateralModal'
 import {FaInfoCircle} from 'react-icons/fa'
 import {ChevronDownIcon} from '@heroicons/react/solid'
-import PairsSelector from '../../components/PairsSelector'
+import PairsSelector from '../../src/components/PairsSelector'
 import {useOpenLoanHandler} from '../../hooks/useOpenLoanHandler'
 import {OpenLoanStyles} from '../../styles/OpenLoanStyles'
 
