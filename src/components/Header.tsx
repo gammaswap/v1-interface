@@ -5,18 +5,17 @@ import truncateEthAddress from 'truncate-eth-address'
 import { WalletContext } from '../context/WalletContext'
 
 const style = {
-  wrapper: "border p-4 w-screen flex justify-between items-center bg-violet-50",
+  wrapper: "p-4 w-screen flex justify-between items-center text-textV1-1",
   headerLogo: "w-1/3 flex cursor-pointer",
   nav: "flex-1 flex justify-center items-center",
-  navItemsContainer: "flex bg-red-400 rounded-3xl",
+  navItemsContainer: "flex bg-textV1-5 rounded-3xl ",
   navItem: "px-4 py-2 m-1 text-lg font-semibold cursor-pointer rounded-3xl h-12",
-  activeNavItem: "bg-gray-400",
+  activeNavItem: "bg-textV1-4",
   buttonsContainer: "flex w-1/3 justify-end items-center",
-  button: "m-1 flex items-center bg-red-400 text-md font-semibold cursor-pointer rounded-2xl h-12",
+  button: "m-1 flex items-center bg-textV1-5 text-md font-semibold cursor-pointer rounded-2xl h-12",
   buttonPadding: "p-2",
   balanceContainer: "mx-2 text-md flex items-center",
-  buttonTextContainer: "bg-gray-400 rounded-lg px-4 py-2 text-md h-8 flex items-center",
-  buttonAccent: "bg-blue-600 border border-[#163256] text-blue-200 h-full flex justify-center items-center rounded-xl",
+  buttonTextContainer: "bg-gray-400 rounded-lg px-4 py-2 text-md h-8 flex items-center"
 }
 
 const Header = () => {
@@ -27,7 +26,7 @@ const Header = () => {
     <div className={style.wrapper}>
       <Link href={'/positions'}>
         <div className={style.headerLogo}>
-          <Image src="/gsLogo.png" alt="GammaSwap logo" width={56} height={56} />
+          <Image src="/GammaSwap-Logo-Black-isoColor.svg" alt="GammaSwap logo" width={270} height={56} />
         </div>
       </Link>
       <nav className={style.nav}>
@@ -84,9 +83,7 @@ const Header = () => {
             onClick={() => connectWallet()}
             className={`${style.button} ${style.buttonPadding}`}
           >
-            <div className={`${style.buttonAccent} ${style.buttonPadding}`}>
-              Connect Wallet
-            </div>
+            Connect Wallet
           </div>
         )}
       </div>
