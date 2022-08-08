@@ -20,12 +20,7 @@ export const useWithdrawLiquidityHandler = () => {
   const [totalLiquidityAmt, setTotalLiquidityAmt] = useState<string>('0')
   const [liqInTokB, setLiqInTokB] = useState<number>(0)
   const [token0, setToken0] = useState<Token>(Tokens[0])
-  const [token1, setToken1] = useState<Token>({
-    imgPath: '',
-    symbol: '',
-    address: '',
-    decimals: 0,
-  })
+  const [token1, setToken1] = useState<Token>(Tokens[1])
   const [enableRemove, setEnableRemove] = useState<Boolean>(false)
 
   async function changeSliderPercentage(percentage: number) {
@@ -216,44 +211,45 @@ export const useWithdrawLiquidityHandler = () => {
       }
     }
 
-    async function initializeTokens() {
-      if (depPool !== null && provider !== null) {
-        // Variable to hold address of token0
-        let token0Addr = null
+    // TODO: This section is commented because we do not have a factory of all the tokens. Once that is integrated then we will add the logic to get the tokens from the contract. For now we are getting the tokens from the token file
+    // async function initializeTokens() {
+    //   if (depPool !== null && provider !== null) {
+    //     // Variable to hold address of token0
+    //     let token0Addr = null
 
-        // Variable to hold address of token1
-        let token1Addr = null
+    //     // Variable to hold address of token1
+    //     let token1Addr = null
 
-        // Variable to hold contract token0
-        let _token0: Contract
+    //     // Variable to hold contract token0
+    //     let _token0: Contract
 
-        // Variable to hold contract token0
-        let _token1: Contract
+    //     // Variable to hold contract token0
+    //     let _token1: Contract
 
-        // Variable to hold symbol of token0
-        let symbol0 = null
+    //     // Variable to hold symbol of token0
+    //     let symbol0 = null
 
-        // Variable to hold symbol of token1
-        let symbol1 = null
+    //     // Variable to hold symbol of token1
+    //     let symbol1 = null
 
-        token0Addr = await depPool.token0()
-        token1Addr = await depPool.token1()
+    //     token0Addr = await depPool.token0()
+    //     token1Addr = await depPool.token1()
 
-        if (token0Addr) {
-          _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
-          symbol0 = await _token0.symbol()
-          setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
-        }
+    //     if (token0Addr) {
+    //       _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
+    //       symbol0 = await _token0.symbol()
+    //       setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
+    //     }
 
-        if (token1Addr) {
-          _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
-          symbol1 = await _token1.symbol()
-          setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
-        }
-      }
-    }
+    //     if (token1Addr) {
+    //       _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
+    //       symbol1 = await _token1.symbol()
+    //       setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
+    //     }
+    //   }
+    // }
 
-    initializeTokens()
+    // initializeTokens()
     fetchData()
   }, [depPool])
 

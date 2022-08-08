@@ -2,7 +2,7 @@ import type {NextPage} from 'next'
 import {BsArrowDownShort} from 'react-icons/bs'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
-import {useRepayLoanHandler} from '../../hooks/useRepayLoanHandler'
+import {useRepayLoanHandler} from '../../src/hooks/useRepayLoanHandler'
 
 const Repayloan: NextPage = () => {
   const {repayAmt, repayAmtChange, changeSliderPercentage, percentages, approveTransaction, repayTransaction, enableRepay} = useRepayLoanHandler()
