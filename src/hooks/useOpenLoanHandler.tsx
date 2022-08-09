@@ -1,22 +1,22 @@
 import * as React from 'react'
-import {useState, useEffect, useContext, Dispatch, SetStateAction, useCallback, ChangeEvent} from 'react'
-import Tokens, {Token} from '../components/Tokens'
-import {WalletContext} from '../context/WalletContext'
+import { useState, useEffect, useContext, Dispatch, SetStateAction, useCallback, ChangeEvent } from 'react'
+import Tokens, { Token } from '../components/Tokens'
+import { WalletContext } from '../context/WalletContext'
 // TODO: import Factory from '../../abis/Factory.json'
 import PositionMgr from '../../abis/v0-hackathon/PositionManager.json'
 import IERC20 from '../../abis/v0-hackathon/ERC20.json'
-import {ethers, Contract, BigNumber, constants} from 'ethers'
-import {CollateralType} from '../components/OpenLoan/CollateralType'
+import { ethers, Contract, BigNumber, constants } from 'ethers'
+import { CollateralType } from '../components/OpenLoan/CollateralType'
 import toast from 'react-hot-toast'
-import {FcInfo} from 'react-icons/fc'
-import {FieldValues, useForm} from 'react-hook-form'
+import { FcInfo } from 'react-icons/fc'
+import { FieldValues, useForm } from 'react-hook-form'
 import useNotification from './useNotification'
-import {OpenLoanStyles} from '../../styles/OpenLoanStyles'
+import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 
 const style = OpenLoanStyles()
 
 export const useOpenLoanHandler = () => {
-  const {provider, accountInfo} = useContext(WalletContext)
+  const { provider, accountInfo } = useContext(WalletContext)
   const [token0, setToken0] = useState<Token>(Tokens[0])
   const [token1, setToken1] = useState<Token>({
     imgPath: '',
@@ -35,15 +35,16 @@ export const useOpenLoanHandler = () => {
   const [collateralAmt0Str, setCollateralAmt0Str] = useState<string>('')
   const [collateralAmt1, setCollateralAmt1] = useState<number>(0)
   const [collateralAmt1Str, setCollateralAmt1Str] = useState<string>('')
-  const {register, handleSubmit, setValue} = useForm()
+  const { register, handleSubmit, setValue } = useForm()
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const {notifyError, notifySuccess} = useNotification()
+  const { notifyError, notifySuccess } = useNotification()
   const [buttonText, setButtonText] = useState<string>('Confirm')
   const [collateral1Class, setCollateral1Class] = useState<string>('')
+  const [tooltipText, setTooltipText] = useState<string>('')
 
   useEffect(() => {
     if (!provider) {
-      toast('Please connect wallet.', {icon: <FcInfo />})
+      toast('Please connect wallet.', { icon: <FcInfo /> })
       return
     }
 
@@ -157,7 +158,7 @@ export const useOpenLoanHandler = () => {
 
   function getPosMgr() {
     if (token0 == token1) {
-      toast('Token values must be different', {icon: <FcInfo />})
+      toast('Token values must be different', { icon: <FcInfo /> })
       return
     }
     let pairsAddress = '0xC6CB7f8c046756Bd33ad6b322a3b88B0CA9ceC1b'
@@ -171,7 +172,7 @@ export const useOpenLoanHandler = () => {
         setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider))
       }
     } else {
-      toast('Please connect wallet', {icon: <FcInfo />})
+      toast('Please connect wallet', { icon: <FcInfo /> })
     }
   }
 
@@ -331,5 +332,7 @@ export const useOpenLoanHandler = () => {
     setCollateralAmt1,
     confirmStyle,
     buttonText,
+    tooltipText,
+    setTooltipText,
   }
 }
