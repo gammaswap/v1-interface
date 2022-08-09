@@ -9,6 +9,8 @@ type PositionTypeParams = {
 export const usePositionsHandler = () => {
   const [positions, setPositions] = useState<PositionTypeParams[]>()
   const [initialPositions, setInitialPositions] = useState<PositionTypeParams[]>()
+  const [isSelectOpen, setIsSelectOpen] = useState<boolean>(false)
+  const [selectedOption, setSelectedOption] = useState<string>('All')
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -23,23 +25,31 @@ export const usePositionsHandler = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  function changePositionType(e: any) {
-    if (e.target.value && initialPositions) {
-      switch (e.target.value) {
+  function openOrCloseSelectBox() {
+    setIsSelectOpen((prevState) => !prevState)
+  }
+
+  function changePositionType(positionType: string) {
+    if (positionType && initialPositions) {
+      setIsSelectOpen((prevState) => !prevState)
+      switch (positionType) {
         case 'Lent':
+          setSelectedOption('Lent')
           let lentData = initialPositions.filter((pos) => pos.positionType.toLocaleLowerCase() === 'lent')
           setPositions(lentData)
           break
         case 'Borrowed':
+          setSelectedOption('Borrowed')
           let borrowedData = initialPositions.filter((pos) => pos.positionType.toLocaleLowerCase() === 'borrowed')
           setPositions(borrowedData)
           break
         default:
+          setSelectedOption('All')
           setPositions(initialPositions)
           break
       }
     }
   }
 
-  return { positions, changePositionType }
+  return { positions, changePositionType, isSelectOpen, openOrCloseSelectBox, selectedOption }
 }
