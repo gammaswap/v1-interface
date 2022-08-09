@@ -34,7 +34,7 @@ const PositionsMenu: NextPage = () => {
         <div className={style.selectPositionTypeDiv}>
           <AiOutlineDown className={style.arrow} />
           <select className={style.selectBox} onChange={changePositionType}>
-            <option value="All" selected>
+            <option value="All">
               All
             </option>
             <option value="Lent">Lent</option>
