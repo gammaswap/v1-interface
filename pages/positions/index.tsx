@@ -15,7 +15,7 @@ const style = {
   positionWrapper: 'bg-textV1-6 flex flex-col mt-3 rounded-2xl min-h-[550px] min-w-[500px]',
   noPositionWrapper:
     'bg-textV1-6 flex flex-col justify-center align-center items-center mt-3 rounded-2xl min-h-[550px] min-w-[500px]',
-  noPositionText: 'text-center',
+  noPositionText: 'text-center text-white',
   posWrapper: 'flex flex-col justify-between min-h-[200px] p-4 m-2 bg-primaryV3-2 rounded-2xl',
   posData: 'flex justify-between align-center',
   eachPos: 'text-2xl font-semibold text-white',
