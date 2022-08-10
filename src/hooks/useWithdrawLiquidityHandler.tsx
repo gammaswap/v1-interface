@@ -1,24 +1,21 @@
-import * as React from 'react'
-import {useState, useEffect, useContext} from 'react'
-import {WalletContext} from '../context/WalletContext'
-import {ethers, Contract, BigNumber, constants} from 'ethers'
-import DepPool from '../../abis/v0-hackathon/DepositPool.json'
+import { useState, useEffect, useContext } from 'react'
+import { WalletContext } from '../context/WalletContext'
+import { ethers, Contract, BigNumber, constants } from 'ethers'
+import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import IUniswapV2Pair from '../../abis/v0-hackathon/IUniswapV2Pair.json'
 import IERC20 from '../../abis/v0-hackathon/ERC20.json'
-import IERC20Metadata from '../../abis/v0-hackathon/IERC20Metadata.json'
-import {sqrt} from '../utils/mathFunctions'
-import Tokens, {Token} from '../components/Tokens'
+import { sqrt } from '../utils/mathFunctions'
+import Tokens, { Token } from '../components/Tokens'
+import TestGammaPool from '../../abis/v1-periphery/test/TestGammaPool.sol/TestGammaPool.json'
 
 const ZEROMIN = 0
 
 export const useWithdrawLiquidityHandler = () => {
-  const [depPool, setdepPool] = useState<Contract | null>(null)
+  const [posManager, setPosManager] = useState<Contract | null>(null)
   const [sliderPercentage, setsliderPercentage] = useState<number>(0)
-  const {provider, accountInfo} = useContext(WalletContext)
-  const [uniPrice, setUniPrice] = useState<string>('0')
+  const { provider, accountInfo } = useContext(WalletContext)
   const [liquidityAmt, setLiquidityAmt] = useState<number>(0)
   const [totalLiquidityAmt, setTotalLiquidityAmt] = useState<string>('0')
-  const [liqInTokB, setLiqInTokB] = useState<number>(0)
   const [token0, setToken0] = useState<Token>(Tokens[0])
   const [token1, setToken1] = useState<Token>(Tokens[1])
   const [enableRemove, setEnableRemove] = useState<Boolean>(false)
@@ -34,13 +31,13 @@ export const useWithdrawLiquidityHandler = () => {
   }
 
   async function approveTransaction() {
-    if (provider) {
-      // Deposit poll contract address
-      let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+    // Position Manager contract address
+    let address = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+    if (provider && address) {
       if (accountInfo && accountInfo?.address) {
-        setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
+        setPosManager(new ethers.Contract(address, PosManager.abi, provider.getSigner(accountInfo?.address)))
       } else {
-        setdepPool(new ethers.Contract(address, DepPool.abi, provider))
+        setPosManager(new ethers.Contract(address, PosManager.abi, provider))
       }
     } else {
       console.log('Please connect wallet')
@@ -51,10 +48,10 @@ export const useWithdrawLiquidityHandler = () => {
       return
     }
 
-    if (depPool === null) {
+    if (posManager === null) {
       return
     }
-    approveWithdraw(depPool, depPool.address)
+    approveWithdraw(posManager, posManager.address)
       .then(() => {
         setEnableRemove(true)
       })
@@ -71,13 +68,13 @@ export const useWithdrawLiquidityHandler = () => {
     } else {
       amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
     }
-    if (provider) {
-      // Deposit poll contract address
-      let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+    // Position Manager contract address
+    let address = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+    if (provider && address) {
       if (accountInfo && accountInfo?.address) {
-        setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
+        setPosManager(new ethers.Contract(address, PosManager.abi, provider.getSigner(accountInfo?.address)))
       } else {
-        setdepPool(new ethers.Contract(address, DepPool.abi, provider))
+        setPosManager(new ethers.Contract(address, PosManager.abi, provider))
       }
     } else {
       console.log('Please connect wallet')
@@ -88,65 +85,59 @@ export const useWithdrawLiquidityHandler = () => {
       return
     }
 
-    if (depPool === null) {
+    if (posManager === null) {
       return
     }
 
     try {
-      let tx = await depPool.removeLiquidity(amt, ZEROMIN, ZEROMIN, accountInfo.address, {
-        gasLimit: 10000000,
-      })
+      const WithdrawReservesParams = {
+        cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+        protocol: 1,
+        amount: amt,
+        amountsMin: [100, 200, 300],
+        to: accountInfo.address,
+        deadline: ethers.constants.MaxUint256,
+      }
+      let tx = await posManager.withdrawReserves(WithdrawReservesParams)
       return await tx.wait()
     } catch (e) {
       return e
     }
   }
 
-  async function approveWithdraw(depPool: Contract | null, depPoolAddr: string) {
+  async function approveWithdraw(posManager: Contract | null, positionManagerAddr: string) {
     if (!accountInfo || !accountInfo.address) {
       console.log('Wallet not connected.')
       return
     }
-    if (depPool === null) {
+    if (posManager === null) {
       return null
     } else {
       if (provider !== null) {
         try {
-          let tx = await depPool.approve(depPoolAddr, constants.MaxUint256.toString())
-          return await tx.wait()
+          let address = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS
+          let gammaPoolContract
+          if (provider && address) {
+            if (accountInfo && accountInfo?.address) {
+              gammaPoolContract = new ethers.Contract(
+                address,
+                TestGammaPool.abi,
+                provider.getSigner(accountInfo?.address)
+              )
+            } else {
+              gammaPoolContract = new ethers.Contract(address, TestGammaPool.abi, provider)
+            }
+            let tx = await gammaPoolContract.approve(positionManagerAddr, constants.MaxUint256.toString())
+            return await tx.wait()
+          } else {
+            console.log('Please connect wallet')
+          }
         } catch (e) {
           throw e
         }
       } else {
         console.log('Please connect wallet')
       }
-    }
-  }
-
-  async function approve(fromToken: string, toAddr: string) {
-    if (!provider) {
-      console.log('provider or accountInfo not set')
-      return
-    }
-    if (!accountInfo || !accountInfo.address) {
-      console.log('Wallet not connected.')
-      return
-    }
-    if (depPool === null) {
-      return
-    }
-    let erc20 = new ethers.Contract(fromToken, IERC20.abi, provider.getSigner(accountInfo?.address))
-    let allowance = await erc20
-      .allowance(accountInfo.address, toAddr)
-      .then((res: string) => {
-        console.log('check allowance ', res.toString())
-        return res
-      })
-      .catch((err: Error) => {
-        console.error('checkAllowance', err)
-      })
-    if (parseFloat(allowance.toString()) <= 0) {
-      await erc20.approve(toAddr, constants.MaxUint256)
     }
   }
 
@@ -157,16 +148,20 @@ export const useWithdrawLiquidityHandler = () => {
         return
       }
 
-      if (provider) {
-        // Deposit poll contract address
-        let address = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+      // Position Manager contract address
+      let address = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
 
-        // Variable to hold deposit pool contract
-        let _depPool = null
+      if (provider && address) {
+        // Variable to hold Position Manager contract
+        let _posManager = null
 
-        _depPool = new ethers.Contract(address, DepPool.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
-        if (_depPool) {
-          setdepPool(_depPool)
+        _posManager = new ethers.Contract(
+          address,
+          PosManager.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+        if (_posManager) {
+          setPosManager(_posManager)
         }
       } else {
         console.log('Please connect wallet')
@@ -177,43 +172,17 @@ export const useWithdrawLiquidityHandler = () => {
 
   useEffect(() => {
     async function fetchData() {
-      if (!depPool) {
+      if (!posManager) {
         return
       }
-      const liqBal = await depPool.balanceOf(accountInfo?.address)
+      const liqBal = await posManager.balanceOf(accountInfo?.address)
       setTotalLiquidityAmt(liqBal.toString())
       setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
-
-      const uniPair = await depPool.getUniPair()
-      if (!provider) {
-        return
-      }
-
-      const uniPairContract = new ethers.Contract(uniPair, IUniswapV2Pair.abi, provider)
-      const reserves = await uniPairContract.getReserves()
-      const _uniPrice = BigNumber.from(reserves.reserve1).mul(BigNumber.from(10).pow(18)).div(reserves.reserve0)
-      setUniPrice(_uniPrice.toString())
-      const liqBalNum = BigNumber.from(liqBal.toString())
-
-      if (liqBalNum.gt(constants.Zero) && _uniPrice.gt(constants.Zero)) {
-        setLiqInTokB(
-          parseFloat(
-            ethers.utils.formatEther(
-              sqrt(_uniPrice.mul(BigNumber.from(10).pow(18)))
-                .mul(liqBalNum)
-                .div(BigNumber.from(10).pow(18))
-                .mul(2)
-            )
-          )
-        )
-      } else {
-        setLiqInTokB(0)
-      }
     }
 
     // TODO: This section is commented because we do not have a factory of all the tokens. Once that is integrated then we will add the logic to get the tokens from the contract. For now we are getting the tokens from the token file
     // async function initializeTokens() {
-    //   if (depPool !== null && provider !== null) {
+    //   if (posManager !== null && provider !== null) {
     //     // Variable to hold address of token0
     //     let token0Addr = null
 
@@ -232,8 +201,8 @@ export const useWithdrawLiquidityHandler = () => {
     //     // Variable to hold symbol of token1
     //     let symbol1 = null
 
-    //     token0Addr = await depPool.token0()
-    //     token1Addr = await depPool.token1()
+    //     token0Addr = await posManager.token0()
+    //     token1Addr = await posManager.token1()
 
     //     if (token0Addr) {
     //       _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
@@ -251,18 +220,27 @@ export const useWithdrawLiquidityHandler = () => {
 
     // initializeTokens()
     fetchData()
-  }, [depPool])
+  }, [posManager])
+
+  const withdraw = (amount: number) => {
+    withdrawLiquidity(amount)
+      .then((res) => {
+        const { args } = res.events[1]
+        console.log(args)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
 
   return {
     sliderPercentage,
     changeSliderPercentage,
     sliderPercentChange,
-    withdrawLiquidity,
     approveTransaction,
     token0,
     token1,
-    liquidityAmt,
-    liqInTokB,
     enableRemove,
+    withdraw,
   }
 }
