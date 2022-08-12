@@ -54,7 +54,14 @@ export const useAddLiquidityHandler = () => {
     let tokenInput: string
     if (typeof e !== 'string') tokenInput = (e.target as HTMLInputElement).value
     else tokenInput = e
-    setToken(tokenInput.replace(/[^0-9.]/g, ''))
+    let strToSet = ''
+    let i = tokenInput.indexOf('.')
+    if (i >= 0 && i + 1 < tokenInput.length) {
+      strToSet = tokenInput.substring(0, i + 1) + tokenInput.substring(i + 1).replace(/[^0-9]/g, '')
+    } else {
+      strToSet = tokenInput.replace(/[^0-9\.]/g, '')
+    }
+    setToken(strToSet)
   }
 
   // checks which tokenSelector element was selected and opens modal
@@ -150,9 +157,9 @@ export const useAddLiquidityHandler = () => {
 
           validateTokenInput(tokenInput, setTokenInputVal)
 
-          const tokenAAddr = tokenContracts?.tokenAContract?.address as string
-          const tokenBAddr = tokenContracts?.tokenBContract?.address as string
-          handleEstimatedOutput(tokenInput, setCounterTokenInputVal, [tokenAAddr, tokenBAddr])
+          // const tokenAAddr = tokenContracts?.tokenAContract?.address as string
+          // const tokenBAddr = tokenContracts?.tokenBContract?.address as string
+          // handleEstimatedOutput(tokenInput, setCounterTokenInputVal, [tokenAAddr, tokenBAddr])
         }
       } catch (error) {
         let message
@@ -166,19 +173,19 @@ export const useAddLiquidityHandler = () => {
     [validateTokenInput]
   )
 
-  const handleEstimatedOutput = async (
-    inputVal: string,
-    setCounterTokenInputVal: Dispatch<SetStateAction<string>>,
-    tokenAddrs: Array<string>
-  ) => {
-    const estimatedOutput = await getEstimatedOutput(tokenAddrs, inputVal, provider as Provider)
-    if (estimatedOutput) {
-      const output = Number(formatEther(estimatedOutput[1]))
-      console.log(`1 TOKB = ${Number(output / Number(inputVal)).toFixed(4)} TOKA`)
-      console.log(`1 TOKA = ${Number(Number(formatEther(estimatedOutput[0])) / Number(inputVal)).toFixed(4)} TOKB`)
-      setCounterTokenInputVal(output.toFixed(4).toString())
-    }
-  }
+  // const handleEstimatedOutput = async (
+  //   inputVal: string,
+  //   setCounterTokenInputVal: Dispatch<SetStateAction<string>>,
+  //   tokenAddrs: Array<string>
+  // ) => {
+  //   const estimatedOutput = await getEstimatedOutput(tokenAddrs, inputVal, provider as Provider)
+  //   if (estimatedOutput) {
+  //     const output = Number(formatEther(estimatedOutput[1]))
+  //     console.log(`1 TOKB = ${Number(output / Number(inputVal)).toFixed(4)} TOKA`)
+  //     console.log(`1 TOKA = ${Number(Number(formatEther(estimatedOutput[0])) / Number(inputVal)).toFixed(4)} TOKB`)
+  //     setCounterTokenInputVal(output.toFixed(4).toString())
+  //   }
+  // }
 
   const addLiquidity = async () => {
     if (posManager && accountInfo) {
