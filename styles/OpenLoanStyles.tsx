@@ -20,7 +20,7 @@ export const OpenLoanStyles = () => {
     invalidatedButton: ' w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
     confirmButton: 'w-full bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
     infoGroup: 'inline-flex w-full place-content-center pt-1',
-    loanInfoButton: 'bg-teal-900 rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex mr-2 px-2 py-1 items-center',
+    loanInfoButton: 'bg-primaryV2-4 rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex mr-2 px-2 py-1 items-center hover:bg-primaryV2-3 hover:shadow-primaryV2-3/30 tooltip',
     infoIcon: 'mr-1',
     sectionHeader: 'font-semibold text-gray-200 w-full',
     collateralHeader: 'inline-flex w-full place-content-start',
