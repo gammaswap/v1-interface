@@ -1,14 +1,18 @@
+import { useAddLiquidityHandler } from '../hooks/useAddLiquidityHandler'
+
 type ButtonSubmitProps = {
-    buttonStyle: string
-    buttonText: string
+  canClick: Boolean
+  buttonStyle: string
+  buttonText: string
 }
 
-const AddLiquiditySubmitValidator = ({ buttonStyle, buttonText }: ButtonSubmitProps): JSX.Element => {
-    return (
-        <div className={buttonStyle}>
-            {buttonText}
-        </div>
-    )
+const AddLiquiditySubmitValidator = ({ canClick, buttonStyle, buttonText }: ButtonSubmitProps): JSX.Element => {
+  const { addLiquidity } = useAddLiquidityHandler()
+  return (
+    <div className={buttonStyle} onClick={canClick ? addLiquidity : undefined}>
+      {buttonText}
+    </div>
+  )
 }
 
 export default AddLiquiditySubmitValidator

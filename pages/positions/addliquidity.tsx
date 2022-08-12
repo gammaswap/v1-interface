@@ -22,7 +22,7 @@ const AddLiquidity: NextPage = () => {
     tokenSelected,
     setTokenASelected,
     setTokenBSelected,
-    validateSubmit
+    validateSubmit,
   } = useAddLiquidityHandler()
 
   return (
