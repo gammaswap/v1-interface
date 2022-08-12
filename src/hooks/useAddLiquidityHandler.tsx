@@ -192,7 +192,11 @@ export const useAddLiquidityHandler = () => {
           deadline: ethers.constants.MaxUint256,
         }
         let tx = await posManager.depositReserves(DepositReservesParams)
-        return await tx.wait()
+        let res = await tx.wait()
+        const { args } = res.events[0]
+        console.log(args.pool)
+        console.log(args.reservesLen.toNumber())
+        console.log(args.shares.toNumber())
       } catch (e) {
         return e
       }
