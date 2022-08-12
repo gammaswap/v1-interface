@@ -1,27 +1,27 @@
 import * as React from 'react'
 import {useState, useEffect, useContext} from 'react'
-import WithdrawLiquidityView from './WithdrawLiquidityView'
-import {WalletContext} from '../../context/WalletContext'
+import {WalletContext} from '../context/WalletContext'
 import {ethers, Contract, BigNumber, constants} from 'ethers'
-import DepPool from '../../abis/DepositPool.json'
-import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
-import IERC20 from '../../abis/ERC20.json'
-import IERC20Metadata from '../../abis/IERC20Metadata.json'
-import {sqrt} from '../../utils/mathFunctions'
+import DepPool from '../../abis/v0-hackathon/DepositPool.json'
+import IUniswapV2Pair from '../../abis/v0-hackathon/IUniswapV2Pair.json'
+import IERC20 from '../../abis/v0-hackathon/ERC20.json'
+import IERC20Metadata from '../../abis/v0-hackathon/IERC20Metadata.json'
+import {sqrt} from '../utils/mathFunctions'
+import Tokens, {Token} from '../components/Tokens'
 
 const ZEROMIN = 0
 
-const WithdrawLiquidity = () => {
+export const useWithdrawLiquidityHandler = () => {
   const [depPool, setdepPool] = useState<Contract | null>(null)
-  const [sliderPercentage, setsliderPercentage] = useState(0)
+  const [sliderPercentage, setsliderPercentage] = useState<number>(0)
   const {provider, accountInfo} = useContext(WalletContext)
   const [uniPrice, setUniPrice] = useState<string>('0')
   const [liquidityAmt, setLiquidityAmt] = useState<number>(0)
   const [totalLiquidityAmt, setTotalLiquidityAmt] = useState<string>('0')
   const [liqInTokB, setLiqInTokB] = useState<number>(0)
-  const [token0, setToken0] = useState({})
-  const [token1, setToken1] = useState({})
-  const [enableRemove, setenableRemove] = useState<Boolean>(false)
+  const [token0, setToken0] = useState<Token>(Tokens[0])
+  const [token1, setToken1] = useState<Token>(Tokens[1])
+  const [enableRemove, setEnableRemove] = useState<Boolean>(false)
 
   async function changeSliderPercentage(percentage: number) {
     setsliderPercentage(percentage)
@@ -56,9 +56,10 @@ const WithdrawLiquidity = () => {
     }
     approveWithdraw(depPool, depPool.address)
       .then(() => {
-        setenableRemove(true)
+        setEnableRemove(true)
       })
       .catch((err: any) => {
+        setEnableRemove(false)
         console.log(err)
       })
   }
@@ -114,7 +115,7 @@ const WithdrawLiquidity = () => {
           let tx = await depPool.approve(depPoolAddr, constants.MaxUint256.toString())
           return await tx.wait()
         } catch (e) {
-          return e
+          throw e
         }
       } else {
         console.log('Please connect wallet')
@@ -134,7 +135,7 @@ const WithdrawLiquidity = () => {
     if (depPool === null) {
       return
     }
-    var erc20 = new ethers.Contract(fromToken, IERC20.abi, provider.getSigner(accountInfo?.address))
+    let erc20 = new ethers.Contract(fromToken, IERC20.abi, provider.getSigner(accountInfo?.address))
     let allowance = await erc20
       .allowance(accountInfo.address, toAddr)
       .then((res: string) => {
@@ -210,61 +211,58 @@ const WithdrawLiquidity = () => {
       }
     }
 
-    async function initializeTokens() {
-      if (depPool !== null && provider !== null) {
-        // Variable to hold address of token0
-        let token0Addr = null
+    // TODO: This section is commented because we do not have a factory of all the tokens. Once that is integrated then we will add the logic to get the tokens from the contract. For now we are getting the tokens from the token file
+    // async function initializeTokens() {
+    //   if (depPool !== null && provider !== null) {
+    //     // Variable to hold address of token0
+    //     let token0Addr = null
 
-        // Variable to hold address of token1
-        let token1Addr = null
+    //     // Variable to hold address of token1
+    //     let token1Addr = null
 
-        // Variable to hold contract token0
-        let _token0 = null
+    //     // Variable to hold contract token0
+    //     let _token0: Contract
 
-        // Variable to hold contract token0
-        let _token1 = null
+    //     // Variable to hold contract token0
+    //     let _token1: Contract
 
-        // Variable to hold symbol of token0
-        let symbol0 = null
+    //     // Variable to hold symbol of token0
+    //     let symbol0 = null
 
-        // Variable to hold symbol of token1
-        let symbol1 = null
+    //     // Variable to hold symbol of token1
+    //     let symbol1 = null
 
-        token0Addr = await depPool.token0()
-        token1Addr = await depPool.token1()
+    //     token0Addr = await depPool.token0()
+    //     token1Addr = await depPool.token1()
 
-        if (token0Addr) {
-          _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
-          symbol0 = await _token0.symbol()
-          setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
-        }
+    //     if (token0Addr) {
+    //       _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
+    //       symbol0 = await _token0.symbol()
+    //       setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
+    //     }
 
-        if (token1Addr) {
-          _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
-          symbol1 = await _token1.symbol()
-          setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
-        }
-      }
-    }
+    //     if (token1Addr) {
+    //       _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
+    //       symbol1 = await _token1.symbol()
+    //       setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
+    //     }
+    //   }
+    // }
 
-    initializeTokens()
+    // initializeTokens()
     fetchData()
   }, [depPool])
 
-  return (
-    <WithdrawLiquidityView
-      sliderPercentage={sliderPercentage}
-      changeSliderPercentage={changeSliderPercentage}
-      sliderPercentChange={sliderPercentChange}
-      withdrawLiquidity={withdrawLiquidity}
-      approveTransaction={approveTransaction}
-      token0={token0}
-      token1={token1}
-      liquidityAmt={liquidityAmt}
-      liqInTokB={liqInTokB}
-      enableRemove={enableRemove}
-    />
-  )
+  return {
+    sliderPercentage,
+    changeSliderPercentage,
+    sliderPercentChange,
+    withdrawLiquidity,
+    approveTransaction,
+    token0,
+    token1,
+    liquidityAmt,
+    liqInTokB,
+    enableRemove,
+  }
 }
-
-export default WithdrawLiquidity

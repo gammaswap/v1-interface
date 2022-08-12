@@ -2,12 +2,13 @@ import React, { ReactNode } from 'react'
 import Head from 'next/head'
 import WalletProvider from '../context/WalletContext'
 import BasicContractProvider from '../context/BasicContractContext'
+
 interface Props {
     children?: ReactNode
 }
 
 const style = {
-    wrapper: "h-screen max-h-screen h-min-screen w-screen flex flex-col justify-between",
+    wrapper: "h-screen max-h-screen h-min-screen w-screen flex flex-col justify-between items-center",
 }
 
 const Layout = ({ children }: Props) => {
