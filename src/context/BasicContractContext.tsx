@@ -29,17 +29,17 @@ const BasicContractProvider = ({ children }: BasicContractProviderProps) => {
 
     useEffect(() => {
         const newPairContract = new ethers.Contract(
-            process.env.IUNISWAP_V2_PAIR_ADDR as string,
+            process.env.NEXT_PUBLIC_IUNISWAP_V2_PAIR_ADDR as string,
             IUniswapV2PairABI,
             provider as Provider
         )
         const newFactoryContract = new ethers.Contract(
-            process.env.IUNISWAP_V2_FACTORY_ADDR as string,
+            process.env.NEXT_PUBLIC_IUNISWAP_V2_FACTORY_ADDR as string,
             IUniswapV2FactoryABI,
             provider as Provider
         )
         const newRouterContract = new ethers.Contract(
-            process.env.IUNISWAP_V2_ROUTER_02_ADDR as string,
+            process.env.NEXT_PUBLIC_IUNISWAP_V2_ROUTER_02_ADDR as string,
             IUniswapV2Router02ABI,
             provider as Provider
         )
