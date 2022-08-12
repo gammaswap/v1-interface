@@ -3,12 +3,13 @@ import AddLiquiditySubmitButton from '../../src/components/AddLiquiditySubmitBut
 import Tokens, { Token } from '../../src/components/Tokens'
 import { AccountInfo, WalletContext } from '../../src/context/WalletContext'
 import { Provider } from '@ethersproject/providers'
-import { BigNumber, Contract } from 'ethers'
+import { BigNumber, Contract, ethers } from 'ethers'
 import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } from '../../src/utils/getSmartContract'
 import { BasicContractContext } from '../../src/context/BasicContractContext'
 import useNotification from '../../src/hooks/useNotification'
 import { formatEther } from 'ethers/lib/utils'
 import { AddLiquidityStyles } from '../../styles/AddLiquidityStyles'
+import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 
 export const useAddLiquidityHandler = () => {
   const style = AddLiquidityStyles()
@@ -24,6 +25,8 @@ export const useAddLiquidityHandler = () => {
     address: '',
     decimals: 18,
   })
+
+  const [posManager, setPosManager] = useState<Contract | null>(null)
 
   // holds state of what token input field was selected for modal opening
   const [tokenSelected, setTokenSelected] = useState<string>('')
@@ -63,13 +66,21 @@ export const useAddLiquidityHandler = () => {
   // validates add liquidity submit transaction button
   const validateSubmit = (): JSX.Element | undefined => {
     if (isTokenEmpty(tokenBSelected)) {
-      return <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={'Select Token'} />
+      return (
+        <AddLiquiditySubmitButton canClick={false} buttonStyle={style.invalidatedButton} buttonText={'Select Token'} />
+      )
     }
     if (tokenAInputVal === '' || tokenBInputVal === '') {
-      return <AddLiquiditySubmitButton buttonStyle={style.invalidatedButton} buttonText={'Enter an Amount'} />
+      return (
+        <AddLiquiditySubmitButton
+          canClick={false}
+          buttonStyle={style.invalidatedButton}
+          buttonText={'Enter an Amount'}
+        />
+      )
     }
     if (!isTokenEmpty(tokenBSelected) && tokenAInputVal !== '' && tokenBInputVal !== '') {
-      return <AddLiquiditySubmitButton buttonStyle={style.confirmButton} buttonText={'Confirm'} />
+      return <AddLiquiditySubmitButton canClick={true} buttonStyle={style.confirmButton} buttonText={'Confirm'} />
     }
   }
 
@@ -91,6 +102,35 @@ export const useAddLiquidityHandler = () => {
     // validates and gets new esimated output only on tokenAInputVal
     handleTokenInput(tokenAInputVal, setTokenAInputVal, setTokenBInputVal)
   }, [tokenASelected, tokenBSelected])
+
+  useEffect(() => {
+    async function fetchContract() {
+      if (!provider) {
+        console.log('Please connect wallet.')
+        return
+      }
+
+      // Position Manager contract address
+      let address = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+
+      if (provider && address) {
+        // Variable to hold Position Manager contract
+        let _posManager = null
+
+        _posManager = new ethers.Contract(
+          address,
+          PosManager.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+        if (_posManager) {
+          setPosManager(_posManager)
+        }
+      } else {
+        console.log('Please connect wallet')
+      }
+    }
+    fetchContract()
+  }, [provider])
 
   // if called on change of token A or B input vals, validate and update estimated output value
   const handleTokenInput = useCallback(
@@ -140,6 +180,25 @@ export const useAddLiquidityHandler = () => {
     }
   }
 
+  const addLiquidity = async () => {
+    if (posManager && accountInfo) {
+      try {
+        const DepositReservesParams = {
+          cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+          amountsDesired: [10000, 100],
+          amountsMin: [1000, 10],
+          to: accountInfo.address,
+          protocol: 1,
+          deadline: ethers.constants.MaxUint256,
+        }
+        let tx = await posManager.depositReserves(DepositReservesParams)
+        return await tx.wait()
+      } catch (e) {
+        return e
+      }
+    }
+  }
+
   return {
     handleTokenInput,
     setTokenAInputVal,
@@ -156,5 +215,6 @@ export const useAddLiquidityHandler = () => {
     setTokenASelected,
     setTokenBSelected,
     validateSubmit,
+    addLiquidity,
   }
 }
