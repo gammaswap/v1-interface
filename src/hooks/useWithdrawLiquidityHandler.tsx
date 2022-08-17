@@ -2,12 +2,12 @@ import { useState, useEffect, useContext } from 'react'
 import { WalletContext } from '../context/WalletContext'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
-import IUniswapV2Pair from '../../abis/v0-hackathon/IUniswapV2Pair.json'
-import IERC20 from '../../abis/v0-hackathon/ERC20.json'
+import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
+import IERC20 from '../../abis/ERC20.json'
 import { sqrt } from '../utils/mathFunctions'
 import Tokens, { Token } from '../components/Tokens'
 import TestGammaPool from '../../abis/v1-periphery/test/TestGammaPool.sol/TestGammaPool.json'
-import DepPool from '../../abis/v0-hackathon/DepositPool.json'
+import DepPool from '../../abis/DepositPool.json'
 
 const ZEROMIN = 0
 
@@ -38,9 +38,9 @@ export const useWithdrawLiquidityHandler = () => {
     // Position Manager contract address
     let address =
       process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
         : '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
-    if (provider && address) {
+    if (provider) {
       if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
         if (accountInfo && accountInfo?.address) {
           setPosManager(new ethers.Contract(address, PosManager.abi, provider.getSigner(accountInfo?.address)))
@@ -99,9 +99,9 @@ export const useWithdrawLiquidityHandler = () => {
     // Position Manager contract address
     let address =
       process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
         : '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
-    if (provider && address) {
+    if (provider) {
       if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
         if (accountInfo && accountInfo?.address) {
           setPosManager(new ethers.Contract(address, PosManager.abi, provider.getSigner(accountInfo?.address)))
@@ -222,36 +222,32 @@ export const useWithdrawLiquidityHandler = () => {
       // Position Manager contract address
       let address =
         process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-          ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+          ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
           : '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
 
-      if (provider && address) {
-        if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-          // Variable to hold Position Manager contract
-          let _posManager = null
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
+        // Variable to hold Position Manager contract
+        let _posManager = null
 
-          _posManager = new ethers.Contract(
-            address,
-            PosManager.abi,
-            accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
-          )
-          if (_posManager) {
-            setPosManager(_posManager)
-          }
-        } else {
-          let _depPool = null
-
-          _depPool = new ethers.Contract(
-            address,
-            DepPool.abi,
-            accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
-          )
-          if (_depPool) {
-            setdepPool(_depPool)
-          }
+        _posManager = new ethers.Contract(
+          address,
+          PosManager.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+        if (_posManager) {
+          setPosManager(_posManager)
         }
       } else {
-        console.log('Please connect wallet')
+        let _depPool = null
+
+        _depPool = new ethers.Contract(
+          address,
+          DepPool.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+        if (_depPool) {
+          setdepPool(_depPool)
+        }
       }
     }
     fetchContract()

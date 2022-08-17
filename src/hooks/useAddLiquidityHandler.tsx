@@ -118,22 +118,18 @@ export const useAddLiquidityHandler = () => {
       }
 
       // Position Manager contract address
-      let address = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+      let address = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
 
-      if (provider && address) {
-        // Variable to hold Position Manager contract
-        let _posManager = null
+      // Variable to hold Position Manager contract
+      let _posManager = null
 
-        _posManager = new ethers.Contract(
-          address,
-          PosManager.abi,
-          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
-        )
-        if (_posManager) {
-          setPosManager(_posManager)
-        }
-      } else {
-        console.log('Please connect wallet')
+      _posManager = new ethers.Contract(
+        address,
+        PosManager.abi,
+        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+      )
+      if (_posManager) {
+        setPosManager(_posManager)
       }
     }
     fetchContract()

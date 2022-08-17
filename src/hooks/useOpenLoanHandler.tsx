@@ -3,8 +3,8 @@ import { useState, useEffect, useContext, Dispatch, SetStateAction, useCallback,
 import Tokens, { Token } from '../components/Tokens'
 import { WalletContext } from '../context/WalletContext'
 // TODO: import Factory from '../../abis/Factory.json'
-import PositionMgr from '../../abis/v0-hackathon/PositionManager.json'
-import IERC20 from '../../abis/v0-hackathon/ERC20.json'
+import PositionMgr from '../../abis/PositionManager.json'
+import IERC20 from '../../abis/ERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import { CollateralType } from '../components/OpenLoan/CollateralType'
 import toast from 'react-hot-toast'
@@ -54,24 +54,22 @@ export const useOpenLoanHandler = () => {
     // Position Manager contract address
     let pairsAddress =
       process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
         : '0xC6CB7f8c046756Bd33ad6b322a3b88B0CA9ceC1b'
 
-    if (provider && pairsAddress) {
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local') {
-        if (accountInfo && accountInfo?.address) {
-          setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
-        } else {
-          setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider))
-        }
+    if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local') {
+      if (accountInfo && accountInfo?.address) {
+        setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
       } else {
-        if (accountInfo && accountInfo?.address) {
-          setPeripheryPosManager(
-            new ethers.Contract(pairsAddress, PositionManager.abi, provider.getSigner(accountInfo?.address))
-          )
-        } else {
-          setPeripheryPosManager(new ethers.Contract(pairsAddress, PositionManager.abi, provider))
-        }
+        setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider))
+      }
+    } else {
+      if (accountInfo && accountInfo?.address) {
+        setPeripheryPosManager(
+          new ethers.Contract(pairsAddress, PositionManager.abi, provider.getSigner(accountInfo?.address))
+        )
+      } else {
+        setPeripheryPosManager(new ethers.Contract(pairsAddress, PositionManager.abi, provider))
       }
     }
   }, [provider])
@@ -262,12 +260,12 @@ export const useOpenLoanHandler = () => {
     }
     let pairsAddress =
       process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
         : '0xC6CB7f8c046756Bd33ad6b322a3b88B0CA9ceC1b'
 
     //TODO: when the factory is available need to call it to get the pair's pool address to set
 
-    if (provider && pairsAddress) {
+    if (provider) {
       if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local' && !posManager) {
         if (accountInfo && accountInfo?.address) {
           setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
