@@ -43,6 +43,7 @@ export const useOpenLoanHandler = () => {
   const { notifyError, notifySuccess } = useNotification()
   const [buttonText, setButtonText] = useState<string>('Confirm')
   const [collateral1Class, setCollateral1Class] = useState<string>('')
+  const [tooltipText, setTooltipText] = useState<string>('')
 
   useEffect(() => {
     if (!provider) {
@@ -451,5 +452,7 @@ export const useOpenLoanHandler = () => {
     setCollateralAmt1,
     confirmStyle,
     buttonText,
+    tooltipText,
+    setTooltipText,
   }
 }
