@@ -47,6 +47,10 @@ module.exports = {
           6: '#171717',
         },
 
+      },
+      fontFamily:{
+        inter:['Inter'],
+        montserrat:['Montserrat']
       }
     },
   },
