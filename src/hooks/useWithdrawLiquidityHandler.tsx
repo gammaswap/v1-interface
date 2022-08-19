@@ -2,12 +2,12 @@ import { useState, useEffect, useContext } from 'react'
 import { WalletContext } from '../context/WalletContext'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
-import IUniswapV2Pair from '../../abis/IUniswapV2Pair.json'
-import IERC20 from '../../abis/ERC20.json'
+import IUniswapV2Pair from '../../abis/v0-hackathon/IUniswapV2Pair.json'
+import IERC20 from '../../abis/v0-hackathon/ERC20.json'
 import { sqrt } from '../utils/mathFunctions'
 import Tokens, { Token } from '../components/Tokens'
 import TestGammaPool from '../../abis/v1-periphery/test/TestGammaPool.sol/TestGammaPool.json'
-import DepPool from '../../abis/DepositPool.json'
+import DepPool from '../../abis/v0-hackathon/DepositPool.json'
 
 const ZEROMIN = 0
 
