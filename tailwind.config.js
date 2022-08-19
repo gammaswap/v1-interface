@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
@@ -49,9 +50,9 @@ module.exports = {
 
       },
       fontFamily:{
-        inter:['Inter'],
-        montserrat:['Montserrat']
-      }
+        'sans': ['Inter', ...defaultTheme.fontFamily.sans],
+        //'sans': ['Montserrat', ...defaultTheme.fontFamily.sans],
+      },
     },
   },
   plugins: [],
