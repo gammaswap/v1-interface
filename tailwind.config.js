@@ -49,9 +49,8 @@ module.exports = {
         },
 
       },
-      fontFamily:{
+      fontFamily: {
         'sans': ['Inter', ...defaultTheme.fontFamily.sans],
-        //'sans': ['Montserrat', ...defaultTheme.fontFamily.sans],
       },
     },
   },
