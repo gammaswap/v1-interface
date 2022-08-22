@@ -1,5 +1,5 @@
 import { MdOutlineClose } from 'react-icons/md'
-import { useSwapHandler } from '../../hooks/useSwapHandler'
+import { useRebalanceHandler } from '../../hooks/useRebalanceHandler'
 
 type SlippageProps = {
   openSlippage: any
@@ -7,7 +7,7 @@ type SlippageProps = {
 
 export const SlippageModal = ({ openSlippage }: SlippageProps) => {
   const { slippage, handleSlippageInput, slippageMinutes, handleSlippageMinutes, changeSlippagePercent } =
-    useSwapHandler()
+    useRebalanceHandler()
   const style = {
     slippageWrapper: 'w-screen flex justify-center items-center bg-primaryV1-4/50 absolute h-screen z-50',
     slippageContent: 'bg-primaryV3-4 w-[25rem] rounded-2xl p-4 border-2 border-primaryV3-1',

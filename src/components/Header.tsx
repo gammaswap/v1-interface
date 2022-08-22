@@ -31,13 +31,13 @@ const Header = () => {
       </Link>
       <nav className={style.nav}>
         <div className={style.navItemsContainer}>
-          <Link href={'/swap'}>
+          <Link href={'/pools/main'}>
             <div
-              onClick={() => setSelectedNavItem('swap')}
-              className={`${style.navItem} ${selectedNavItem === 'swap' && style.activeNavItem
+              onClick={() => setSelectedNavItem("pools")}
+              className={`${style.navItem} ${selectedNavItem === "pools" && style.activeNavItem
                 }`}
             >
-              Swap
+              Pools
             </div>
           </Link>
           <Link href={'/positions'}>
@@ -47,15 +47,6 @@ const Header = () => {
                 }`}
             >
               Positions
-            </div>
-          </Link>
-          <Link href={'/pools'}>
-            <div
-              onClick={() => setSelectedNavItem("pools")}
-              className={`${style.navItem} ${selectedNavItem === "pools" && style.activeNavItem
-                }`}
-            >
-              Pools
             </div>
           </Link>
         </div>
