@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IGammaPoolFactory",
-  "sourceName": "contracts/interfaces/IGammaPoolFactory.sol",
+  "contractName": "ITestGammaPoolFactory",
+  "sourceName": "contracts/test/ITestGammaPoolFactory.sol",
   "abi": [
     {
       "anonymous": false,
@@ -218,6 +218,19 @@
     },
     {
       "inputs": [],
+      "name": "longStrategy",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "owner",
       "outputs": [
         {
@@ -286,6 +299,32 @@
       "name": "setIsProtocolRestricted",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "shortStrategy",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "tester",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     }
   ],
