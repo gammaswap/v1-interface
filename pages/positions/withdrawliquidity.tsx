@@ -1,23 +1,35 @@
-import type {NextPage} from 'next'
+import type { NextPage } from 'next'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
-import {BsArrowDownShort} from 'react-icons/bs'
-import {useWithdrawLiquidityHandler} from '../../src/hooks/useWithdrawLiquidityHandler'
+import { BsArrowDownShort } from 'react-icons/bs'
+import { useWithdrawLiquidityHandler } from '../../src/hooks/useWithdrawLiquidityHandler'
 
 const WithdrawLiquidity: NextPage = () => {
-  const {sliderPercentage, changeSliderPercentage, sliderPercentChange, withdrawLiquidity, approveTransaction, token0, token1, liquidityAmt, liqInTokB, enableRemove} = useWithdrawLiquidityHandler()
+  const {
+    sliderPercentage,
+    changeSliderPercentage,
+    sliderPercentChange,
+    approveTransaction,
+    token0,
+    token1,
+    enableRemove,
+    withdraw,
+  } = useWithdrawLiquidityHandler()
 
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
     content: 'bg-gray-900 w-[30rem] rounded-2xl p-4',
     formHeader: 'px-2 justify-between items-center font-semibold text-xl text-gray-200 text-center',
     formLabel: ' flex justify-between pt-3 px-2',
-    tokenContainer: 'bg-gray-800 my-3 rounded-2xl p-6 text-3xl border-2 border-gray-800 hover:border-gray-600 flex justify-between',
+    tokenContainer:
+      'bg-gray-800 my-3 rounded-2xl p-6 text-3xl border-2 border-gray-800 hover:border-gray-600 flex justify-between',
     tokenInput: 'bg-transparent placeholder:text-gray-600 outline-none mb-6 w-full text-4xl text-gray-300 mt-4',
-    confirmButton: 'w-full bg-blue-400 m-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
+    confirmButton:
+      'w-full bg-blue-400 m-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
     successButton:
       'w-full bg-green-400 m-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-green-400 hover:border-green-300',
-    invalidatedButton: 'w-full my-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
+    invalidatedButton:
+      'w-full my-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
     withdrawHeading: 'w-screen text-left',
     sliderStyle: 'border-2 border-gray-800 shadow-lg mt-2 p-4 rounded-2xl',
     sliderPercent: 'mb-5 text-6xl text-white rounded-xl',
@@ -31,16 +43,6 @@ const WithdrawLiquidity: NextPage = () => {
     totalPriceContainer: 'flex flex-col items-end text-gray-500 text-sm mt-2',
     unitTokenConversion: 'font-semibold',
     sectionHeader: 'font-semibold text-gray-200 w-full',
-  }
-
-  const withdraw = (amount: number) => {
-    withdrawLiquidity(amount)
-      .then((res) => {
-        console.log(res)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
   }
 
   return (
@@ -98,7 +100,7 @@ const WithdrawLiquidity: NextPage = () => {
             </div>
           </div>
           <div className={style.downIcon}>
-            <BsArrowDownShort className={style.dropdownArrow} style={{color: 'white'}} />
+            <BsArrowDownShort className={style.dropdownArrow} style={{ color: 'white' }} />
           </div>
 
           <div className={style.amountDiv}>
@@ -114,7 +116,8 @@ const WithdrawLiquidity: NextPage = () => {
 
           <div className={style.totalPriceContainer}>
             <div className={style.unitTokenConversion}>
-              {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}1 {token1.symbol || '-'} = 1 {token0.symbol || '-'}
+              {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}1{' '}
+              {token1.symbol || '-'} = 1 {token0.symbol || '-'}
             </div>
             <div className={style.unitTokenConversion}>
               1 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
