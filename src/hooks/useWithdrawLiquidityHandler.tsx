@@ -12,7 +12,7 @@ import DepPool from '../../abis/v0-hackathon/DepositPool.json'
 const ZEROMIN = 0
 
 export const useWithdrawLiquidityHandler = () => {
-  const [depPool, setdepPool] = useState<Contract | null>(null)
+  const [depPool, setDepPool] = useState<Contract | null>(null)
   const [posManager, setPosManager] = useState<Contract | null>(null)
   const [sliderPercentage, setsliderPercentage] = useState<number>(0)
   const { provider, accountInfo } = useContext(WalletContext)
@@ -23,6 +23,8 @@ export const useWithdrawLiquidityHandler = () => {
   const [enableRemove, setEnableRemove] = useState<Boolean>(false)
   const [uniPrice, setUniPrice] = useState<string>('0')
   const [liqInTokB, setLiqInTokB] = useState<number>(0)
+
+  let DEPOSIT_POOL_ADDRESS = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
 
   async function changeSliderPercentage(percentage: number) {
     setsliderPercentage(percentage)
@@ -39,19 +41,19 @@ export const useWithdrawLiquidityHandler = () => {
     let address =
       process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
         ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
-        : '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+        : DEPOSIT_POOL_ADDRESS
     if (provider) {
       if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-        if (accountInfo && accountInfo?.address) {
-          setPosManager(new ethers.Contract(address, PosManager.abi, provider.getSigner(accountInfo?.address)))
+        if (accountInfo?.address) {
+          setPosManager(new ethers.Contract(address, PosManager.abi, provider.getSigner(accountInfo.address)))
         } else {
           setPosManager(new ethers.Contract(address, PosManager.abi, provider))
         }
       } else {
-        if (accountInfo && accountInfo?.address) {
-          setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
+        if (accountInfo?.address) {
+          setDepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo.address)))
         } else {
-          setdepPool(new ethers.Contract(address, DepPool.abi, provider))
+          setDepPool(new ethers.Contract(address, DepPool.abi, provider))
         }
       }
     } else {
@@ -100,7 +102,7 @@ export const useWithdrawLiquidityHandler = () => {
     let address =
       process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
         ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
-        : '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+        : DEPOSIT_POOL_ADDRESS
     if (provider) {
       if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
         if (accountInfo && accountInfo?.address) {
@@ -110,9 +112,9 @@ export const useWithdrawLiquidityHandler = () => {
         }
       } else {
         if (accountInfo && accountInfo?.address) {
-          setdepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
+          setDepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
         } else {
-          setdepPool(new ethers.Contract(address, DepPool.abi, provider))
+          setDepPool(new ethers.Contract(address, DepPool.abi, provider))
         }
       }
     } else {
@@ -150,7 +152,7 @@ export const useWithdrawLiquidityHandler = () => {
 
       try {
         let tx = await depPool.removeLiquidity(amt, ZEROMIN, ZEROMIN, accountInfo.address, {
-          gasLimit: 10000000,
+          gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT,
         })
         return await tx.wait()
       } catch (e) {
@@ -223,7 +225,7 @@ export const useWithdrawLiquidityHandler = () => {
       let address =
         process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
           ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
-          : '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+          : DEPOSIT_POOL_ADDRESS
 
       if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
         // Variable to hold Position Manager contract
@@ -246,7 +248,7 @@ export const useWithdrawLiquidityHandler = () => {
           accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
         )
         if (_depPool) {
-          setdepPool(_depPool)
+          setDepPool(_depPool)
         }
       }
     }
