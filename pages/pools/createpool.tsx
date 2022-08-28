@@ -1,6 +1,11 @@
 import type { NextPage } from "next"
 
+import { useCreatePoolHandler } from "../../src/hooks/useCreatePoolHandler"
+
 const CreatePool: NextPage = () => {
+
+  const { createPool } = useCreatePoolHandler()
+
   const style = {
     wrapper: "w-screen flex flex-col items-center",
     card: "flex flex-col bg-gray-900 w-[30rem] rounded-2xl p-4 mt-4",
@@ -23,6 +28,22 @@ const CreatePool: NextPage = () => {
         </div>
         <div className={style.cardBody}>
           <div className={style.createPoolLabelDiv}>
+            <p className={style.createPoolAddress}>Token 1</p>
+          </div>
+          <div className={style.inputDiv}>
+            <input placeholder="0x36cZJ7...gDQj" type="text" className={style.inputBox} />
+          </div>
+        </div>
+        <div className={style.cardBody}>
+          <div className={style.createPoolLabelDiv}>
+            <p className={style.createPoolAddress}>Token 2</p>
+          </div>
+          <div className={style.inputDiv}>
+            <input placeholder="0x36cZJ7...gDQj" type="text" className={style.inputBox} />
+          </div>
+        </div>
+        <div className={style.cardBody}>
+          <div className={style.createPoolLabelDiv}>
             <p className={style.createPoolAddress}>Address</p>
           </div>
           <div className={style.inputDiv}>
@@ -30,7 +51,7 @@ const CreatePool: NextPage = () => {
           </div>
         </div>
         <div className={style.cardFooter}>
-          <button className={style.saveBtn}>Save</button>
+          <button className={style.saveBtn} onClick={createPool} >Save</button>
         </div>
       </div>
     </div>
