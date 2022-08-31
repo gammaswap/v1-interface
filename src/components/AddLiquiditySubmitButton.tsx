@@ -1,15 +1,15 @@
+import { MouseEventHandler } from 'react'
 import { useAddLiquidityHandler } from '../hooks/useAddLiquidityHandler'
 
 type ButtonSubmitProps = {
-  canClick: Boolean
+  clickFunction: MouseEventHandler<HTMLDivElement>
   buttonStyle: string
   buttonText: string
 }
 
-const AddLiquiditySubmitValidator = ({ canClick, buttonStyle, buttonText }: ButtonSubmitProps): JSX.Element => {
-  const { addLiquidity } = useAddLiquidityHandler()
+const AddLiquiditySubmitValidator = ({ clickFunction, buttonStyle, buttonText }: ButtonSubmitProps): JSX.Element => {
   return (
-    <div className={buttonStyle} onClick={canClick ? addLiquidity : undefined}>
+    <div className={buttonStyle} onClick={clickFunction}>
       {buttonText}
     </div>
   )

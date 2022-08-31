@@ -74,22 +74,34 @@ export const useAddLiquidityHandler = () => {
   const validateSubmit = (): JSX.Element | undefined => {
     if (isTokenEmpty(tokenBSelected)) {
       return (
-        <AddLiquiditySubmitButton canClick={false} buttonStyle={style.invalidatedButton} buttonText={'Select Token'} />
+        <AddLiquiditySubmitButton
+          clickFunction={doNothing}
+          buttonStyle={style.invalidatedButton}
+          buttonText={'Select Token'}
+        />
       )
     }
     if (tokenAInputVal === '' || tokenBInputVal === '') {
       return (
         <AddLiquiditySubmitButton
-          canClick={false}
+          clickFunction={doNothing}
           buttonStyle={style.invalidatedButton}
           buttonText={'Enter an Amount'}
         />
       )
     }
     if (!isTokenEmpty(tokenBSelected) && tokenAInputVal !== '' && tokenBInputVal !== '') {
-      return <AddLiquiditySubmitButton canClick={true} buttonStyle={style.confirmButton} buttonText={'Confirm'} />
+      return (
+        <AddLiquiditySubmitButton
+          clickFunction={addLiquidity}
+          buttonStyle={style.confirmButton}
+          buttonText={'Confirm'}
+        />
+      )
     }
   }
+
+  const doNothing = () => {}
 
   // checks if token selected object is empty
   const isTokenEmpty = (tokenToCheck: Token): boolean => {
@@ -189,8 +201,8 @@ export const useAddLiquidityHandler = () => {
       try {
         const DepositReservesParams = {
           cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
-          amountsDesired: [10000, 100],
-          amountsMin: [1000, 10],
+          amountsDesired: [BigNumber.from(parseFloat(tokenAInputVal)), BigNumber.from(parseFloat(tokenBInputVal))],
+          amountsMin: [0, 0],
           to: accountInfo.address,
           protocol: 1,
           deadline: ethers.constants.MaxUint256,
@@ -202,6 +214,7 @@ export const useAddLiquidityHandler = () => {
         console.log(args.reservesLen.toNumber())
         console.log(args.shares.toNumber())
       } catch (e) {
+        console.log(e)
         return e
       }
     }

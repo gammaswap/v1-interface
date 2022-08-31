@@ -28,6 +28,7 @@ const Rebalance: NextPage = () => {
     isSlippageOpen,
     openSlippage,
     swapTokenInputs,
+    rebalance,
   } = useRebalanceHandler()
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
@@ -132,7 +133,9 @@ const Rebalance: NextPage = () => {
 
           <div className={style.bottomBar}>
             {accountInfo?.address ? (
-              <button className={style.swapBtn}>Swap</button>
+              <button className={style.swapBtn} onClick={() => rebalance()}>
+                Rebalance
+              </button>
             ) : (
               <button className={style.swapBtn} onClick={() => connectWallet()}>
                 Connect Wallet

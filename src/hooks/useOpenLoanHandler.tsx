@@ -163,8 +163,10 @@ export const useOpenLoanHandler = () => {
           .then((res) => {
             const { args } = res.events[1]
             let tokenId = args.tokenId.toNumber()
+            console.log(tokenId)
             borrowLiquidity(tokenId)
-              .then(() => {
+              .then((result) => {
+                console.log(result)
                 toast.success('Open loan was successful')
                 toast.dismiss(loading)
               })
