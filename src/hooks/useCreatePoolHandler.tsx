@@ -58,6 +58,7 @@ export const useCreatePoolHandler = () => {
       let poolAddress = res.events[0].address
       let msg = 'Pool created successfully at address: ' + poolAddress
       toast.success(msg)
+      console.log(msg)
       resetParameters()
     } catch (e) {
       let errorMsg = "Pool not created: "
