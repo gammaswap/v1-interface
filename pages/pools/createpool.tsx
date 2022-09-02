@@ -1,5 +1,5 @@
 import type { NextPage } from "next"
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useCreatePoolHandler } from "../../src/hooks/useCreatePoolHandler"
 import { ethers } from 'ethers'
 
@@ -33,8 +33,7 @@ const CreatePool: NextPage = () => {
   }
 
   useEffect(() => {
-    if (!token1Addr || !token2Addr || !cfmmAddr ||
-      !ethers.utils.isAddress(token1Addr) ||
+    if (!ethers.utils.isAddress(token1Addr) ||
       !ethers.utils.isAddress(token2Addr) ||
       !ethers.utils.isAddress(cfmmAddr)) {
       setButtonEnabled(false)
