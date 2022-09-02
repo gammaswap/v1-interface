@@ -21,7 +21,7 @@ const CreatePool: NextPage = () => {
     wrapper: "w-screen flex flex-col items-center",
     card: "flex flex-col bg-gray-900 w-[30rem] rounded-2xl p-4 mt-4",
     cardHead: "font-semibold text-xl text-gray-200 px-2",
-    createPoolHeading: "",
+    createPoolHeading: 'justify-between items-center font-semibold text-xl text-gray-200 text-center',
     cardBody: "px-2 text-white my-4",
     createPoolLabelDiv: "mt-3",
     createPoolAddress: "font-semibold text-gray-200 w-full",
