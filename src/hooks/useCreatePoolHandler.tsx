@@ -1,15 +1,16 @@
 import { useContext, useEffect, useState } from 'react'
 import { ethers, Contract } from 'ethers'
-
 import { WalletContext } from '../../src/context/WalletContext'
-import { Provider } from '@ethersproject/providers'
 import GammaPoolFactory from '../../abis/v1-core/GammaPoolFactory.sol/GammaPoolFactory.json'
-import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
+import toast from 'react-hot-toast'
+import { calcPoolKey } from '../../src/utils/getSmartContract'
 
 export const useCreatePoolHandler = () => {
 
   const [gammaPoolFactory, setGammaPoolFactory] = useState<Contract | null>(null)
-  const [gammaPool, setGammaPool] = useState<Contract | null>(null)
+  const [token1Addr, setToken1Addr] = useState<string>('')
+  const [token2Addr, setToken2Addr] = useState<string>('')
+  const [cfmmAddr, setCfmmAddr] = useState<string>('')
 
   const { accountInfo, provider, signer } = useContext(WalletContext)
   useEffect(() => {
@@ -19,82 +20,68 @@ export const useCreatePoolHandler = () => {
         return
       }
 
-      // Position Manager contract address
-      let address = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS || ''
-
-      // Variable to hold Position Manager contract
-      let _gammaPoolFactory = null
-      let _gammaPool = null
-
-      _gammaPoolFactory = new ethers.Contract(
-        address,
+      let gammaFactoryaddr = process.env.NEXT_PUBLIC_GAMMAFACTORY_ADDR || ''
+      let _gammaPoolFactory = new ethers.Contract(
+        gammaFactoryaddr,
         GammaPoolFactory.abi,
-        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
-      )
-
-      _gammaPool = new ethers.Contract(
-        '0xF058A56adb2d25aeE2600F7334EA6EACA5eFab11',
-        GammaPool.abi,
-        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        accountInfo && accountInfo?.address ? signer : provider
       )
 
       if (_gammaPoolFactory) {
         setGammaPoolFactory(_gammaPoolFactory)
-      }
-
-      if(_gammaPool) {
-        setGammaPool(_gammaPool)
       }
     }
     fetchContract()
   }, [provider])
 
   const createPool = async () => {
-    console.log('here')
-    console.log('Gamma', gammaPoolFactory)
-    console.log(accountInfo)
-    console.log('Gamma Pool', gammaPool)
-    if (gammaPoolFactory && accountInfo) {
-      try {
-        const CreatePoolParams = {
-          cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
-          tokens: [],
-          protocol: 1,
-        }
-        console.log(gammaPoolFactory)
-        getPool(process.env.NEXT_PUBLIC_CFMM_ADDRESS || '').then(
-          (res) => {
-            console.log('res', res)
-          }
-        ).catch(
-          (err) => {console.log(err)}
-        )
-        let tx = await gammaPoolFactory.createPool(CreatePoolParams)
-        let res = await tx.wait()
-        const { args } = res.events[0]
-        console.log(args.pool)
-        console.log(args.reservesLen.toNumber())
-        console.log(args.shares.toNumber())
-      } catch (e) {
-        console.log(e)
-        return e
+    try {
+      if (!accountInfo || !gammaPoolFactory) {
+        toast.error("Please connect your wallet.")
+        return
+      }
+
+      // check if pool already exists
+      let pool = await gammaPoolFactory.getPool(calcPoolKey(cfmmAddr))
+      if (pool != ethers.constants.AddressZero) {
+        toast.error("Pool already exsts at " + pool)
+        return
+      }
+
+      let CreatePoolParams = {
+        cfmm: cfmmAddr,
+        tokens: [token1Addr, token2Addr],
+        protocol: 1,
+      }
+      let tx = await gammaPoolFactory.createPool(CreatePoolParams)
+      let res = await tx.wait()
+      let poolAddress = res.events[0].address
+      let msg = 'Pool created successfully at address: ' + poolAddress
+      toast.success(msg)
+      resetParameters()
+    } catch (e) {
+      let errorMsg = "Pool not created: "
+      if (typeof e === 'string') {
+        toast.error(errorMsg + e)
+      } else if (e instanceof Error) {
+        toast.error(errorMsg + e.message)
       }
     }
   }
 
-  const getPool = async (cfmm: string) => {
-    let key = ethers.utils.solidityKeccak256(['string'], [cfmm])
-    console.log('key', key)
-    let key32 = ethers.utils.formatBytes32String(key)
-    console.log('key 32', key32)
-    console.log('getPool')
-    if(gammaPoolFactory) {
-      let res = await gammaPoolFactory.getPool(key)
-      return await res.wait()
-    }
+  function resetParameters() {
+    setToken1Addr('')
+    setToken2Addr('')
+    setCfmmAddr('')
   }
 
   return {
-    createPool
+    createPool,
+    token1Addr,
+    setToken1Addr,
+    token2Addr,
+    setToken2Addr,
+    cfmmAddr,
+    setCfmmAddr
   }
 }
