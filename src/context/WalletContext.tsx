@@ -83,10 +83,6 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
 
     const network = await provider.getNetwork()
 
-    if (network.chainId !== parseInt(process.env.NEXT_PUBLIC_ETH_CHAIN_ID || "3")) {
-      notifyError("Please switch to the Ropsten network to use the app.")
-    }
-
     setProvider(provider)
     setSigner(signer)
     setAccountInfo({

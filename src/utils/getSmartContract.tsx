@@ -51,9 +51,9 @@ export const getEstimatedOutput = async (
   return amountsOut
 }
 
-export const calcPoolKey = (cfmm: string): string => {
+export const calcPoolKey = (cfmm: string, protocol: number): string => {
   let abi = new ethers.utils.AbiCoder()
-  let bytesData = abi.encode(["address", "uint24"], [cfmm, 1])
+  let bytesData = abi.encode(["address", "uint24"], [cfmm, protocol])
   return ethers.utils.solidityKeccak256(['bytes'], [bytesData])
 }
 
@@ -105,11 +105,3 @@ export const calcPoolKey = (cfmm: string): string => {
 const formatEther = (weiNumber: number | BigNumber): string => {
   return ethers.utils.formatEther(weiNumber)
 }
-
-// const getEstimatedOutput = async (
-//     tokenAddr: string,
-//     tokenBAddr: string,
-//     inputValue: string,
-// ): Promise<string> => {
-//     const amountsOut = await
-// }

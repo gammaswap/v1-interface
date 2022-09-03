@@ -2,6 +2,7 @@ import type { NextPage } from "next"
 import { useEffect, useState } from "react"
 import { useCreatePoolHandler } from "../../src/hooks/useCreatePoolHandler"
 import { ethers } from 'ethers'
+import { AiOutlineDown } from 'react-icons/ai'
 
 const CreatePool: NextPage = () => {
 
@@ -12,10 +13,9 @@ const CreatePool: NextPage = () => {
     token2Addr,
     setToken2Addr,
     cfmmAddr,
-    setCfmmAddr
+    setCfmmAddr,
+    protocol,
   } = useCreatePoolHandler()
-
-  const [buttonEnabled, setButtonEnabled] = useState<boolean>(false)
 
   const style = {
     wrapper: "w-screen flex flex-col items-center",
@@ -30,6 +30,20 @@ const CreatePool: NextPage = () => {
     cardFooter: "text-white px-2 mt-3",
     saveBtn: "bg-green-300 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold",
     saveBtnGrey: 'bg-[#274060] w-full rounded-2xl text-gray-500 inline-flex place-content-center py-2 font-semibold',
+    selectBox: 'flex justify-between items-center border-y border-x border-slate-200 hover:border-slate-300 w-full py-1 px-2 rounded-lg cursor-pointer mt-3',
+    selectOptions: 'absolute top-10 bg-white shadow-2xl rounded-lg border-y border-x border-slate-200 z-50',
+    arrow: 'text-sm',
+    selectedOptionText: 'font-semibold text-slate-50',
+    eachOption: 'py-2 px-2 text-md hover:bg-primaryV3-2 group cursor-pointer',
+    firstOption: 'rounded-tl-lg rounded-tr-lg',
+  }
+
+  const [buttonEnabled, setButtonEnabled] = useState<boolean>(false)
+  const [isSelectOpen, setIsSelectOpen] = useState<boolean>(false)
+
+  function openOrCloseSelectBox() {
+    setIsSelectOpen((prevState) => !prevState)
+    console.log(isSelectOpen)
   }
 
   useEffect(() => {
@@ -47,6 +61,15 @@ const CreatePool: NextPage = () => {
       <div className={style.card}>
         <div className={style.cardHead}>
           <p className={style.createPoolHeading}>Create Pool</p>
+        </div>
+        <div className={style.cardBody}>
+          <div className={style.createPoolLabelDiv}>
+            <p className={style.createPoolAddress}>Protocol</p>
+          </div>
+          <div className={style.selectBox} onClick={openOrCloseSelectBox}>
+            <p>{protocol.name}</p>
+            <AiOutlineDown className={style.arrow} />
+          </div>
         </div>
         <div className={style.cardBody}>
           <div className={style.createPoolLabelDiv}>

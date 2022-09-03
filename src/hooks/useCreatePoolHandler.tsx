@@ -4,13 +4,14 @@ import { WalletContext } from '../../src/context/WalletContext'
 import GammaPoolFactory from '../../abis/v1-core/GammaPoolFactory.sol/GammaPoolFactory.json'
 import toast from 'react-hot-toast'
 import { calcPoolKey } from '../../src/utils/getSmartContract'
+import Protocols, { Protocol } from '../components/Protocols'
 
 export const useCreatePoolHandler = () => {
-
   const [gammaPoolFactory, setGammaPoolFactory] = useState<Contract | null>(null)
   const [token1Addr, setToken1Addr] = useState<string>('')
   const [token2Addr, setToken2Addr] = useState<string>('')
   const [cfmmAddr, setCfmmAddr] = useState<string>('')
+  const [protocol, setProtocol] = useState<Protocol>(Protocols[0])
 
   const { accountInfo, provider, signer } = useContext(WalletContext)
   useEffect(() => {
@@ -42,7 +43,7 @@ export const useCreatePoolHandler = () => {
       }
 
       // check if pool already exists
-      let pool = await gammaPoolFactory.getPool(calcPoolKey(cfmmAddr))
+      let pool = await gammaPoolFactory.getPool(calcPoolKey(cfmmAddr, protocol.id))
       if (pool != ethers.constants.AddressZero) {
         toast.error("Pool already exsts at " + pool)
         return
@@ -51,7 +52,7 @@ export const useCreatePoolHandler = () => {
       let CreatePoolParams = {
         cfmm: cfmmAddr,
         tokens: [token1Addr, token2Addr],
-        protocol: 1,
+        protocol: protocol.id,
       }
       let tx = await gammaPoolFactory.createPool(CreatePoolParams)
       let res = await tx.wait()
@@ -83,6 +84,8 @@ export const useCreatePoolHandler = () => {
     token2Addr,
     setToken2Addr,
     cfmmAddr,
-    setCfmmAddr
+    setCfmmAddr,
+    protocol,
+    setProtocol
   }
 }
