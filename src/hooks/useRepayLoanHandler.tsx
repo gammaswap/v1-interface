@@ -85,9 +85,13 @@ export const useRepayLoanHandler = () => {
     if(posManager) {
       let tx = await posManager.repayLiquidity(RepayLiquidityParams)
       let res = await tx.wait()
-      setRepayAmt(0)
+      resetValues()
       toast.success("Repay liquidity succeeded")
     }
+  }
+
+  const resetValues = () => {
+    setRepayAmt(0)
   }
 
   return {
