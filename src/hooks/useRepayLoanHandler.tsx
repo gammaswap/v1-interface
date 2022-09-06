@@ -2,6 +2,7 @@ import {useState, useContext, useEffect} from 'react'
 import { ethers, Contract } from 'ethers'
 import { WalletContext } from '../context/WalletContext'
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
+import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
 import toast from 'react-hot-toast'
 
 export const useRepayLoanHandler = () => {
@@ -9,9 +10,11 @@ export const useRepayLoanHandler = () => {
   const [repayAmt, setRepayAmt] = useState<number>(0)
   const [enableRepay, setEnableRepay] = useState<Boolean>(false)
   const [posManager, setPosManager] = useState<Contract | null>(null)
+  const [gammaPool, setGammaPool] = useState<Contract | null>(null)
   const [tokenId, setTokenId] = useState(19)
   const [loanAmount, setLoanAmount] = useState<number>(0)
   const [repayCal, setRepayCal] = useState(0)
+  const [cfmm, setCfmm] = useState()
   let percentages = [25, 50, 75, 100]
 
   useEffect(() => {
@@ -23,9 +26,20 @@ export const useRepayLoanHandler = () => {
 
       // Position Manager contract address
       let address = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
+      let gammaPoolAddress = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS || ''
 
       // Variable to hold Position Manager contract
       let _posManager = null
+      let _gammaPool
+
+      _gammaPool = new ethers.Contract(
+        gammaPoolAddress,
+        GammaPool.abi,
+        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+      )
+      if (_gammaPool) {
+        setGammaPool(_gammaPool)
+      }
 
       _posManager = new ethers.Contract(
         address,
@@ -40,16 +54,32 @@ export const useRepayLoanHandler = () => {
   }, [provider])
 
   useEffect(() => {
-    if(posManager) {
+    if(gammaPool) {
+      getCfmm().then((res) => setCfmm(res)).catch((err) => console.log(err))
+    }
+  }, [gammaPool])
+
+  useEffect(() => {
+    console.log(cfmm)
+    if(posManager && cfmm) {
       getLoan().then((res) => setLoanAmount(res.liquidity.toString()))
     }
-  }, [posManager])
+  }, [posManager, cfmm])
+
+  const getCfmm = async () => {
+    if(gammaPool) {
+      try {
+        return await gammaPool?.cfmm()
+      } catch (err) {
+        throw err
+      }
+    }
+  }
 
   const getLoan = async () => {
-    console.log(posManager)
     if(posManager) {
       try {
-        return await posManager.loan(process.env.NEXT_PUBLIC_CFMM_ADDRESS, 1, tokenId)
+        return await posManager.loan(cfmm, 1, tokenId)
       } catch (err) {
         throw err
       }
@@ -92,6 +122,7 @@ export const useRepayLoanHandler = () => {
 
   const resetValues = () => {
     setRepayAmt(0)
+    setRepayCal(0)
   }
 
   return {
