@@ -1,55 +1,60 @@
 import { useContext } from 'react'
 import { BigNumber, Contract, ethers } from 'ethers'
 import { Provider } from '@ethersproject/providers'
-import useNotification from '../hooks/useNotification'
 import { AccountInfo } from '../context/WalletContext'
+import { notifyError } from '../hooks/useNotification'
+
 
 const erc20ABI = require('erc-20-abi')
 const { abi: IUniswapV2FactoryABI } = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
 const { abi: IUniswapV2Router02ABI } = require('@uniswap/v2-periphery/build/IUniswapV2Router02.json')
-const { notifyError, notifySuccess } = useNotification()
 
 export type AmountsOut = Array<BigNumber>
 
 export type TokenContracts = {
-    tokenAContract: Contract | null
-    tokenBContract: Contract | null
+  tokenAContract: Contract | null
+  tokenBContract: Contract | null
 }
 
 export const getTokenContracts = (
-    tokenAAddr: string,
-    tokenBAddr: string,
-    provider: Provider,
+  tokenAAddr: string,
+  tokenBAddr: string,
+  provider: Provider,
 ): TokenContracts | null => {
-    try {
-        const tokenAContract = new ethers.Contract(tokenAAddr, erc20ABI, provider)
-        const tokenBContract = new ethers.Contract(tokenBAddr, erc20ABI, provider)
+  try {
+    const tokenAContract = new ethers.Contract(tokenAAddr, erc20ABI, provider)
+    const tokenBContract = new ethers.Contract(tokenBAddr, erc20ABI, provider)
 
-        return {
-            tokenAContract: tokenAContract,
-            tokenBContract: tokenBContract,
-        }
-    } catch (error) {
-        let message
-        if (error instanceof Error) message = error.message
-        else message = String(error)
-
-        notifyError(message)
+    return {
+      tokenAContract: tokenAContract,
+      tokenBContract: tokenBContract,
     }
-    return null
+  } catch (error) {
+    let message
+    if (error instanceof Error) message = error.message
+    else message = String(error)
+
+    notifyError(message)
+  }
+  return null
 }
 
 export const getEstimatedOutput = async (
-    tokenAddrs: Array<string>,
-    inputAmt: string,
-    provider: Provider
+  tokenAddrs: Array<string>,
+  inputAmt: string,
+  provider: Provider
 ): Promise<AmountsOut | undefined> => {
-    const routerContract = new ethers.Contract(process.env.NEXT_PUBLIC_IUNISWAP_V2_ROUTER_02_ADDR as string, IUniswapV2Router02ABI, provider as Provider)
-    let convertedInput = ethers.utils.parseEther(inputAmt)
-    const amountsOut = await routerContract.getAmountsOut(convertedInput, [tokenAddrs[0], tokenAddrs[1]])
-    return amountsOut
+  const routerContract = new ethers.Contract(process.env.NEXT_PUBLIC_IUNISWAP_V2_ROUTER_02_ADDR as string, IUniswapV2Router02ABI, provider as Provider)
+  let convertedInput = ethers.utils.parseEther(inputAmt)
+  const amountsOut = await routerContract.getAmountsOut(convertedInput, [tokenAddrs[0], tokenAddrs[1]])
+  return amountsOut
 }
 
+export const calcPoolKey = (cfmm: string, protocol: number): string => {
+  let abi = new ethers.utils.AbiCoder()
+  let bytesData = abi.encode(["address", "uint24"], [cfmm, protocol])
+  return ethers.utils.solidityKeccak256(['bytes'], [bytesData])
+}
 
 // /**
 //  * Gets token pair address non-negotiably,
@@ -96,13 +101,5 @@ export const getEstimatedOutput = async (
  * @returns the number in ethers of type string
  */
 const formatEther = (weiNumber: number | BigNumber): string => {
-    return ethers.utils.formatEther(weiNumber)
+  return ethers.utils.formatEther(weiNumber)
 }
-
-// const getEstimatedOutput = async (
-//     tokenAddr: string,
-//     tokenBAddr: string,
-//     inputValue: string,
-// ): Promise<string> => {
-//     const amountsOut = await 
-// }
