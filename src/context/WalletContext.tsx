@@ -4,7 +4,7 @@ import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import { Web3Provider, JsonRpcSigner } from '@ethersproject/providers'
-import useNotification from '../hooks/useNotification'
+import { notifyError } from '../hooks/useNotification'
 
 export type AccountInfo = {
   address: string | null
@@ -31,8 +31,6 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
   const [signer, setSigner] = useState<JsonRpcSigner | undefined>(undefined)
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null)
   const [web3Modal, setweb3Modal] = useState<Web3Modal | null>(null)
-
-  const { notifyError } = useNotification()
 
   // initiates web3modal
   useEffect(() => {

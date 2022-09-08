@@ -64,7 +64,7 @@ const CreatePool: NextPage = () => {
         </div>
         <div className={style.cardBody}>
           <div className={style.createPoolLabelDiv}>
-            <p className={style.createPoolAddress}>Protocol</p>
+            <p className={style.createPoolAddress}>Exchange</p>
           </div>
           <div className={style.selectBox} onClick={openOrCloseSelectBox}>
             <p>{protocol.name}</p>

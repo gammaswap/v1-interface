@@ -2,9 +2,9 @@ import { useContext, useEffect, useState } from 'react'
 import { ethers, Contract } from 'ethers'
 import { WalletContext } from '../../src/context/WalletContext'
 import GammaPoolFactory from '../../abis/v1-core/GammaPoolFactory.sol/GammaPoolFactory.json'
-import toast from 'react-hot-toast'
 import { calcPoolKey } from '../../src/utils/getSmartContract'
 import Protocols, { Protocol } from '../components/Protocols'
+import {notifySuccess, notifyError} from '../../src/hooks/useNotification'
 
 export const useCreatePoolHandler = () => {
   const [gammaPoolFactory, setGammaPoolFactory] = useState<Contract | null>(null)
@@ -38,14 +38,14 @@ export const useCreatePoolHandler = () => {
   const createPool = async () => {
     try {
       if (!accountInfo || !gammaPoolFactory) {
-        toast.error("Please connect your wallet.")
+        notifyError("Please connect your wallet.")
         return
       }
 
       // check if pool already exists
       let pool = await gammaPoolFactory.getPool(calcPoolKey(cfmmAddr, protocol.id))
       if (pool != ethers.constants.AddressZero) {
-        toast.error("Pool already exsts at " + pool)
+        notifyError("Pool already exsts at " + pool)
         return
       }
 
@@ -58,15 +58,15 @@ export const useCreatePoolHandler = () => {
       let res = await tx.wait()
       let poolAddress = res.events[0].address
       let msg = 'Pool created successfully at address: ' + poolAddress
-      toast.success(msg)
+      notifySuccess(msg)
       console.log(msg)
       resetParameters()
     } catch (e) {
       let errorMsg = "Pool not created: "
       if (typeof e === 'string') {
-        toast.error(errorMsg + e)
+        notifyError(errorMsg + e)
       } else if (e instanceof Error) {
-        toast.error(errorMsg + e.message)
+        notifyError(errorMsg + e.message)
       }
     }
   }

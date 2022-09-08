@@ -1,12 +1,19 @@
-const useNotification = () => {
+import toast from 'react-hot-toast'
 
-  const notifySuccess = (message: string) => console.log(`success: ${message}`)
-  const notifyError = (message: string) => console.log(`error: ${message}`)
-
-  return {
-    notifySuccess,
-    notifyError
-  }
+export const notifySuccess = (message: string) => {
+  toast.success(message)
+  console.log('success: ${message}')
 }
 
-export default useNotification
+export const notifyError = (message: string) => {
+  toast.error(message)
+  console.log('error: ${message}')
+}
+
+export const notifyLoading = (message: string) => {
+  return toast.loading(message)
+}
+
+export const notifyDismiss = (toastId: string) => {
+  toast.dismiss(toastId)
+}

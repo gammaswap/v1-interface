@@ -1,14 +1,13 @@
 import { useContext } from 'react'
 import { BigNumber, Contract, ethers } from 'ethers'
 import { Provider } from '@ethersproject/providers'
-import useNotification from '../hooks/useNotification'
 import { AccountInfo } from '../context/WalletContext'
+import { notifyError } from '../hooks/useNotification'
 
 
 const erc20ABI = require('erc-20-abi')
 const { abi: IUniswapV2FactoryABI } = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
 const { abi: IUniswapV2Router02ABI } = require('@uniswap/v2-periphery/build/IUniswapV2Router02.json')
-const { notifyError, notifySuccess } = useNotification()
 
 export type AmountsOut = Array<BigNumber>
 
@@ -56,7 +55,6 @@ export const calcPoolKey = (cfmm: string, protocol: number): string => {
   let bytesData = abi.encode(["address", "uint24"], [cfmm, protocol])
   return ethers.utils.solidityKeccak256(['bytes'], [bytesData])
 }
-
 
 // /**
 //  * Gets token pair address non-negotiably,
