@@ -22,7 +22,7 @@ const AddLiquidity: NextPage = () => {
     tokenSelected,
     setTokenASelected,
     setTokenBSelected,
-    validateSubmit,
+    addLiquidity,
   } = useAddLiquidityHandler()
 
   return (
@@ -82,7 +82,17 @@ const AddLiquidity: NextPage = () => {
               </div>
             )}
           </div>
-          <div>{validateSubmit()}</div>
+          <div>
+            {isTokenEmpty(tokenBSelected) ? (
+              <div className={style.invalidatedButton}>Select Token</div>
+            ) : tokenAInputVal === '' || tokenBInputVal === '' ? (
+              <div className={style.invalidatedButton}>Enter an Amount</div>
+            ) : !isTokenEmpty(tokenBSelected) && tokenAInputVal !== '' && tokenBInputVal !== '' ? (
+              <div className={style.confirmButton} onClick={addLiquidity}>
+                Confirm
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
       <TokenSelectorModal

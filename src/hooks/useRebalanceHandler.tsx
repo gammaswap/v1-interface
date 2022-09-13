@@ -4,7 +4,7 @@ import { WalletContext } from '../context/WalletContext'
 import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
 import { Contract, ethers } from 'ethers'
-import toast from 'react-hot-toast'
+import { notifySuccess, notifyError } from '../hooks/useNotification'
 
 export const useRebalanceHandler = () => {
   const { accountInfo, connectWallet, provider } = useContext(WalletContext)
@@ -144,7 +144,7 @@ export const useRebalanceHandler = () => {
 
   const rebalance = () => {
     if (!tokenAInputVal || !tokenBInputVal) {
-      toast.error('Please enter a valid token value')
+      notifyError('Please enter a valid token value')
       return
     }
     let liquidityLoan = loanLiquidity
@@ -155,18 +155,18 @@ export const useRebalanceHandler = () => {
           liquidityLoan = res.liquidity.toString()
         })
         .catch((err) => {
-          toast.error('An error occurred while getting loan')
+          notifyError('An error occurred while getting loan')
           console.log(err)
         })
     }
     // TODO: Hardcoded the tokenId value. We will get it from subgraph when we query user's positions
     doRebalance(19, parseFloat(liquidityLoan))
       .then((result) => {
-        toast.success('Rebalance was successfully')
+        notifySuccess('Rebalance was successfully')
         console.log(result)
       })
       .catch((err) => {
-        toast.error('An error occurred while Rebalance Collateral')
+        notifyError('An error occurred while Rebalance Collateral')
         console.log(err)
       })
   }
@@ -237,7 +237,7 @@ export const useRebalanceHandler = () => {
         }
       })
       .catch((err) => {
-        toast.error('An error occurred while getting loan')
+        notifyError('An error occurred while getting loan')
         console.log(err)
       })
   }, [posManager, gammaPool])
