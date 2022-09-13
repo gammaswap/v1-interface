@@ -60,6 +60,8 @@ const Rebalance: NextPage = () => {
     bottomBar: 'flex justify-center items-center mt-4',
     swapBtn:
       'w-full rounded-2xl text-white bg-primaryV2-1 py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer border-2 border-blue-400 hover:border-primaryV2-2',
+    confirmButton:
+      'w-full rounded-2xl text-white bg-primaryV1-7 py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer border-2 border-green-400 hover:border-green-300',
   }
   return (
     <>
@@ -133,7 +135,7 @@ const Rebalance: NextPage = () => {
 
           <div className={style.bottomBar}>
             {accountInfo?.address ? (
-              <button className={style.swapBtn} onClick={() => rebalance()}>
+              <button className={style.confirmButton} onClick={() => rebalance()}>
                 Rebalance
               </button>
             ) : (
