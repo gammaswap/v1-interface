@@ -6,10 +6,11 @@ import { Provider } from '@ethersproject/providers'
 import { BigNumber, Contract, ethers } from 'ethers'
 import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } from '../../src/utils/getSmartContract'
 import { BasicContractContext } from '../../src/context/BasicContractContext'
-import useNotification from '../../src/hooks/useNotification'
+
 import { formatEther } from 'ethers/lib/utils'
 import { AddLiquidityStyles } from '../../styles/AddLiquidityStyles'
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
+import { notifyError } from './useNotification'
 
 export const useAddLiquidityHandler = () => {
   const style = AddLiquidityStyles()
@@ -42,9 +43,6 @@ export const useAddLiquidityHandler = () => {
 
   // holds basic smart contracts for uniswap functions
   const { IUniswapV2Router02Contract, IUniswapV2FactoryContract } = useContext(BasicContractContext)
-
-  // error-handling
-  const { notifyError, notifySuccess } = useNotification()
 
   // checks for non-numeric value inputs
   const validateTokenInput = (
