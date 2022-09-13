@@ -10,10 +10,10 @@ import { CollateralType } from '../components/OpenLoan/CollateralType'
 import toast from 'react-hot-toast'
 import { FcInfo } from 'react-icons/fc'
 import { FieldValues, useForm } from 'react-hook-form'
-import useNotification from './useNotification'
 import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 // For V1 Periphery
 import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
+import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
 
 const style = OpenLoanStyles()
 
@@ -40,7 +40,6 @@ export const useOpenLoanHandler = () => {
   const [collateralAmt1Str, setCollateralAmt1Str] = useState<string>('')
   const { register, handleSubmit, setValue } = useForm()
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const { notifyError, notifySuccess } = useNotification()
   const [buttonText, setButtonText] = useState<string>('Confirm')
   const [collateral1Class, setCollateral1Class] = useState<string>('')
   const [tooltipText, setTooltipText] = useState<string>('')
@@ -76,19 +75,19 @@ export const useOpenLoanHandler = () => {
 
   async function openLoanHandler(data: FieldValues) {
     if (!accountInfo || !accountInfo.address) {
-      toast.error('Wallet not connected.')
+      notifyError('Wallet not connected.')
       return
     }
 
     getPosMgr()
     if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local') {
       if (!posManager) {
-        toast.error('Position manager not found.')
+        notifyError('Position manager not found.')
         return
       }
 
       if (!provider) {
-        toast.error('Provider not set.')
+        notifyError('Provider not set.')
         return
       }
 
@@ -129,7 +128,7 @@ export const useOpenLoanHandler = () => {
             )
             break
           default:
-            toast.error('Invalid collateral type.')
+            notifyError('Invalid collateral type.')
             return
         }
         // TODO: wait for contract to handle collateral
@@ -141,24 +140,24 @@ export const useOpenLoanHandler = () => {
           loanAmtBN,
           accountAddress
         )
-        let loading = toast.loading('Waiting for block confirmation')
+        let loading = notifyLoading('Waiting for block confirmation')
         let receipt = await tx.wait()
         if (receipt.status == 1) {
-          toast.dismiss(loading)
-          toast.success('Position opened successfully.')
+          notifyDismiss(loading)
+          notifySuccess('Position opened successfully.')
           return
         }
-        toast.error('Open position was unsuccessful.')
+        notifyError('Open position was unsuccessful.')
       } catch (e) {
         if (typeof e === 'string') {
-          toast.error(e)
+          notifyError(e)
         } else if (e instanceof Error) {
-          toast.error(e.message)
+          notifyError(e.message)
         }
       }
     } else {
       if (peripheryPosManager) {
-        let loading = toast.loading('Waiting for block confirmation')
+        let loading = notifyLoading('Waiting for block confirmation')
         createLoan()
           .then((res) => {
             const { args } = res.events[1]
@@ -172,14 +171,14 @@ export const useOpenLoanHandler = () => {
               })
               .catch((err) => {
                 console.log(err)
-                toast.dismiss(loading)
-                toast.error('Borrow liquidity was unsuccessful')
+                notifyDismiss(loading)
+                notifyError('Borrow liquidity was unsuccessful')
               })
           })
           .catch((err) => {
             console.log(err)
-            toast.dismiss(loading)
-            toast.error('Create loan was unsuccessful')
+            notifyDismiss(loading)
+            notifyError('Create loan was unsuccessful')
           })
       }
     }
@@ -225,7 +224,7 @@ export const useOpenLoanHandler = () => {
       // check enough balance
       let balanceBN = await erc20.balanceOf(account)
       if (balanceBN < amountBN) {
-        toast.error(
+        notifyError(
           'Not enough funds. Requested: ' + amountStr + ' Balance ' + ethers.utils.formatUnits(balanceBN, decimals)
         )
       }
@@ -236,23 +235,23 @@ export const useOpenLoanHandler = () => {
       }
     } catch (e) {
       if (typeof e === 'string') {
-        toast.error('checkAllowance: ' + e)
+        notifyError('checkAllowance: ' + e)
       } else if (e instanceof Error) {
-        toast.error('checkAllowance: ' + e.message)
+        notifyError('checkAllowance: ' + e.message)
       }
     }
   }
 
   async function approve(fromTokenContract: Contract, spender: string) {
     let tx = await fromTokenContract.approve(spender, constants.MaxUint256)
-    let loading = toast.loading('Waiting for approval')
+    let loading = notifyLoading('Waiting for approval')
     let receipt = await tx.wait()
-    toast.dismiss(loading)
+    notifyDismiss(loading)
     if (receipt.status == 1) {
-      toast.success('Approval completed')
+      notifySuccess('Approval completed')
       return
     }
-    toast.success('Approval failed')
+    notifySuccess('Approval failed')
   }
 
   function getPosMgr() {
