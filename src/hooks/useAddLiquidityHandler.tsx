@@ -7,7 +7,7 @@ import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } fro
 import { BasicContractContext } from '../../src/context/BasicContractContext'
 
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
-import { notifyError } from './useNotification'
+import { notifyError, notifySuccess } from './useNotification'
 
 export const useAddLiquidityHandler = () => {
   // holds state of user amount inputted for each of the token input fields
@@ -75,7 +75,6 @@ export const useAddLiquidityHandler = () => {
       provider as Provider
     )
     setTokenContracts(fetchedTokenContracts)
-    console.log(tokenContracts)
     // validates and gets new esimated output only on tokenAInputVal
     handleTokenInput(tokenAInputVal, setTokenAInputVal, setTokenBInputVal)
   }, [tokenASelected, tokenBSelected])
@@ -83,7 +82,7 @@ export const useAddLiquidityHandler = () => {
   useEffect(() => {
     async function fetchContract() {
       if (!provider) {
-        console.log('Please connect wallet.')
+        notifyError('Please connect wallet.')
         return
       }
 
@@ -168,11 +167,13 @@ export const useAddLiquidityHandler = () => {
         let tx = await posManager.depositReserves(DepositReservesParams)
         let res = await tx.wait()
         const { args } = res.events[0]
-        console.log(args.pool)
-        console.log(args.reservesLen.toNumber())
-        console.log(args.shares.toNumber())
+        let message = "Add Liquidity Success: "
+          + args.pool
+          + args.reservesLen.toNumber()
+          + args.shares.toNumber()
+        notifySuccess(message)
       } catch (e) {
-        notifyError('An error occurred while adding liquidity. Please try again')
+        notifyError('An error occurred while adding liquidity. Please try again:' + e)
         return e
       }
     }

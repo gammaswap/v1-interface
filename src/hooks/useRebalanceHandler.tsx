@@ -111,7 +111,7 @@ export const useRebalanceHandler = () => {
         let message
         if (error instanceof Error) message = error.message
         else message = String(error)
-        console.log(message)
+        notifyError(message)
       }
       return null
     },
