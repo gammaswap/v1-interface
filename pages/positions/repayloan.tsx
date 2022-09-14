@@ -5,7 +5,7 @@ import 'rc-slider/assets/index.css'
 import {useRepayLoanHandler} from '../../src/hooks/useRepayLoanHandler'
 
 const Repayloan: NextPage = () => {
-  const {repayAmt, repayAmtChange, changeSliderPercentage, percentages, approveTransaction, repayTransaction, enableRepay} = useRepayLoanHandler()
+  const {repayAmt, repayAmtChange, changeSliderPercentage, percentages, approveTransaction, repayTransaction, enableRepay, loanAmount, repayCal} = useRepayLoanHandler()
 
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
@@ -75,15 +75,15 @@ const Repayloan: NextPage = () => {
           <div className={style.allAmountsDiv}>
             <div className={style.amountsDiv}>
               <p>Loan Amount</p>
-              <p>100 TokA</p>
+              <p>{loanAmount}</p>
             </div>
             <div className={style.amountsDiv}>
               <p>Repay Amount</p>
-              <p>100 TokA</p>
+              <p>{repayCal}</p>
             </div>
             <div className={style.amountsDiv}>
               <p>Remaining Amount</p>
-              <p>0 TokA</p>
+              <p>{loanAmount - repayCal}</p>
             </div>
           </div>
           <div className={style.buttonDiv}>
