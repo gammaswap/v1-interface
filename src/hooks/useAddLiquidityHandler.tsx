@@ -1,19 +1,15 @@
 import { useState, useEffect, useContext, ChangeEvent, SetStateAction, Dispatch, useCallback } from 'react'
-import AddLiquiditySubmitButton from '../../src/components/AddLiquiditySubmitButton'
 import Tokens, { Token } from '../../src/components/Tokens'
-import { AccountInfo, WalletContext } from '../../src/context/WalletContext'
+import { WalletContext } from '../../src/context/WalletContext'
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, Contract, ethers } from 'ethers'
 import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } from '../../src/utils/getSmartContract'
 import { BasicContractContext } from '../../src/context/BasicContractContext'
 
-import { formatEther } from 'ethers/lib/utils'
-import { AddLiquidityStyles } from '../../styles/AddLiquidityStyles'
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import { notifyError } from './useNotification'
 
 export const useAddLiquidityHandler = () => {
-  const style = AddLiquidityStyles()
   // holds state of user amount inputted for each of the token input fields
   const [tokenAInputVal, setTokenAInputVal] = useState<string>('')
   const [tokenBInputVal, setTokenBInputVal] = useState<string>('')
@@ -39,10 +35,7 @@ export const useAddLiquidityHandler = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   // holds global state of user info and ethers provider for contract calls
-  const { accountInfo, provider, signer } = useContext(WalletContext)
-
-  // holds basic smart contracts for uniswap functions
-  const { IUniswapV2Router02Contract, IUniswapV2FactoryContract } = useContext(BasicContractContext)
+  const { accountInfo, provider } = useContext(WalletContext)
 
   // checks for non-numeric value inputs
   const validateTokenInput = (
@@ -66,27 +59,6 @@ export const useAddLiquidityHandler = () => {
   const handleTokenSelector = (tokenSelected: string): void => {
     setTokenSelected(tokenSelected)
     setIsOpen(true)
-  }
-
-  // validates add liquidity submit transaction button
-  const validateSubmit = (): JSX.Element | undefined => {
-    if (isTokenEmpty(tokenBSelected)) {
-      return (
-        <AddLiquiditySubmitButton canClick={false} buttonStyle={style.invalidatedButton} buttonText={'Select Token'} />
-      )
-    }
-    if (tokenAInputVal === '' || tokenBInputVal === '') {
-      return (
-        <AddLiquiditySubmitButton
-          canClick={false}
-          buttonStyle={style.invalidatedButton}
-          buttonText={'Enter an Amount'}
-        />
-      )
-    }
-    if (!isTokenEmpty(tokenBSelected) && tokenAInputVal !== '' && tokenBInputVal !== '') {
-      return <AddLiquiditySubmitButton canClick={true} buttonStyle={style.confirmButton} buttonText={'Confirm'} />
-    }
   }
 
   // checks if token selected object is empty
@@ -187,8 +159,8 @@ export const useAddLiquidityHandler = () => {
       try {
         const DepositReservesParams = {
           cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
-          amountsDesired: [10000, 100],
-          amountsMin: [1000, 10],
+          amountsDesired: [BigNumber.from(parseFloat(tokenAInputVal)), BigNumber.from(parseFloat(tokenBInputVal))],
+          amountsMin: [0, 0],
           to: accountInfo.address,
           protocol: 1,
           deadline: ethers.constants.MaxUint256,
@@ -200,6 +172,7 @@ export const useAddLiquidityHandler = () => {
         console.log(args.reservesLen.toNumber())
         console.log(args.shares.toNumber())
       } catch (e) {
+        notifyError('An error occurred while adding liquidity. Please try again')
         return e
       }
     }
@@ -220,7 +193,6 @@ export const useAddLiquidityHandler = () => {
     tokenSelected,
     setTokenASelected,
     setTokenBSelected,
-    validateSubmit,
     addLiquidity,
   }
 }

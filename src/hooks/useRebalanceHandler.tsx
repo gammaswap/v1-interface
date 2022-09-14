@@ -1,9 +1,17 @@
-import { ChangeEvent, Dispatch, SetStateAction, useCallback, useContext, useState } from 'react'
+import { ChangeEvent, Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from 'react'
 import Tokens, { Token } from '../components/Tokens'
 import { WalletContext } from '../context/WalletContext'
+import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
+import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
+import { Contract, ethers } from 'ethers'
+import { notifySuccess, notifyError } from '../hooks/useNotification'
 
 export const useRebalanceHandler = () => {
-  const { accountInfo, connectWallet } = useContext(WalletContext)
+  const { accountInfo, connectWallet, provider } = useContext(WalletContext)
+
+  const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+  const GAMMAPOOL_ADDRESS = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS
+  const CFMM_ADDRESS = process.env.NEXT_PUBLIC_CFMM_ADDRESS
 
   const [tokenAInputVal, setTokenAInputVal] = useState<string>('')
   const [tokenBInputVal, setTokenBInputVal] = useState<string>('')
@@ -20,6 +28,10 @@ export const useRebalanceHandler = () => {
   const [isSlippageOpen, setIsSlippageOpen] = useState<boolean>(false)
   const [slippage, setSlippage] = useState<string>('')
   const [slippageMinutes, setSlippageMinutes] = useState<string>('')
+
+  const [posManager, setPosManager] = useState<Contract | null>(null)
+  const [gammaPool, setGammaPool] = useState<Contract | null>(null)
+  const [loanLiquidity, setLoanLiquidity] = useState<string>('')
 
   const openSlippage = () => {
     setIsSlippageOpen((prevState) => !prevState)
@@ -130,6 +142,106 @@ export const useRebalanceHandler = () => {
     setTokenBInputVal(tokenAVal)
   }
 
+  const rebalance = () => {
+    if (!tokenAInputVal || !tokenBInputVal) {
+      notifyError('Please enter a valid token value')
+      return
+    }
+    let liquidityLoan = loanLiquidity
+    if (!liquidityLoan) {
+      getLoan()
+        .then((res) => {
+          setLoanLiquidity(res.liquidity.toString())
+          liquidityLoan = res.liquidity.toString()
+        })
+        .catch((err) => {
+          notifyError('An error occurred while getting loan')
+          console.log(err)
+        })
+    }
+    // TODO: Hardcoded the tokenId value. We will get it from subgraph when we query user's positions
+    doRebalance(19, parseFloat(liquidityLoan))
+      .then((result) => {
+        notifySuccess('Rebalance was successfully')
+        console.log(result)
+      })
+      .catch((err) => {
+        notifyError('An error occurred while Rebalance Collateral')
+        console.log(err)
+      })
+  }
+
+  const doRebalance = async (tokenId: number, liquidity: number) => {
+    if (posManager) {
+      const RebalanceCollateralParams = {
+        cfmm: CFMM_ADDRESS,
+        protocol: 1,
+        tokenId: tokenId,
+        deltas: [tokenAInputVal, tokenBInputVal],
+        liquidity: liquidity,
+        to: accountInfo?.address,
+        deadline: ethers.constants.MaxUint256,
+      }
+      try {
+        const tx = await posManager.rebalanceCollateral(RebalanceCollateralParams)
+        return await tx.wait()
+      } catch (e) {
+        throw e
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (!posManager && provider) {
+      let _posManager = new ethers.Contract(
+        POSITION_MANAGER_ADDRESS || '',
+        PositionManager.abi,
+        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+      )
+      setPosManager(_posManager)
+    }
+  }, [posManager, provider])
+
+  useEffect(() => {
+    if (!gammaPool && provider) {
+      let _gammaPool = new ethers.Contract(
+        GAMMAPOOL_ADDRESS || '',
+        GammaPool.abi,
+        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+      )
+      setGammaPool(_gammaPool)
+    }
+  }, [gammaPool, provider])
+
+  const getLoan = useCallback(async () => {
+    if (posManager) {
+      try {
+        let cfmm_address = CFMM_ADDRESS
+        if (!cfmm_address && gammaPool) {
+          cfmm_address = await gammaPool.cfmm()
+          console.log(cfmm_address)
+        }
+        // TODO: Hardcoded the tokenId value. We will get it from subgraph when we query user's positions
+        return await posManager.loan(cfmm_address, 1, 19)
+      } catch (e) {
+        throw e
+      }
+    }
+  }, [posManager, gammaPool])
+
+  useEffect(() => {
+    getLoan()
+      .then((res) => {
+        if (res) {
+          setLoanLiquidity(res.liquidity.toString())
+        }
+      })
+      .catch((err) => {
+        notifyError('An error occurred while getting loan')
+        console.log(err)
+      })
+  }, [posManager, gammaPool])
+
   return {
     tokenAInputVal,
     setTokenAInputVal,
@@ -155,5 +267,6 @@ export const useRebalanceHandler = () => {
     handleSlippageMinutes,
     changeSlippagePercent,
     swapTokenInputs,
+    rebalance,
   }
 }

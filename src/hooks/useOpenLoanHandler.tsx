@@ -162,10 +162,12 @@ export const useOpenLoanHandler = () => {
           .then((res) => {
             const { args } = res.events[1]
             let tokenId = args.tokenId.toNumber()
+            console.log(tokenId)
             borrowLiquidity(tokenId)
-              .then(() => {
-                notifySuccess('Open loan was successful')
-                notifyDismiss(loading)
+              .then((result) => {
+                console.log(result)
+                toast.success('Open loan was successful')
+                toast.dismiss(loading)
               })
               .catch((err) => {
                 console.log(err)

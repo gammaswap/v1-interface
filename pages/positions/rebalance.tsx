@@ -28,6 +28,7 @@ const Rebalance: NextPage = () => {
     isSlippageOpen,
     openSlippage,
     swapTokenInputs,
+    rebalance,
   } = useRebalanceHandler()
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
@@ -55,10 +56,12 @@ const Rebalance: NextPage = () => {
     tokenBalance: 'self-end mt-2 text-sm text-gray-300 opacity-50 text-right',
     nonSelectedTokenContainer: 'flex items-center w-2/3 text-gray-200',
     nonSelectedTokenContent:
-      'w-full h-min flex justify-center items-center bg-blue-500 rounded-2xl text-2xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30',
+      'w-full h-min flex justify-center items-center bg-blue-500 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30',
     bottomBar: 'flex justify-center items-center mt-4',
     swapBtn:
       'w-full rounded-2xl text-white bg-primaryV2-1 py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer border-2 border-blue-400 hover:border-primaryV2-2',
+    confirmButton:
+      'w-full rounded-2xl text-white bg-primaryV1-7 py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer border-2 border-green-400 hover:border-green-300',
   }
   return (
     <>
@@ -132,7 +135,9 @@ const Rebalance: NextPage = () => {
 
           <div className={style.bottomBar}>
             {accountInfo?.address ? (
-              <button className={style.swapBtn}>Swap</button>
+              <button className={style.confirmButton} onClick={() => rebalance()}>
+                Rebalance
+              </button>
             ) : (
               <button className={style.swapBtn} onClick={() => connectWallet()}>
                 Connect Wallet
