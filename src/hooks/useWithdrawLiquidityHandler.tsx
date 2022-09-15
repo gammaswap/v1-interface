@@ -8,6 +8,7 @@ import { sqrt } from '../utils/mathFunctions'
 import Tokens, { Token } from '../components/Tokens'
 import TestGammaPool from '../../abis/v1-periphery/test/TestGammaPool.sol/TestGammaPool.json'
 import DepPool from '../../abis/v0-hackathon/DepositPool.json'
+import { notifyError, notifySuccess } from './useNotification'
 
 const ZEROMIN = 0
 
@@ -57,11 +58,11 @@ export const useWithdrawLiquidityHandler = () => {
         }
       }
     } else {
-      console.log('Please connect wallet')
+      notifyError('Please connect wallet')
     }
 
     if (!accountInfo || !accountInfo.address) {
-      console.log('Wallet not connected.')
+      notifyError('Wallet not connected.')
       return
     }
     if (accountInfo && accountInfo?.address) {
@@ -74,7 +75,7 @@ export const useWithdrawLiquidityHandler = () => {
         })
         .catch((err: any) => {
           setEnableRemove(false)
-          console.log(err)
+          notifyError(err)
         })
     } else {
       if (depPool === null) {
@@ -86,7 +87,7 @@ export const useWithdrawLiquidityHandler = () => {
         })
         .catch((err: any) => {
           setEnableRemove(false)
-          console.log(err)
+          notifyError(err)
         })
     }
   }
@@ -118,11 +119,11 @@ export const useWithdrawLiquidityHandler = () => {
         }
       }
     } else {
-      console.log('Please connect wallet')
+      notifyError('Please connect wallet')
     }
 
     if (!accountInfo || !accountInfo.address) {
-      console.log('Wallet not connected.')
+      notifyError('Wallet not connected.')
       return
     }
 
@@ -163,7 +164,7 @@ export const useWithdrawLiquidityHandler = () => {
 
   async function approveWithdraw(posManager: Contract | null, contractAddress: string) {
     if (!accountInfo || !accountInfo.address) {
-      console.log('Wallet not connected.')
+      notifyError('Wallet not connected.')
       return
     }
     if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
@@ -187,13 +188,13 @@ export const useWithdrawLiquidityHandler = () => {
               let tx = await gammaPoolContract.approve(contractAddress, constants.MaxUint256.toString())
               return await tx.wait()
             } else {
-              console.log('Please connect wallet')
+              notifyError('Please connect wallet')
             }
           } catch (e) {
             throw e
           }
         } else {
-          console.log('Please connect wallet')
+          notifyError('Please connect wallet')
         }
       }
     } else {
@@ -208,7 +209,7 @@ export const useWithdrawLiquidityHandler = () => {
             throw e
           }
         } else {
-          console.log('Please connect wallet')
+          notifyError('Please connect wallet')
         }
       }
     }
@@ -217,7 +218,7 @@ export const useWithdrawLiquidityHandler = () => {
   useEffect(() => {
     async function fetchContract() {
       if (!provider) {
-        console.log('Please connect wallet.')
+        notifyError('Please connect wallet.')
         return
       }
 
@@ -346,12 +347,14 @@ export const useWithdrawLiquidityHandler = () => {
     withdrawLiquidity(amount)
       .then((res) => {
         const { args } = res.events[1]
-        console.log(args.pool)
-        console.log(args.reservesLen.toString())
-        console.log(args.assets.toString())
+        let message = "Add Liquidity Success: "
+          + args.pool
+          + args.reservesLen.toNumber()
+          + args.shares.toNumber()
+        notifySuccess(message)
       })
       .catch((err) => {
-        console.log(err)
+        notifyError(err)
       })
   }
 
