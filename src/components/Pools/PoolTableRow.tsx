@@ -18,7 +18,7 @@ const PoolTableRow = (props: PropsType) => {
 
   const style = {
     tableBodyRow: "flex border-b border-gray-500 pl-2 pr-4",
-    tableBodyDefinition: "py-4 flex",
+    tableBodyDefinition: "py-4 flex overflow-hidden mr-2 ml-2",
     assetHead: "w-[20%] justify-start font-medium text-white",
     totalSupplyHead: "w-[16%] justify-end font-medium text-white",
     supplyApyHead: "w-[16%] justify-end font-medium text-white",
