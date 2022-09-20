@@ -7,7 +7,7 @@ import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
 import { Tooltip } from '../../src/components/Tooltip'
 import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 
-const style = OpenLoanStyles()
+const style = OpenLoanStyles
 
 const tips = {
   maxltv: 'The Maximum LTV ratio represents the maximum borrowing power of a ' +

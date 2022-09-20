@@ -6,7 +6,7 @@ import { AddLiquidityStyles } from '../../styles/AddLiquidityStyles'
 import { useAddLiquidityHandler } from '../../src/hooks/useAddLiquidityHandler'
 
 const AddLiquidity: NextPage = () => {
-  const style = AddLiquidityStyles()
+  const style = AddLiquidityStyles
   const {
     handleTokenInput,
     setTokenAInputVal,
