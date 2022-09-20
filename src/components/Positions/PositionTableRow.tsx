@@ -17,7 +17,7 @@ const PositionTableRow = (props: PropsType) => {
 
   const style = {
     tableBodyRow: 'flex text-xs text-gray-700 uppercase pl-2 pr-4 border-b border-gray-500',
-    tableBodyDefinition: 'py-3 w-[20%] justify-start font-medium text-white flex align-center',
+    tableBodyDefinition: 'py-3 w-[20%] justify-start font-medium text-white flex align-center overflow-hidden',
     rightAlign: 'justify-end',
     leftAlign: 'justify-start',
   }
