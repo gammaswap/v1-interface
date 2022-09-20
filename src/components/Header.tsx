@@ -32,15 +32,6 @@ const Header = () => {
       </Link>
       <nav className={style.nav}>
         <div className={style.navItemsContainer}>
-          <Link href={'/pools/main'}>
-            <div
-              onClick={() => setSelectedNavItem("pools")}
-              className={`${style.navItem} ${selectedNavItem === "pools" && style.activeNavItem
-                }`}
-            >
-              Pools
-            </div>
-          </Link>
           <Link href={'/positions'}>
             <div
               onClick={() => setSelectedNavItem("positions")}
@@ -48,6 +39,15 @@ const Header = () => {
                 }`}
             >
               Positions
+            </div>
+          </Link>
+          <Link href={'/pools/main'}>
+            <div
+              onClick={() => setSelectedNavItem("pools")}
+              className={`${style.navItem} ${selectedNavItem === "pools" && style.activeNavItem
+                }`}
+            >
+              Pools
             </div>
           </Link>
         </div>

@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react'
 import Head from 'next/head'
+import Header from './Header'
 import WalletProvider from '../context/WalletContext'
 import BasicContractProvider from '../context/BasicContractContext'
 
@@ -16,10 +17,13 @@ const Layout = ({ children }: Props) => {
         <WalletProvider>
             <BasicContractProvider>
                 <Head>
-                    <title>GammaSwap</title>
+                    <title>GammaSwap - Oracle-Free Volatility DEX</title>
                     <link rel="icon" href="/favicon.ico" />
                 </Head>
-                <main className={style.wrapper}>{children}</main>
+                <main className={style.wrapper}>
+                    <Header />
+                    {children}
+                </main>
             </BasicContractProvider>
         </WalletProvider>
     )
