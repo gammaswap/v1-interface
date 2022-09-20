@@ -34,8 +34,10 @@ export const usePositionHandler = () => {
         setPositions(data)
       }
     }
-    if (positions?.length === 0 && process.env.NEXT_PUBLIC_SUBGRAPH_URL) {
-      fetchPositionsData()
+    if (process.env.NEXT_PUBLIC_SUBGRAPH_URL) {
+      if (positions?.length === 0) {
+        fetchPositionsData()
+      }
     } else {
       setPositions([
         {
