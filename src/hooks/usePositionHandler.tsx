@@ -34,8 +34,32 @@ export const usePositionHandler = () => {
         setPositions(data)
       }
     }
-    if (positions?.length === 0) {
+    if (positions?.length === 0 && process.env.NEXT_PUBLIC_SUBGRAPH_URL) {
       fetchPositionsData()
+    } else {
+      setPositions([
+        {
+          asset: 'ETH - BN',
+          amountOfLiquidity: '100',
+          amountOfCollateral: '200',
+          profit: '20',
+          loss: '80',
+        },
+        {
+          asset: 'ZIL - ETH',
+          amountOfLiquidity: '154',
+          amountOfCollateral: '375',
+          profit: '12',
+          loss: '88',
+        },
+        {
+          asset: 'DAI - BTC',
+          amountOfLiquidity: '45687',
+          amountOfCollateral: '1234',
+          profit: '100',
+          loss: '00',
+        },
+      ])
     }
   }, [positions])
 
