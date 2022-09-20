@@ -5,17 +5,18 @@ import truncateEthAddress from 'truncate-eth-address'
 import { WalletContext } from '../context/WalletContext'
 
 const style = {
-  wrapper: "p-4 w-screen flex justify-between items-center text-textV1-1",
-  headerLogo: "w-1/3 flex cursor-pointer",
+  wrapper: "p-4 w-screen flex justify-between items-center",
+  headerLogo: "w-1/3 flex cursor-pointer pl-2",
   nav: "flex-1 flex justify-center items-center",
-  navItemsContainer: "flex bg-textV1-5 rounded-3xl shadow-lg shadow-textV1-5/30",
-  navItem: "px-4 py-2 m-1 text-lg font-semibold cursor-pointer rounded-3xl h-12 hover:bg-textV1-6 hover:shadow-textV1-6/30",
-  activeNavItem: "bg-textV1-4",
+  navItemsContainer: "flex bg-neutrals-700 rounded-2xl drop-shadow-lg",
+  navItem: "px-4 py-2 m-1 text-lg cursor-pointer rounded-xl h-12 hover:bg-neutrals-600",
+  activeNavItem: "bg-neutrals-800",
   buttonsContainer: "flex w-1/3 justify-end items-center",
-  button: "m-1 flex items-center bg-textV1-5 text-md font-semibold cursor-pointer rounded-2xl h-12 shadow-lg shadow-textV1-5/30 hover:bg-textV1-6 hover:shadow-textV1-6/30",
-  buttonPadding: "p-2",
+  ethButton: "m-2 flex space-x-2 items-center bg-primary-grey text-md cursor-pointer rounded-2xl h-12 drop-shadow-lg hover:bg-neutrals-700 hover:shadow-neutrals-700/30",
+  button: "m-2 flex items-center bg-primary-grey text-md cursor-pointer rounded-2xl h-12 drop-shadow-lg hover:bg-neutrals-700 hover:shadow-neutrals-700/30",
+  buttonPadding: "p-3",
   balanceContainer: "mx-2 text-md flex items-center",
-  buttonTextContainer: "bg-gray-400 rounded-lg px-4 py-2 text-md h-8 flex items-center"
+  buttonTextContainer: "bg-neutrals-600 rounded-lg px-4 py-2 text-md h-8 flex items-center"
 }
 
 const Header = () => {
@@ -26,20 +27,11 @@ const Header = () => {
     <div className={style.wrapper}>
       <Link href={'/positions'}>
         <div className={style.headerLogo}>
-          <Image src="/GammaSwap-Logo-Black-isoColor.svg" alt="GammaSwap logo" width={270} height={56} />
+          <Image src="/GammaSwap-Logo-White-isoColor.svg" alt="GammaSwap logo" width={250} height={56} />
         </div>
       </Link>
       <nav className={style.nav}>
         <div className={style.navItemsContainer}>
-          <Link href={'/pools/main'}>
-            <div
-              onClick={() => setSelectedNavItem("pools")}
-              className={`${style.navItem} ${selectedNavItem === "pools" && style.activeNavItem
-                }`}
-            >
-              Pools
-            </div>
-          </Link>
           <Link href={'/positions'}>
             <div
               onClick={() => setSelectedNavItem("positions")}
@@ -49,12 +41,22 @@ const Header = () => {
               Positions
             </div>
           </Link>
+          <Link href={'/pools/main'}>
+            <div
+              onClick={() => setSelectedNavItem("pools")}
+              className={`${style.navItem} ${selectedNavItem === "pools" && style.activeNavItem
+                }`}
+            >
+              Pools
+            </div>
+          </Link>
         </div>
       </nav>
       <div className={style.buttonsContainer}>
         <Link href={'/buyeth'}>
-          <div className={`${style.button} ${style.buttonPadding}`}>
-            Buy ETH
+          <div className={`${style.ethButton} ${style.buttonPadding}`}>
+            <Image src={"/walletIcon.svg"} width={24} height={24} />
+            <h1>Buy ETH</h1>
           </div>
         </Link>
         {accountInfo?.address ? (

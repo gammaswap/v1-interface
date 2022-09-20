@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react'
 import Head from 'next/head'
+import Header from './Header'
 import WalletProvider from '../context/WalletContext'
 import BasicContractProvider from '../context/BasicContractContext'
 
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const style = {
-    wrapper: "h-screen max-h-screen h-min-screen w-screen flex flex-col justify-between items-center",
+    wrapper: "h-screen max-h-screen h-min-screen w-screen bg-neutrals-900 font-medium text-white flex flex-col bg-justify-between items-center",
 }
 
 const Layout = ({ children }: Props) => {
@@ -16,10 +17,13 @@ const Layout = ({ children }: Props) => {
         <WalletProvider>
             <BasicContractProvider>
                 <Head>
-                    <title>GammaSwap</title>
+                    <title>GammaSwap - Oracle-Free Volatility DEX</title>
                     <link rel="icon" href="/favicon.ico" />
                 </Head>
-                <main className={style.wrapper}>{children}</main>
+                <main className={style.wrapper}>
+                    <Header />
+                    {children}
+                </main>
             </BasicContractProvider>
         </WalletProvider>
     )

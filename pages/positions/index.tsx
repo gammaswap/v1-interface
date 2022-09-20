@@ -9,14 +9,14 @@ const style = {
   createPositionButtonDiv: 'flex items-center w-full justify-end',
   selectPositionTypeDiv: 'flex flex-col items-center w-full justify-start relative',
   createPositionButtonContent:
-    'bg-primaryV1-1 rounded-2xl text-md text-white font-medium cursor-pointer px-4 py-2 mt-[-0.2rem] shadow-lg shadow-textV1-5/30 hover:bg-primaryV1-3 hover:shadow-textV1-6/30',
+    'bg-primaryV1-1 rounded-2xl text-md text-white cursor-pointer px-4 py-2 mt-[-0.2rem] shadow-lg shadow-textV1-5/30 hover:bg-primaryV1-3 hover:shadow-textV1-6/30',
   positionWrapper: 'bg-textV1-6 flex flex-col mt-3 rounded-2xl min-h-[550px] min-w-[500px]',
   noPositionWrapper:
     'bg-textV1-6 flex flex-col justify-center align-center items-center mt-3 rounded-2xl min-h-[550px] min-w-[500px]',
   noPositionText: 'text-center text-white',
   posWrapper: 'flex flex-col justify-between min-h-[200px] p-4 m-2 bg-primaryV3-2 rounded-2xl',
   posData: 'flex justify-between align-center',
-  eachPos: 'text-2xl font-semibold text-white',
+  eachPos: 'text-2xl text-white',
   posType: 'px-4 bg-primaryV3-1 rounded-2xl text-sm h-fit text-primaryV3-5',
   viewButtonDiv: 'w-full flex justify-end',
   viewButton: 'text-white bg-primaryV1-7 rounded-md px-8 py-2',
@@ -28,10 +28,10 @@ const style = {
   eachOption: 'py-2 px-2 text-md hover:bg-primaryV3-2 group cursor-pointer',
   firstOption: 'rounded-tl-lg rounded-tr-lg',
   lastOption: 'rounded-bl-lg rounded-br-lg',
-  optionText: 'font-semibold text-slate-600 group-hover:text-slate-50',
+  optionText: 'text-slate-600 group-hover:text-slate-50',
   optionDesc: 'text-slate-400 text-sm group-hover:text-slate-200',
   isSelected: 'bg-primaryV3-2',
-  selectedOptionText: 'font-semibold text-slate-50',
+  selectedOptionText: 'text-slate-50',
   selectedOptionDesc: 'text-slate-200 text-sm',
 }
 
