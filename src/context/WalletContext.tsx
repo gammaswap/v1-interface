@@ -87,6 +87,17 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
       address: userAddress,
       balance: ethers.utils.formatEther(userBalance)
     })
+
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', function (accounts: any) {
+        if(accounts.length == 0) {
+          setProvider(null)
+          setSigner(undefined)
+          setAccountInfo(null)
+          notifyError("Wallet disconnected")
+        }
+      })
+    }
   }
 
   // instantiates a new connection and sets a new provider
@@ -95,7 +106,6 @@ const WalletProvider = ({ children }: WalletProviderProps) => {
       try {
         const connection = await web3Modal.connect()
         const provider = new Web3Provider(connection)
-
         initializeProvider(provider)
       } catch (err: any) {
         notifyError(err.message || "Failed to connect to wallet")
