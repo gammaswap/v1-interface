@@ -1,45 +1,60 @@
 import type { NextPage } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 
 const style = {
-  wrapper: "flex-col space-y-20 justify-center w-[30rem]",
-  header: "font-bold mx-auto flex justify-center w-[30rem] text-black text-4xl",
-  optionsButtonContainer: "mx-auto flex justify-left items-left w-[30rem] text-textV1-1",
-  optionsButtonContent: "w-full justify-left items-left bg-textV1-5 rounded-2xl font-medium cursor-pointer p-4 mt-[-0.2rem] shadow-lg shadow-textV1-5/30 hover:bg-textV1-6 hover:shadow-textV1-6/30",
-  buttonTitle: "text-2xl flex",
-  buttonText: "text-sm flex text-left",
+  wrapper: "w-full h-full flex justify-center",
+  optionsContainer: "mt-20 flex-col h-1/2 space-y-14",
+  optionsHeader: "font-medium flex justify-center text-4xl text-gray-100",
+  optionsButtonContainer: "w-[30rem]",
+  optionsButtonContent: "w-full overflow-hidden flex items-center bg-neutrals-700 rounded-xl cursor-pointer p-6 drop-shadow-lg hover:bg-neutrals-700 group",
+  hoveredOptionsButtonContent: "w-0 h-0 rounded bg-gradient-to-tr from-accents-royalBlue via-primary-blue to-cyan-400 absolute top-0 left-0 ease-out duration-50 transition-all group-hover:w-full group-hover:h-full -z-1",
+  optionsButtonPrimary: "w-full transition-colors duration-300 ease-in-out group-hover:text-white z-10 space-y-2",
+  buttonTitle: "group-hover:text-white text-2xl text-gray-50 flex",
+  buttonText: "text-sm text-gray-50 flex text-start",
+  optionsButtonSecondary: "hidden group-hover:absolute group-hover:block group-hover:ml-[15rem]",
 }
 
-const options: NextPage = () => {
+const Options: NextPage = () => {
   return (
     <div className={style.wrapper}>
-      <div className={style.header}>
-        <div>Open a new Position</div>
-      </div>
-      <div className={style.optionsButtonContainer}>
-        <Link href={'addliquidity'}>
-          <button className={style.optionsButtonContent}>
-            <div className={style.buttonTitle}> Lend</div>
-            <div className={style.buttonText}>
-              Provide liquidity with any pair of ERC-20 tokens. Begin earning
-              yields when you deposit your tokens into the GammaSwap Pool.</div>
-          </button>
-        </Link>
-      </div>
-      <div className={style.optionsButtonContainer}>
-        <Link href={'openloan'}>
-          <button className={style.optionsButtonContent}>
-            <div className={style.buttonTitle}>Borrow</div>
-            <div className={style.buttonText}>
-              Open a laon if you're long volatility and hedge your risk 
-              exposure. Analyze the health of your loan from the moment you 
-              borrow all the way until you pay it back.
+      <div className={style.optionsContainer}>
+        <h1 className={style.optionsHeader}>Open a New Position</h1>
+        <div className={style.optionsButtonContainer}>
+          <Link href={'addliquidity'}>
+            <button className={style.optionsButtonContent}>
+              <span className={style.hoveredOptionsButtonContent}></span>
+              <div className={style.optionsButtonPrimary}>
+                <div className={style.buttonTitle}>Lend</div>
+                <div className={style.buttonText}>
+                  Provide liquidity with any ERC-20 Token pair.
+                </div>
               </div>
-          </button>
-        </Link>
+              <div className={style.optionsButtonSecondary}>
+                <Image src="/gsLogoImage.png" width={200} height={200} className="rounded-full opacity-20" />
+              </div>
+            </button>
+          </Link>
+        </div>
+        <div className={style.optionsButtonContainer}>
+          <Link href={'openloan'}>
+            <button className={style.optionsButtonContent}>
+            <span className={style.hoveredOptionsButtonContent}></span>
+              <div className={style.optionsButtonPrimary}>
+                <div className={style.buttonTitle}>Borrow</div>
+                <div className={style.buttonText}>
+                  Open a loan if you're long volatility and hedge against impermanent loss.
+                </div>
+              </div>
+              <div className={style.optionsButtonSecondary}>
+                <Image src="/gsLogoImage.png" width={200} height={200} className="rounded-full opacity-20" />
+              </div>
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   )
 }
 
-export default options
+export default Options

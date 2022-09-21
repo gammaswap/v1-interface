@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
@@ -8,6 +7,43 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        primary: {
+          blue: '#549AF0',
+          grey: '#3E454F',
+          black: '#121212'
+        },
+        accents: {
+          royalBlue: '#5B57E1',
+          dessertPeach: '#F09E6C'
+        },
+        secondary: {
+          malibu: '#54BFF8',
+          corn: '#FFED66',
+          jungleGreen: '#43AA8B',
+          jet: '#33312E',
+          mediumPurple: '#9381FF',
+          orangeRedCrayola: '#FF5E5B'
+        },
+        neutrals: {
+          100: '#ECECED',
+          200: '#D8DADC',
+          300: '#C5C7CA',
+          400: '#9FA2A7',
+          500: '#787D84',
+          600: '#656A72',
+          700: '#383E47',
+          800: '#2b3037',
+          900: '#1f2328',
+          1000: '#131518',
+          1100: '#0C0E10',
+          1200: '#060708',
+        },
+        semantic: {
+          error: '#FF3131',
+          warning: '#FF673A',
+          success: '#23D86A',
+          unavailable: '#ECECED'
+        },
         primaryV1: {
           1: '#5631F1',
           2: '#172F5E',
@@ -49,8 +85,11 @@ module.exports = {
         },
 
       },
+      fontSize: {
+        'xxs': '0.70rem',
+      },
       fontFamily: {
-        'sans': ['Inter', ...defaultTheme.fontFamily.sans],
+        'sans': ['Inter', 'Montserrat'],
       },
     },
   },
