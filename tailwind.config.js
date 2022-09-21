@@ -85,6 +85,9 @@ module.exports = {
         },
 
       },
+      fontSize: {
+        'xxs': '0.70rem',
+      },
       fontFamily: {
         'sans': ['Inter', 'Montserrat'],
       },
