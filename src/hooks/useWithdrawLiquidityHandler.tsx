@@ -22,22 +22,22 @@ export const useWithdrawLiquidityHandler = () => {
   const [enableApprove, setEnableApprove] = useState<Boolean>(false)
 
   async function changeSliderPercentage(percentage: number) {
-    if (percentage > 0) {
-      setEnableApprove(true)
-    } else {
-      setEnableApprove(false)
+    try {
+      setEnableApprove(percentage > 0 && parseInt(totalLiquidityAmt) > 0)
+      setsliderPercentage(percentage)
+    } catch (err: any) {
+      notifyError(err.toString())
     }
-    setsliderPercentage(percentage)
   }
 
   async function sliderPercentChange(value: number | number[]) {
-    if (typeof value === 'number') {
-      if (value > 0) {
-        setEnableApprove(true)
-      } else {
-        setEnableApprove(false)
+    try {
+      if (typeof value === 'number') {
+        setEnableApprove(value > 0 && parseInt(totalLiquidityAmt) > 0)
+        setsliderPercentage(value)
       }
-      setsliderPercentage(value)
+    } catch (err: any) {
+      notifyError(err.toString())
     }
   }
 
@@ -80,10 +80,10 @@ export const useWithdrawLiquidityHandler = () => {
   }
 
   async function withdrawLiquidity(balance: number) {
+    let amt = '0'
     if (balance === 0) {
       throw new Error('Please select a valid amount to withdraw')
     }
-    let amt = '0'
     if (balance === 100) {
       amt = totalLiquidityAmt.toString()
     } else {
@@ -93,12 +93,13 @@ export const useWithdrawLiquidityHandler = () => {
       notifyError('Wallet not connected.')
       return
     }
-
-    if (parseInt(amt) === 0) {
-      throw new Error('User does not have enough reserves to withdraw')
-    }
-
     try {
+      if (parseInt(amt) === 0) {
+        const error: any = new Error('User does not have enough reserves to withdraw')
+        error.code = '4001'
+        throw error
+      }
+
       if (!posManager) {
         await initializePositionManagerContract()
       }
@@ -116,8 +117,12 @@ export const useWithdrawLiquidityHandler = () => {
         let tx = await posManager.withdrawReserves(WithdrawReservesParams)
         return await tx.wait()
       }
-    } catch (e) {
-      throw new Error('An error occurred while whithdrawing reserves')
+    } catch (e: any) {
+      if (e?.code && e?.code === '4001') {
+        throw new Error(e.message)
+      } else {
+        throw new Error('An error occurred while whithdrawing reserves')
+      }
     }
   }
 
@@ -132,11 +137,12 @@ export const useWithdrawLiquidityHandler = () => {
       return
     }
 
-    if (parseInt(totalLiquidityAmt) === 0) {
-      throw new Error('User does not have reserves to withdraw')
-    }
-
     try {
+      if (parseInt(totalLiquidityAmt) === 0) {
+        const error: any = new Error('User does not have reserves to withdraw')
+        error.code = '4002'
+        throw error
+      }
       if (!gammaPoolContract) {
         await initializeGammaPoolContract()
       }
@@ -146,8 +152,12 @@ export const useWithdrawLiquidityHandler = () => {
       } else {
         notifyError('Please connect wallet')
       }
-    } catch (e) {
-      throw e
+    } catch (e: any) {
+      if (e?.code && e?.code === '4002') {
+        throw new Error(e.message)
+      } else {
+        throw new Error('An error occurred while approval')
+      }
     }
   }
 
@@ -157,9 +167,7 @@ export const useWithdrawLiquidityHandler = () => {
         return
       }
       const liqBal = await posManager.balanceOf(accountInfo?.address)
-      if (liqBal.toString() > 0) {
-        setEnableApprove(true)
-      }
+      setEnableApprove(liqBal.toString() > 0)
       setTotalLiquidityAmt(liqBal.toString())
       setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
     }
@@ -182,34 +190,42 @@ export const useWithdrawLiquidityHandler = () => {
   }
 
   const initializeGammaPoolContract = async () => {
-    if (provider && accountInfo && accountInfo?.address) {
-      if (!gammaPoolContract && GAMMA_POOL_ADDRESS) {
-        setGammaPoolContract(
-          new ethers.Contract(
-            GAMMA_POOL_ADDRESS,
-            GammaPool.abi,
-            accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+    try {
+      if (provider && accountInfo && accountInfo?.address) {
+        if (!gammaPoolContract && GAMMA_POOL_ADDRESS) {
+          setGammaPoolContract(
+            new ethers.Contract(
+              GAMMA_POOL_ADDRESS,
+              GammaPool.abi,
+              accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+            )
           )
-        )
+        }
+      } else {
+        notifyError('Please connect wallet')
       }
-    } else {
-      notifyError('Please connect wallet')
+    } catch (err) {
+      notifyError('An error occurred while initializing contract')
     }
   }
 
   const initializePositionManagerContract = async () => {
-    if (provider && accountInfo && accountInfo?.address) {
-      if (!posManager && POSITION_MANAGER_ADDRESS) {
-        setPosManager(
-          new ethers.Contract(
-            POSITION_MANAGER_ADDRESS,
-            PosManager.abi,
-            accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+    try {
+      if (provider && accountInfo && accountInfo?.address) {
+        if (!posManager && POSITION_MANAGER_ADDRESS) {
+          setPosManager(
+            new ethers.Contract(
+              POSITION_MANAGER_ADDRESS,
+              PosManager.abi,
+              accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+            )
           )
-        )
+        }
+      } else {
+        notifyError('Please connect wallet')
       }
-    } else {
-      notifyError('Please connect wallet')
+    } catch (err) {
+      notifyError('An error occurred while initializing contract')
     }
   }
 

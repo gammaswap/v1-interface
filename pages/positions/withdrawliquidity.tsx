@@ -127,12 +127,7 @@ const WithdrawLiquidity: NextPage = () => {
         </div>
         <div className={style.buttonDiv}>
           {enableApprove ? (
-            <div
-              className={style.confirmButton}
-              onClick={() => {
-                approveTransaction()
-              }}
-            >
+            <div className={style.confirmButton} onClick={approveTransaction}>
               Approve
             </div>
           ) : (
