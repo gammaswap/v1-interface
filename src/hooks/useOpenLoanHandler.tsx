@@ -15,7 +15,7 @@ import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
 
-const style = OpenLoanStyles()
+const style = OpenLoanStyles
 
 export const useOpenLoanHandler = () => {
   const { provider, accountInfo } = useContext(WalletContext)
