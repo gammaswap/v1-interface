@@ -14,10 +14,11 @@ const WithdrawLiquidity: NextPage = () => {
     token1,
     enableRemove,
     withdraw,
+    enableApprove,
   } = useWithdrawLiquidityHandler()
 
   const style = {
-    wrapper: 'w-screen flex justify-center items-center',
+    wrapper: 'w-full flex justify-center items-center mb-8',
     content: 'bg-gray-900 w-[30rem] rounded-2xl p-4',
     formHeader: 'px-2 justify-between items-center font-semibold text-xl text-gray-200 text-center',
     formLabel: ' flex justify-between pt-3 px-2',
@@ -29,7 +30,7 @@ const WithdrawLiquidity: NextPage = () => {
     successButton:
       'w-full bg-green-400 m-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-green-400 hover:border-green-300',
     invalidatedButton:
-      'w-full my-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
+      'w-full my-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 mx-2 border-2 border-gray-700',
     withdrawHeading: 'w-screen text-left',
     sliderStyle: 'border-2 border-gray-800 shadow-lg mt-2 p-4 rounded-2xl',
     sliderPercent: 'mb-5 text-6xl text-white rounded-xl',
@@ -125,14 +126,18 @@ const WithdrawLiquidity: NextPage = () => {
           </div>
         </div>
         <div className={style.buttonDiv}>
-          <div
-            className={style.confirmButton}
-            onClick={() => {
-              approveTransaction()
-            }}
-          >
-            Approve
-          </div>
+          {enableApprove ? (
+            <div
+              className={style.confirmButton}
+              onClick={() => {
+                approveTransaction()
+              }}
+            >
+              Approve
+            </div>
+          ) : (
+            <div className={style.invalidatedButton}>Approve</div>
+          )}
           {enableRemove ? (
             <div
               className={style.successButton}

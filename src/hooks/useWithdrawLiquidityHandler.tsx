@@ -2,18 +2,14 @@ import { useState, useEffect, useContext } from 'react'
 import { WalletContext } from '../context/WalletContext'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
-import IUniswapV2Pair from '../../abis/v0-hackathon/IUniswapV2Pair.json'
-import IERC20 from '../../abis/v0-hackathon/ERC20.json'
-import { sqrt } from '../utils/mathFunctions'
 import Tokens, { Token } from '../components/Tokens'
-import TestGammaPool from '../../abis/v1-periphery/test/TestGammaPool.sol/TestGammaPool.json'
-import DepPool from '../../abis/v0-hackathon/DepositPool.json'
-import { notifyError, notifySuccess } from './useNotification'
-
-const ZEROMIN = 0
+import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
+import { notifyError, notifySuccess, notifyLoading, notifyDismiss } from './useNotification'
 
 export const useWithdrawLiquidityHandler = () => {
-  const [depPool, setDepPool] = useState<Contract | null>(null)
+  const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
+  const GAMMA_POOL_ADDRESS = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS
+
   const [posManager, setPosManager] = useState<Contract | null>(null)
   const [sliderPercentage, setsliderPercentage] = useState<number>(0)
   const { provider, accountInfo } = useContext(WalletContext)
@@ -22,340 +18,199 @@ export const useWithdrawLiquidityHandler = () => {
   const [token0, setToken0] = useState<Token>(Tokens[0])
   const [token1, setToken1] = useState<Token>(Tokens[1])
   const [enableRemove, setEnableRemove] = useState<Boolean>(false)
-  const [uniPrice, setUniPrice] = useState<string>('0')
-  const [liqInTokB, setLiqInTokB] = useState<number>(0)
-
-  let DEPOSIT_POOL_ADDRESS = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
+  const [gammaPoolContract, setGammaPoolContract] = useState<Contract | null>(null)
+  const [enableApprove, setEnableApprove] = useState<Boolean>(false)
 
   async function changeSliderPercentage(percentage: number) {
+    if (percentage > 0) {
+      setEnableApprove(true)
+    } else {
+      setEnableApprove(false)
+    }
     setsliderPercentage(percentage)
   }
 
   async function sliderPercentChange(value: number | number[]) {
     if (typeof value === 'number') {
+      if (value > 0) {
+        setEnableApprove(true)
+      } else {
+        setEnableApprove(false)
+      }
       setsliderPercentage(value)
     }
   }
 
-  async function approveTransaction() {
-    // Position Manager contract address
-    let address =
-      process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
-        : DEPOSIT_POOL_ADDRESS
+  useEffect(() => {
     if (provider) {
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-        if (accountInfo?.address) {
-          setPosManager(new ethers.Contract(address, PosManager.abi, provider.getSigner(accountInfo.address)))
-        } else {
-          setPosManager(new ethers.Contract(address, PosManager.abi, provider))
-        }
-      } else {
-        if (accountInfo?.address) {
-          setDepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo.address)))
-        } else {
-          setDepPool(new ethers.Contract(address, DepPool.abi, provider))
-        }
+      if (!posManager && POSITION_MANAGER_ADDRESS) {
+        setPosManager(
+          new ethers.Contract(
+            POSITION_MANAGER_ADDRESS,
+            PosManager.abi,
+            accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+          )
+        )
       }
-    } else {
-      notifyError('Please connect wallet')
-    }
 
-    if (!accountInfo || !accountInfo.address) {
-      notifyError('Wallet not connected.')
-      return
-    }
-    if (accountInfo && accountInfo?.address) {
-      if (posManager === null) {
-        return
+      if (!gammaPoolContract && GAMMA_POOL_ADDRESS) {
+        setGammaPoolContract(
+          new ethers.Contract(
+            GAMMA_POOL_ADDRESS,
+            GammaPool.abi,
+            accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+          )
+        )
       }
-      approveWithdraw(posManager, posManager.address)
-        .then(() => {
-          setEnableRemove(true)
-        })
-        .catch((err: any) => {
-          setEnableRemove(false)
-          notifyError(err)
-        })
-    } else {
-      if (depPool === null) {
-        return
-      }
-      approveWithdraw(depPool, depPool.address)
-        .then(() => {
-          setEnableRemove(true)
-        })
-        .catch((err: any) => {
-          setEnableRemove(false)
-          notifyError(err)
-        })
     }
+  }, [provider])
+
+  async function approveTransaction() {
+    let loading = notifyLoading('Waiting for block confirmation')
+    approveWithdraw()
+      .then(() => {
+        setEnableRemove(true)
+        notifyDismiss(loading)
+      })
+      .catch((err) => {
+        notifyDismiss(loading)
+        setEnableRemove(false)
+        notifyError(err.toString())
+      })
   }
 
   async function withdrawLiquidity(balance: number) {
+    if (balance === 0) {
+      throw new Error('Please select a valid amount to withdraw')
+    }
     let amt = '0'
     if (balance === 100) {
       amt = totalLiquidityAmt.toString()
     } else {
       amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
     }
-    // Position Manager contract address
-    let address =
-      process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
-        : DEPOSIT_POOL_ADDRESS
-    if (provider) {
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-        if (accountInfo && accountInfo?.address) {
-          setPosManager(new ethers.Contract(address, PosManager.abi, provider.getSigner(accountInfo?.address)))
-        } else {
-          setPosManager(new ethers.Contract(address, PosManager.abi, provider))
-        }
-      } else {
-        if (accountInfo && accountInfo?.address) {
-          setDepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
-        } else {
-          setDepPool(new ethers.Contract(address, DepPool.abi, provider))
-        }
-      }
-    } else {
-      notifyError('Please connect wallet')
-    }
-
     if (!accountInfo || !accountInfo.address) {
       notifyError('Wallet not connected.')
       return
     }
 
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-      if (posManager === null) {
-        return
+    if (parseInt(amt) === 0) {
+      throw new Error('User does not have enough reserves to withdraw')
+    }
+
+    try {
+      if (!posManager) {
+        await initializePositionManagerContract()
       }
 
-      try {
-        const WithdrawReservesParams = {
-          cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
-          protocol: 1,
-          amount: amt,
-          amountsMin: [100, 200, 300],
-          to: accountInfo.address,
-          deadline: ethers.constants.MaxUint256,
-        }
+      const WithdrawReservesParams = {
+        cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+        protocol: 1,
+        amount: amt,
+        amountsMin: [100, 200, 300],
+        to: accountInfo.address,
+        deadline: ethers.constants.MaxUint256,
+      }
+
+      if (posManager) {
         let tx = await posManager.withdrawReserves(WithdrawReservesParams)
         return await tx.wait()
-      } catch (e) {
-        return e
       }
-    } else {
-      if (depPool === null) {
-        return
-      }
-
-      try {
-        let tx = await depPool.removeLiquidity(amt, ZEROMIN, ZEROMIN, accountInfo.address, {
-          gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT,
-        })
-        return await tx.wait()
-      } catch (e) {
-        return e
-      }
+    } catch (e) {
+      throw new Error('An error occurred while whithdrawing reserves')
     }
   }
 
-  async function approveWithdraw(posManager: Contract | null, contractAddress: string) {
-    if (!accountInfo || !accountInfo.address) {
-      notifyError('Wallet not connected.')
+  async function approveWithdraw() {
+    if (!provider) {
+      notifyError('Please connect wallet')
       return
     }
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-      if (posManager === null) {
-        return null
-      } else {
-        if (provider !== null) {
-          try {
-            let address = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS
-            let gammaPoolContract
-            if (provider && address) {
-              if (accountInfo && accountInfo?.address) {
-                gammaPoolContract = new ethers.Contract(
-                  address,
-                  TestGammaPool.abi,
-                  provider.getSigner(accountInfo?.address)
-                )
-              } else {
-                gammaPoolContract = new ethers.Contract(address, TestGammaPool.abi, provider)
-              }
-              let tx = await gammaPoolContract.approve(contractAddress, constants.MaxUint256.toString())
-              return await tx.wait()
-            } else {
-              notifyError('Please connect wallet')
-            }
-          } catch (e) {
-            throw e
-          }
-        } else {
-          notifyError('Please connect wallet')
-        }
+
+    if (!accountInfo || !accountInfo.address) {
+      notifyError('User wallet not found.')
+      return
+    }
+
+    if (parseInt(totalLiquidityAmt) === 0) {
+      throw new Error('User does not have reserves to withdraw')
+    }
+
+    try {
+      if (!gammaPoolContract) {
+        await initializeGammaPoolContract()
       }
-    } else {
-      if (depPool === null) {
-        return null
+      if (provider && gammaPoolContract) {
+        let tx = await gammaPoolContract.approve(POSITION_MANAGER_ADDRESS, constants.MaxUint256.toString())
+        return await tx.wait()
       } else {
-        if (provider !== null) {
-          try {
-            let tx = await depPool.approve(contractAddress, constants.MaxUint256.toString())
-            return await tx.wait()
-          } catch (e) {
-            throw e
-          }
-        } else {
-          notifyError('Please connect wallet')
-        }
+        notifyError('Please connect wallet')
       }
+    } catch (e) {
+      throw e
     }
   }
-
-  useEffect(() => {
-    async function fetchContract() {
-      if (!provider) {
-        notifyError('Please connect wallet.')
-        return
-      }
-
-      // Position Manager contract address
-      let address =
-        process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-          ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
-          : DEPOSIT_POOL_ADDRESS
-
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-        // Variable to hold Position Manager contract
-        let _posManager = null
-
-        _posManager = new ethers.Contract(
-          address,
-          PosManager.abi,
-          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
-        )
-        if (_posManager) {
-          setPosManager(_posManager)
-        }
-      } else {
-        let _depPool = null
-
-        _depPool = new ethers.Contract(
-          address,
-          DepPool.abi,
-          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
-        )
-        if (_depPool) {
-          setDepPool(_depPool)
-        }
-      }
-    }
-    fetchContract()
-  }, [provider])
 
   useEffect(() => {
     async function fetchData() {
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
-        if (!posManager) {
-          return
-        }
-        const liqBal = await posManager.balanceOf(accountInfo?.address)
-        setTotalLiquidityAmt(liqBal.toString())
-        setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
-      } else {
-        if (!depPool) {
-          return
-        }
-        const liqBal = await depPool.balanceOf(accountInfo?.address)
-        setTotalLiquidityAmt(liqBal.toString())
-        setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
-
-        const uniPair = await depPool.getUniPair()
-        if (!provider) {
-          return
-        }
-
-        const uniPairContract = new ethers.Contract(uniPair, IUniswapV2Pair.abi, provider)
-        const reserves = await uniPairContract.getReserves()
-        const _uniPrice = BigNumber.from(reserves.reserve1).mul(BigNumber.from(10).pow(18)).div(reserves.reserve0)
-        setUniPrice(_uniPrice.toString())
-        const liqBalNum = BigNumber.from(liqBal.toString())
-
-        if (liqBalNum.gt(constants.Zero) && _uniPrice.gt(constants.Zero)) {
-          setLiqInTokB(
-            parseFloat(
-              ethers.utils.formatEther(
-                sqrt(_uniPrice.mul(BigNumber.from(10).pow(18)))
-                  .mul(liqBalNum)
-                  .div(BigNumber.from(10).pow(18))
-                  .mul(2)
-              )
-            )
-          )
-        } else {
-          setLiqInTokB(0)
-        }
+      if (!posManager) {
+        return
       }
+      const liqBal = await posManager.balanceOf(accountInfo?.address)
+      if (liqBal.toString() > 0) {
+        setEnableApprove(true)
+      }
+      setTotalLiquidityAmt(liqBal.toString())
+      setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
     }
-
-    // TODO: This section is commented because we do not have a factory of all the tokens. Once that is integrated then we will add the logic to get the tokens from the contract. For now we are getting the tokens from the token file
-    // async function initializeTokens() {
-    //   if (posManager !== null && provider !== null) {
-    //     // Variable to hold address of token0
-    //     let token0Addr = null
-
-    //     // Variable to hold address of token1
-    //     let token1Addr = null
-
-    //     // Variable to hold contract token0
-    //     let _token0: Contract
-
-    //     // Variable to hold contract token0
-    //     let _token1: Contract
-
-    //     // Variable to hold symbol of token0
-    //     let symbol0 = null
-
-    //     // Variable to hold symbol of token1
-    //     let symbol1 = null
-
-    //     token0Addr = await posManager.token0()
-    //     token1Addr = await posManager.token1()
-
-    //     if (token0Addr) {
-    //       _token0 = new ethers.Contract(token0Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
-    //       symbol0 = await _token0.symbol()
-    //       setToken0({address: token0Addr, symbol: symbol0, contract: _token0})
-    //     }
-
-    //     if (token1Addr) {
-    //       _token1 = new ethers.Contract(token1Addr, IERC20Metadata.abi, accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider)
-    //       symbol1 = await _token1.symbol()
-    //       setToken1({address: token1Addr, symbol: symbol1, contract: _token1})
-    //     }
-    //   }
-    // }
-
-    // initializeTokens()
     fetchData()
   }, [posManager])
 
   const withdraw = (amount: number) => {
+    let loading = notifyLoading('Waiting for withdraw reserves')
     withdrawLiquidity(amount)
       .then((res) => {
-        const { args } = res.events[1]
-        let message = "Add Liquidity Success: "
-          + args.pool
-          + args.reservesLen.toNumber()
-          + args.shares.toNumber()
-        notifySuccess(message)
+        notifyDismiss(loading)
+        // const { args } = res.events[1]
+        // let message = 'Withdraw Liquidity Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
+        notifySuccess('Success')
       })
       .catch((err) => {
-        notifyError(err)
+        notifyDismiss(loading)
+        notifyError(err.toString())
       })
+  }
+
+  const initializeGammaPoolContract = async () => {
+    if (provider && accountInfo && accountInfo?.address) {
+      if (!gammaPoolContract && GAMMA_POOL_ADDRESS) {
+        setGammaPoolContract(
+          new ethers.Contract(
+            GAMMA_POOL_ADDRESS,
+            GammaPool.abi,
+            accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+          )
+        )
+      }
+    } else {
+      notifyError('Please connect wallet')
+    }
+  }
+
+  const initializePositionManagerContract = async () => {
+    if (provider && accountInfo && accountInfo?.address) {
+      if (!posManager && POSITION_MANAGER_ADDRESS) {
+        setPosManager(
+          new ethers.Contract(
+            POSITION_MANAGER_ADDRESS,
+            PosManager.abi,
+            accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+          )
+        )
+      }
+    } else {
+      notifyError('Please connect wallet')
+    }
   }
 
   return {
@@ -367,5 +222,6 @@ export const useWithdrawLiquidityHandler = () => {
     token1,
     enableRemove,
     withdraw,
+    enableApprove,
   }
 }
