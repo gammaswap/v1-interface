@@ -5,6 +5,7 @@ import { Provider } from '@ethersproject/providers'
 import { BigNumber, Contract, ethers } from 'ethers'
 import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } from '../../src/utils/getSmartContract'
 import { BasicContractContext } from '../../src/context/BasicContractContext'
+import { getTokenBalance } from '../utils/getSmartContract'
 
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import { notifyError, notifySuccess } from './useNotification'
@@ -22,6 +23,8 @@ export const useAddLiquidityHandler = () => {
     address: '',
     decimals: 18,
   })
+  const [tokenABalance, setTokenABalance] = useState<string>('0')
+  const [tokenBBalance, setTokenBBalance] = useState<string>('0')
 
   const [posManager, setPosManager] = useState<Contract | null>(null)
 
@@ -104,6 +107,32 @@ export const useAddLiquidityHandler = () => {
     fetchContract()
   }, [provider])
 
+  useEffect(() => {
+    const getTokenABalances = async () => {
+      if (provider) {
+        let accountAddress = accountInfo?.address || ''
+        if (tokenASelected.address) {
+          let balance = await getTokenBalance(accountAddress, tokenASelected.address, tokenASelected.symbol, provider)
+          setTokenABalance(balance || '0')
+        }
+      }
+    }
+    getTokenABalances()
+  }, [tokenASelected, provider])
+
+  useEffect(() => {
+    const getTokenBBalances = async () => {
+      if (provider) {
+        let accountAddress = accountInfo?.address || ''
+        if (tokenBSelected.address) {
+          let balance = await getTokenBalance(accountAddress, tokenBSelected.address, tokenBSelected.symbol, provider)
+          setTokenBBalance(balance || '0')
+        }
+      }
+    }
+    getTokenBBalances()
+  }, [tokenBSelected, provider])
+
   // if called on change of token A or B input vals, validate and update estimated output value
   const handleTokenInput = useCallback(
     (
@@ -167,10 +196,7 @@ export const useAddLiquidityHandler = () => {
         let tx = await posManager.depositReserves(DepositReservesParams)
         let res = await tx.wait()
         const { args } = res.events[0]
-        let message = "Add Liquidity Success: "
-          + args.pool
-          + args.reservesLen.toNumber()
-          + args.shares.toNumber()
+        let message = 'Add Liquidity Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
         notifySuccess(message)
       } catch (e) {
         notifyError('An error occurred while adding liquidity. Please try again:' + e)
@@ -195,5 +221,7 @@ export const useAddLiquidityHandler = () => {
     setTokenASelected,
     setTokenBSelected,
     addLiquidity,
+    tokenABalance,
+    tokenBBalance,
   }
 }

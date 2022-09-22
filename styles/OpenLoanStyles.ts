@@ -1,5 +1,5 @@
 export const OpenLoanStyles = {
-  wrapper: 'w-screen flex justify-center items-center',
+  wrapper: 'w-full flex justify-center items-center',
   formContent: 'bg-gray-900 w-[30rem] rounded-2xl p-4 max-w-lg',
   vStack: 'items-center flex-col',
   vStackItem: 'mt-3',
@@ -32,4 +32,6 @@ export const OpenLoanStyles = {
   confirmButtonContainer: 'pb-4 w-full',
   interestRateText: 'w-full text-right text-gray-200 pr-4',
   spacer: 'p-5',
+  balanceContainer: 'flex',
+  tokenBalance: 'font-semibold text-sm text-neutrals-600 tracking-wide text-right mt-2.5'
 }

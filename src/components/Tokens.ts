@@ -10,13 +10,13 @@ const Tokens: Array<Token> = [
     {
         imgPath: "/crypto/eth.svg",
         symbol: "ETH",
-        address: "0xbb6f4D4544aB61840226ae0694F737752a69449B",
+        address: process.env.NEXT_PUBLIC_TOKEN_A_ADDR || '',
         decimals: 18
     },
     {
         imgPath: "/crypto/bat.svg",
         symbol: "BAT",
-        address: "0x50390975D942E83D661D4Bde43BF73B0ef27b426",
+        address: process.env.NEXT_PUBLIC_TOKEN_B_ADDR || '',
         decimals: 18
     },
     {

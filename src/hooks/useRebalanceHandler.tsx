@@ -5,6 +5,7 @@ import PositionManager from '../../abis/v1-periphery/PositionManager.sol/Positio
 import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
 import { Contract, ethers } from 'ethers'
 import { notifySuccess, notifyError } from '../hooks/useNotification'
+import { getTokenBalance } from '../utils/getSmartContract'
 
 export const useRebalanceHandler = () => {
   const { accountInfo, connectWallet, provider } = useContext(WalletContext)
@@ -32,10 +33,38 @@ export const useRebalanceHandler = () => {
   const [posManager, setPosManager] = useState<Contract | null>(null)
   const [gammaPool, setGammaPool] = useState<Contract | null>(null)
   const [loanLiquidity, setLoanLiquidity] = useState<string>('')
+  const [tokenABalance, setTokenABalance] = useState<string>('0')
+  const [tokenBBalance, setTokenBBalance] = useState<string>('0')
 
   const openSlippage = () => {
     setIsSlippageOpen((prevState) => !prevState)
   }
+
+  useEffect(() => {
+    const getTokenABalance = async () => {
+      if (provider) {
+        let accountAddress = accountInfo?.address || ''
+        if (tokenASelected.address) {
+          let balance = await getTokenBalance(accountAddress, tokenASelected.address, tokenASelected.symbol, provider)
+          setTokenABalance(balance || '0')
+        }
+      }
+    }
+    getTokenABalance()
+  }, [provider, tokenASelected])
+
+  useEffect(() => {
+    const getTokenBBalance = async () => {
+      if (provider) {
+        let accountAddress = accountInfo?.address || ''
+        if (tokenBSelected.address) {
+          let balance = await getTokenBalance(accountAddress, tokenBSelected.address, tokenBSelected.symbol, provider)
+          setTokenBBalance(balance || '0')
+        }
+      }
+    }
+    getTokenBBalance()
+  }, [provider, tokenBSelected])
 
   const handleSlippageMinutes = (e: ChangeEvent<HTMLInputElement> | string) => {
     let minuteInput: string
@@ -268,5 +297,7 @@ export const useRebalanceHandler = () => {
     changeSlippagePercent,
     swapTokenInputs,
     rebalance,
+    tokenABalance,
+    tokenBBalance,
   }
 }

@@ -14,6 +14,7 @@ import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 // For V1 Periphery
 import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
+import { getTokenBalance } from '../utils/getSmartContract'
 
 const style = OpenLoanStyles
 
@@ -43,6 +44,8 @@ export const useOpenLoanHandler = () => {
   const [buttonText, setButtonText] = useState<string>('Confirm')
   const [collateral1Class, setCollateral1Class] = useState<string>('')
   const [tooltipText, setTooltipText] = useState<string>('')
+  const [token0Balance, setToken0Balance] = useState<string>('0')
+  const [token1Balance, setToken1Balance] = useState<string>('0')
 
   useEffect(() => {
     if (!provider) {
@@ -72,6 +75,34 @@ export const useOpenLoanHandler = () => {
       }
     }
   }, [provider])
+
+  useEffect(() => {
+    const getToken0Balance = async () => {
+      if (provider) {
+        let accountAddress = accountInfo?.address ? accountInfo.address : ''
+        if (token0.address) {
+          let balance = await getTokenBalance(accountAddress, token0.address, token0.symbol, provider)
+          setToken0Balance(balance || '0')
+        }
+      }
+    }
+
+    getToken0Balance()
+  }, [provider, token0])
+
+  useEffect(() => {
+    const getToken1Balance = async () => {
+      if (provider) {
+        let accountAddress = accountInfo?.address ? accountInfo.address : ''
+        if (token1.address) {
+          let balance = await getTokenBalance(accountAddress, token1.address, token1.symbol, provider)
+          setToken1Balance(balance || '0')
+        }
+      }
+    }
+
+    getToken1Balance()
+  }, [provider, token1])
 
   async function openLoanHandler(data: FieldValues) {
     if (!accountInfo || !accountInfo.address) {
@@ -451,5 +482,7 @@ export const useOpenLoanHandler = () => {
     buttonText,
     tooltipText,
     setTooltipText,
+    token0Balance,
+    token1Balance,
   }
 }
