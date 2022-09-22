@@ -5,7 +5,7 @@ import truncateEthAddress from 'truncate-eth-address'
 import { WalletContext } from '../context/WalletContext'
 
 const style = {
-  wrapper: "p-4 w-full flex justify-between items-center",
+  wrapper: "p-4 w-screen flex justify-between items-center",
   headerLogo: "w-1/3 flex cursor-pointer pl-2",
   nav: "flex-1 flex justify-center items-center",
   navItemsContainer: "flex bg-neutrals-700 rounded-2xl drop-shadow-lg",

@@ -8,7 +8,7 @@ import { useAddLiquidityHandler } from '../../src/hooks/useAddLiquidityHandler'
 
 const AddLiquidityStyles = {
   reserveToken: {
-    wrapper: 'w-full h-full flex justify-center',
+    wrapper: 'w-screen h-full flex justify-center',
     container: 'mt-20 bg-neutrals-800 w-[30rem] h-3/5 rounded-lg p-4 drop-shadow-lg',
     headerContainer: 'flex text-xxs p-2',
     formHeader: 'font-semibold text-xl text-neutrals-100 tracking-wide text-center',

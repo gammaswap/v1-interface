@@ -33,7 +33,7 @@ const Rebalance: NextPage = () => {
     tokenBBalance,
   } = useRebalanceHandler()
   const style = {
-    wrapper: 'w-full flex justify-center items-center',
+    wrapper: 'w-screen flex justify-center items-center',
     content: 'bg-textV1-6 w-[30rem] rounded-2xl p-4',
     topBar: 'flex justify-between pb-4',
     topBarHeading: 'text-white',
