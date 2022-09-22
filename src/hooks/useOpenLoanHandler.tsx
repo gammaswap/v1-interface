@@ -76,32 +76,20 @@ export const useOpenLoanHandler = () => {
     }
   }, [provider])
 
-  useEffect(() => {
-    const getToken0Balance = async () => {
-      if (provider) {
-        let accountAddress = accountInfo?.address ? accountInfo.address : ''
-        if (token0.address) {
-          let balance = await getTokenBalance(accountAddress, token0.address, token0.symbol, provider)
-          setToken0Balance(balance || '0')
-        }
-      }
+  const getTokenBalanceAsync = async (setTokenBalance: Dispatch<SetStateAction<string>>, token: Token) => {
+    if (provider && token.address) {
+      let accountAddress = accountInfo?.address || ''
+      let balance = await getTokenBalance(accountAddress, token.address, token.symbol, provider)
+      setTokenBalance(balance || '0')
     }
+  }
 
-    getToken0Balance()
+  useEffect(() => {
+    getTokenBalanceAsync(setToken0Balance, token0)
   }, [provider, token0])
 
   useEffect(() => {
-    const getToken1Balance = async () => {
-      if (provider) {
-        let accountAddress = accountInfo?.address ? accountInfo.address : ''
-        if (token1.address) {
-          let balance = await getTokenBalance(accountAddress, token1.address, token1.symbol, provider)
-          setToken1Balance(balance || '0')
-        }
-      }
-    }
-
-    getToken1Balance()
+    getTokenBalanceAsync(setToken1Balance, token1)
   }, [provider, token1])
 
   async function openLoanHandler(data: FieldValues) {

@@ -107,31 +107,21 @@ export const useAddLiquidityHandler = () => {
     fetchContract()
   }, [provider])
 
-  useEffect(() => {
-    const getTokenABalances = async () => {
-      if (provider) {
-        let accountAddress = accountInfo?.address || ''
-        if (tokenASelected.address) {
-          let balance = await getTokenBalance(accountAddress, tokenASelected.address, tokenASelected.symbol, provider)
-          setTokenABalance(balance || '0')
-        }
-      }
+  const getTokenBalanceAsync = async (setTokenBalance: Dispatch<SetStateAction<string>>, token: Token) => {
+    if (provider && token.address) {
+      let accountAddress = accountInfo?.address || ''
+      let balance = await getTokenBalance(accountAddress, token.address, token.symbol, provider)
+      setTokenBalance(balance || '0')
     }
-    getTokenABalances()
-  }, [tokenASelected, provider])
+  }
 
   useEffect(() => {
-    const getTokenBBalances = async () => {
-      if (provider) {
-        let accountAddress = accountInfo?.address || ''
-        if (tokenBSelected.address) {
-          let balance = await getTokenBalance(accountAddress, tokenBSelected.address, tokenBSelected.symbol, provider)
-          setTokenBBalance(balance || '0')
-        }
-      }
-    }
-    getTokenBBalances()
-  }, [tokenBSelected, provider])
+    getTokenBalanceAsync(setTokenABalance, tokenASelected)
+  }, [provider, tokenASelected])
+
+  useEffect(() => {
+    getTokenBalanceAsync(setTokenBBalance, tokenBSelected)
+  }, [provider, tokenBSelected])
 
   // if called on change of token A or B input vals, validate and update estimated output value
   const handleTokenInput = useCallback(
