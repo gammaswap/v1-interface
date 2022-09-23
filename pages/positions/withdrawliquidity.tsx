@@ -1,7 +1,9 @@
 import type { NextPage } from 'next'
+import { Fragment } from 'react'
 import Slider from 'rc-slider'
+import { Tab } from '@headlessui/react'
 import 'rc-slider/assets/index.css'
-import { ArrowDownIcon } from '@heroicons/react/outline'
+import { ArrowDownIcon, ArrowLeftIcon } from '@heroicons/react/outline'
 import { useWithdrawLiquidityHandler } from '../../src/hooks/useWithdrawLiquidityHandler'
 
 const WithdrawLiquidity: NextPage = () => {
@@ -17,9 +19,14 @@ const WithdrawLiquidity: NextPage = () => {
   } = useWithdrawLiquidityHandler()
 
   const style = {
-    wrapper: 'w-screen flex justify-center items-center',
-    content: 'bg-gray-900 w-[30rem] rounded-2xl p-4',
-    formHeader: 'px-2 justify-between items-center font-semibold text-xl text-gray-200 text-center',
+    wrapper: 'w-full h-full flex justify-center',
+    container: 'mt-20 bg-neutrals-800 w-[30rem] h-3/4 rounded-2xl p-4',
+    headerContainer: 'flex text-xxs',
+    backButton: 'w-6 h-6 mt-0.5',
+    formHeader: 'font-semibold text-lg text-neutrals-200 ml-4',
+    tabsContainer: 'flex rounded-lg w-1/4 p-0.5 bg-neutrals-900 bg-opacity-40 drop-shadow-md space-x-2 font-normal ml-auto',
+    tab: 'text-neutrals-600 w-1/2 rounded-md hover:bg-neutrals-800 hover:text-neutrals-300',
+    activeTab: 'outline outline-2 outline-offset-2 outline-accents-royalBlue/50 bg-accents-royalBlue w-1/2 rounded-md',
     formLabel: ' flex justify-between pt-3 px-2',
     tokenContainer:
       'bg-gray-800 my-3 rounded-2xl p-6 text-3xl border-2 border-gray-800 hover:border-gray-600 flex justify-between',
@@ -47,9 +54,28 @@ const WithdrawLiquidity: NextPage = () => {
 
   return (
     <div className={style.wrapper}>
-      <div className={style.content}>
-        <div className={style.formHeader}>Withdraw Liquidity</div>
-        <div>
+      <div className={style.container}>
+        <Tab.Group>
+          <div className={style.headerContainer}>
+            <ArrowLeftIcon className={style.backButton}/>
+            <div className={style.formHeader}>Withdraw Liquidity</div>
+            <Tab.List className={style.tabsContainer}>
+                <Tab as={Fragment}>
+                  {({ selected }) => (
+                    <button className={selected ?  style.activeTab : style.tab}>
+                      LP
+                    </button>
+                  )}
+                </Tab>
+                <Tab as={Fragment}>
+                  {({ selected }) => (
+                    <button className={selected ?  style.activeTab : style.tab}>
+                      Reserve
+                    </button>
+                  )}
+                </Tab>
+              </Tab.List>
+          </div>
           <div className={style.formLabel}></div>
           <div className={style.sliderStyle}>
             <div className={style.sectionHeader}>Amount</div>
@@ -99,31 +125,37 @@ const WithdrawLiquidity: NextPage = () => {
               </p>
             </div>
           </div>
-          <div className={style.downIcon}>
-            <ArrowDownIcon className={style.dropdownArrow} style={{ color: 'white' }} />
-          </div>
+          <Tab.Panels>
+            <Tab.Panel>
+              <div className={style.downIcon}>
+                <ArrowDownIcon className={style.dropdownArrow} style={{ color: 'white' }} />
+              </div>
+              <div className={style.amountDiv}>
+                <div className={style.eachAmount}>
+                  <p>50</p>
+                  <p>{token0.symbol || '-'}</p>
+                </div>
+                <div className={style.eachAmount}>
+                  <p>50</p>
+                  <p>{token1.symbol || '-'}</p>
+                </div>
+              </div>
 
-          <div className={style.amountDiv}>
-            <div className={style.eachAmount}>
-              <p>50</p>
-              <p>{token0.symbol || '-'}</p>
-            </div>
-            <div className={style.eachAmount}>
-              <p>50</p>
-              <p>{token1.symbol || '-'}</p>
-            </div>
-          </div>
-
-          <div className={style.totalPriceContainer}>
-            <div className={style.unitTokenConversion}>
-              {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}1{' '}
-              {token1.symbol || '-'} = 1 {token0.symbol || '-'}
-            </div>
-            <div className={style.unitTokenConversion}>
-              1 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
-            </div>
-          </div>
-        </div>
+              <div className={style.totalPriceContainer}>
+                <div className={style.unitTokenConversion}>
+                  {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}1{' '}
+                  {token1.symbol || '-'} = 1 {token0.symbol || '-'}
+                </div>
+                <div className={style.unitTokenConversion}>
+                  1 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
+                </div>
+              </div>
+            </Tab.Panel>
+            <Tab.Panel>
+              <div>Reserve Token</div>
+            </Tab.Panel>
+          </Tab.Panels>
+        </Tab.Group>
         <div className={style.buttonDiv}>
           <div
             className={style.confirmButton}
