@@ -9,7 +9,7 @@ interface Props {
 }
 
 const style = {
-    wrapper: "h-screen max-h-screen h-min-screen w-full bg-neutrals-900 font-medium text-white flex flex-col bg-justify-between items-center",
+    wrapper: "h-screen max-h-screen h-min-screen w-screen bg-neutrals-900 font-medium text-white flex flex-col bg-justify-between items-center",
 }
 
 const Layout = ({ children }: Props) => {
