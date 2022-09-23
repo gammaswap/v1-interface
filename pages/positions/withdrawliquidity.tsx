@@ -1,4 +1,5 @@
 import type { NextPage } from 'next'
+import Image from 'next/image'
 import { Fragment } from 'react'
 import Slider from 'rc-slider'
 import { Tab } from '@headlessui/react'
@@ -27,10 +28,6 @@ const WithdrawLiquidity: NextPage = () => {
     tabsContainer: 'flex rounded-lg w-1/4 p-0.5 bg-neutrals-900 bg-opacity-40 drop-shadow-md space-x-2 font-normal ml-auto',
     tab: 'text-neutrals-600 w-1/2 rounded-md hover:bg-neutrals-800 hover:text-neutrals-300',
     activeTab: 'outline outline-2 outline-offset-2 outline-accents-royalBlue/50 bg-accents-royalBlue w-1/2 rounded-md',
-    formLabel: ' flex justify-between pt-3 px-2',
-    tokenContainer:
-      'bg-gray-800 my-3 rounded-2xl p-6 text-3xl border-2 border-gray-800 hover:border-gray-600 flex justify-between',
-    tokenInput: 'bg-transparent placeholder:text-gray-600 outline-none mb-6 w-full text-4xl text-gray-300 mt-4',
     confirmButton:
       'w-full bg-blue-400 m-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
     successButton:
@@ -43,11 +40,15 @@ const WithdrawLiquidity: NextPage = () => {
     sliderPercent: 'text-6xl text-neutrals-100 mt-2',
     percentageBoxContainer: 'flex justify-center space-x-8 mt-5',
     percentageBox: 'bg-neutrals-800 text-neutrals-100 py-2 px-5 cursor-pointer drop-shadow-sm rounded-lg hover:text-primary-blue',
-    dropdownArrow: 'w-5 h-5',
-    downIcon: 'flex justify-center my-2',
+    lpTokensPooledContainer: 'flex justify-between',
+    lpTokensPooledAmount: 'flex items-center',
+    lpTokensPooledPair: 'flex space-x-2',
+    lpTokensPooledIcons: 'relative w-[2rem] h-[1.5rem] self-center',
+    tokenAIcon: 'mt-0.5',
+    tokenBIcon: 'absolute top-0.5 right-0 -z-10',
+    lpTokensPooledSymbol: 'text-lg',
     buttonDiv: 'flex justify-center',
-    amountDiv: 'border-2 border-gray-800 shadow-lg p-4 rounded-2xl text-white text-lg font-semibold',
-    eachAmount: 'flex justify-between p-2',
+    pooledTokensContainer: 'drop-shadow-md p-4 bg-neutrals-700 rounded-lg text-neutrals-100 mt-5',
     totalPriceContainer: 'flex flex-col items-end text-gray-500 text-sm mt-2',
     unitTokenConversion: 'font-semibold',
   }
@@ -87,9 +88,7 @@ const WithdrawLiquidity: NextPage = () => {
                 backgroundColor: '#549AF0',
                 height: '6px',
               }}
-              railStyle={{
-                height: '6px',
-              }}
+              railStyle={{ height: '6px' }}
               handleStyle={{
                 borderColor: '#ECECED',
                 width: '16px',
@@ -97,9 +96,6 @@ const WithdrawLiquidity: NextPage = () => {
                 borderWidth: '2px',
                 backgroundColor: '#549AF0',
                 opacity: 1,
-              }}
-              dotStyle={{
-                borderColor: 'red'
               }}
             />
             <div className={style.percentageBoxContainer}>
@@ -130,18 +126,23 @@ const WithdrawLiquidity: NextPage = () => {
             </div>
           </div>
           <Tab.Panels>
+            {/* LP tokens tab */}
             <Tab.Panel>
-              <div className={style.downIcon}>
-                <ArrowDownIcon className={style.dropdownArrow} style={{ color: 'white' }} />
-              </div>
-              <div className={style.amountDiv}>
-                <div className={style.eachAmount}>
-                  <p>50</p>
-                  <p>{token0.symbol || '-'}</p>
-                </div>
-                <div className={style.eachAmount}>
-                  <p>50</p>
-                  <p>{token1.symbol || '-'}</p>
+              <div className={style.pooledTokensContainer}>
+                <div className={style.sectionHeader}>Pooled</div>
+                <div className={style.lpTokensPooledContainer}>
+                  <h1 className={style.lpTokensPooledAmount}>22.3422</h1>
+                  <div className={style.lpTokensPooledPair}>
+                    <div className={style.lpTokensPooledIcons}>
+                      <div className={style.tokenAIcon}>
+                        <Image src={"/crypto/uni.svg"} width={20} height={20} />
+                      </div>
+                      <div className={style.tokenBIcon}>
+                        <Image src={"/crypto/eth.svg"} width={20} height={20} />
+                      </div>
+                    </div>
+                    <div className={style.lpTokensPooledSymbol}>UNI / ETH</div>
+                  </div>
                 </div>
               </div>
 
