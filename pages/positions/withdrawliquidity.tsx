@@ -21,19 +21,17 @@ const WithdrawLiquidity: NextPage = () => {
 
   const style = {
     wrapper: 'w-full h-full flex justify-center',
-    container: 'mt-20 bg-neutrals-800 w-[30rem] h-3/4 rounded-xl p-4',
+    container: 'mt-4 bg-neutrals-800 w-[30rem] h-[47rem] rounded-xl p-4',
     headerContainer: 'flex text-xxs',
     backButton: 'w-7 h-7 mt-0.5 cursor-pointer hover:bg-neutrals-700 p-1 rounded-full',
     formHeader: 'font-semibold text-lg text-neutrals-100 ml-4',
     tabsContainer: 'flex rounded-lg w-1/4 p-0.5 bg-neutrals-900 bg-opacity-40 drop-shadow-md space-x-2 font-normal ml-auto',
     tab: 'text-neutrals-600 w-1/2 rounded-md hover:bg-neutrals-800 hover:text-neutrals-300',
     activeTab: 'outline outline-2 outline-offset-2 outline-accents-royalBlue/50 bg-accents-royalBlue w-1/2 rounded-md',
-    confirmButton:
-      'w-full bg-blue-400 m-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
-    successButton:
-      'w-full bg-green-400 m-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-green-400 hover:border-green-300',
-    invalidatedButton:
-      'w-full my-2 rounded-2xl py-3 px-5 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
+    buttonDiv: 'flex space-x-5 mt-7',
+    confirmButton: 'w-1/2 bg-blue-400 rounded-lg py-3 px-5 text-xl font-semibold cursor-pointer text-white text-center border-2 border-blue-400 hover:border-blue-300',
+    successButton: 'w-1/2 bg-green-400 rounded-lg py-3 px-5 text-xl font-semibold cursor-pointer text-white text-center border-2 border-green-400 hover:border-green-300',
+    invalidatedButton: 'w-1/2 rounded-lg py-3 px-5 text-xl font-semibold text-gray-600 text-center border-2 border-gray-700',
     withdrawHeading: 'w-screen text-left',
     sliderContainer: 'bg-neutrals-700 drop-shadow-md mt-5 p-4 rounded-lg',
     sectionHeader: 'font-semibold mt-1 text-neutrals-400 w-full',
@@ -47,7 +45,11 @@ const WithdrawLiquidity: NextPage = () => {
     tokenAIcon: 'mt-0.5',
     tokenBIcon: 'absolute top-0.5 right-0 -z-10',
     lpTokensPooledSymbol: 'text-lg',
-    buttonDiv: 'flex justify-center',
+    earnedTokensContainer: 'bg-neutrals-700 drop-shadow-md mt-5 p-4 rounded-lg',
+    lpTokensPNLContainer: 'mt-5 flex',
+    lpTokensProfitsLossesContainer: '',
+    profitsLosses: 'text-secondary-jungleGreen',
+    lpTokensPNLGraph: 'w-64 h-32 bg-neutrals-800 rounded-md drop-shadow-md flex justify-center items-center text-neutrals-200/20 ml-auto',
     pooledTokensContainer: 'drop-shadow-md p-4 bg-neutrals-700 rounded-lg text-neutrals-100 mt-5',
     totalPriceContainer: 'flex flex-col items-end text-gray-500 text-sm mt-2',
     unitTokenConversion: 'font-semibold',
@@ -131,7 +133,7 @@ const WithdrawLiquidity: NextPage = () => {
               <div className={style.pooledTokensContainer}>
                 <div className={style.sectionHeader}>Pooled</div>
                 <div className={style.lpTokensPooledContainer}>
-                  <h1 className={style.lpTokensPooledAmount}>22.3422</h1>
+                  <h1 className={style.lpTokensPooledAmount}>322.3422</h1>
                   <div className={style.lpTokensPooledPair}>
                     <div className={style.lpTokensPooledIcons}>
                       <div className={style.tokenAIcon}>
@@ -145,14 +147,28 @@ const WithdrawLiquidity: NextPage = () => {
                   </div>
                 </div>
               </div>
-
-              <div className={style.totalPriceContainer}>
-                <div className={style.unitTokenConversion}>
-                  {/* TODO: once factory contract is available it should be the price that comes from the uniswap pair. */}1{' '}
-                  {token1.symbol || '-'} = 1 {token0.symbol || '-'}
+              <div className={style.earnedTokensContainer}>
+                <div className={style.sectionHeader}>Fees Earned</div>
+                <div className={style.lpTokensPooledContainer}>
+                  <h1 className={style.lpTokensPooledAmount}>28.3422</h1>
+                  <div className={style.lpTokensPooledPair}>
+                    <div className={style.lpTokensPooledIcons}>
+                      <div className={style.tokenAIcon}>
+                        <Image src={"/crypto/uni.svg"} width={20} height={20} />
+                      </div>
+                      <div className={style.tokenBIcon}>
+                        <Image src={"/crypto/eth.svg"} width={20} height={20} />
+                      </div>
+                    </div>
+                    <div className={style.lpTokensPooledSymbol}>UNI / ETH</div>
+                  </div>
                 </div>
-                <div className={style.unitTokenConversion}>
-                  1 {token0.symbol || '-'} = 1 {token1.symbol || '-'}
+                <div className={style.lpTokensPNLContainer}>
+                  <div className={style.lpTokensProfitsLossesContainer}>
+                    <h1 className={style.sectionHeader}>Profits & Losses</h1>
+                    <div className={style.profitsLosses}>+38.2983 (6.79%)</div>
+                  </div>
+                  <div className={style.lpTokensPNLGraph}>Coming Soon</div>
                 </div>
               </div>
             </Tab.Panel>
