@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
 import SelectCollateralModal from '../../src/components/OpenLoan/SelectCollateralModal'
-import { FaInfoCircle } from 'react-icons/fa'
-import { ChevronDownIcon } from '@heroicons/react/solid'
+import { ChevronDownIcon, InformationCircleIcon } from '@heroicons/react/solid'
 import PairsSelector from '../../src/components/PairsSelector'
 import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
 import { Tooltip } from '../../src/components/Tooltip'
@@ -68,19 +67,19 @@ const OpenLoanPage: NextPage = () => {
               <div className={style.infoGroup}>
                 <div className={style.loanInfoButton} onMouseOver={() => setTooltipText(tips.maxltv)}>
                   <div className={style.infoIcon}>
-                    <FaInfoCircle />
+                    <InformationCircleIcon />
                   </div>
                   MaxLTV --%
                 </div>
                 <div className={style.loanInfoButton} onMouseOver={() => setTooltipText(tips.threshold)}>
                   <div className={style.infoIcon}>
-                    <FaInfoCircle />
+                    <InformationCircleIcon />
                   </div>
                   Liquidation Threshold --%
                 </div>
                 <div className={style.loanInfoButton} onMouseOver={() => setTooltipText(tips.penalty)}>
                   <div className={style.infoIcon}>
-                    <FaInfoCircle />
+                    <InformationCircleIcon />
                   </div>
                   Liquidation Penalty --%
                 </div>

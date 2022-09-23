@@ -1,8 +1,8 @@
 import type { NextPage } from "next"
 import { useEffect, useState } from "react"
 import { useCreatePoolHandler } from "../../src/hooks/useCreatePoolHandler"
+import { ChevronDownIcon } from "@heroicons/react/outline"
 import { ethers } from 'ethers'
-import { AiOutlineDown } from 'react-icons/ai'
 
 const CreatePool: NextPage = () => {
 
@@ -32,7 +32,7 @@ const CreatePool: NextPage = () => {
     saveBtnGrey: 'bg-[#274060] w-full rounded-2xl text-gray-500 inline-flex place-content-center py-2 font-semibold',
     selectBox: 'flex justify-between items-center border-y border-x border-slate-200 hover:border-slate-300 w-full py-1 px-2 rounded-lg cursor-pointer mt-3',
     selectOptions: 'absolute top-10 bg-white shadow-2xl rounded-lg border-y border-x border-slate-200 z-50',
-    arrow: 'text-sm',
+    arrow: 'text-sm w-4 h-4',
     selectedOptionText: 'font-semibold text-slate-50',
     eachOption: 'py-2 px-2 text-md hover:bg-primaryV3-2 group cursor-pointer',
     firstOption: 'rounded-tl-lg rounded-tr-lg',
@@ -68,7 +68,7 @@ const CreatePool: NextPage = () => {
           </div>
           <div className={style.selectBox} onClick={openOrCloseSelectBox}>
             <p>{protocol.name}</p>
-            <AiOutlineDown className={style.arrow} />
+            <ChevronDownIcon className={style.arrow} />
           </div>
         </div>
         <div className={style.cardBody}>

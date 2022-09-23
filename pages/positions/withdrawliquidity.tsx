@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
-import { BsArrowDownShort } from 'react-icons/bs'
+import { ArrowDownIcon } from '@heroicons/react/outline'
 import { useWithdrawLiquidityHandler } from '../../src/hooks/useWithdrawLiquidityHandler'
 
 const WithdrawLiquidity: NextPage = () => {
@@ -35,7 +35,7 @@ const WithdrawLiquidity: NextPage = () => {
     sliderPercent: 'mb-5 text-6xl text-white rounded-xl',
     percentageBox: 'flex justify-between mt-4',
     percentages: 'bg-gray-800 text-white text-center py-3 px-6 cursor-pointer rounded-lg font-semibold',
-    dropdownArrow: 'w-12 h-8',
+    dropdownArrow: 'w-5 h-5',
     downIcon: 'flex justify-center my-2',
     buttonDiv: 'flex justify-center',
     amountDiv: 'border-2 border-gray-800 shadow-lg p-4 rounded-2xl text-white text-lg font-semibold',
@@ -100,7 +100,7 @@ const WithdrawLiquidity: NextPage = () => {
             </div>
           </div>
           <div className={style.downIcon}>
-            <BsArrowDownShort className={style.dropdownArrow} style={{ color: 'white' }} />
+            <ArrowDownIcon className={style.dropdownArrow} style={{ color: 'white' }} />
           </div>
 
           <div className={style.amountDiv}>

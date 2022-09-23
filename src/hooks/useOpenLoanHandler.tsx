@@ -8,7 +8,7 @@ import IERC20 from '../../abis/v0-hackathon/ERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import { CollateralType } from '../components/OpenLoan/CollateralType'
 import toast from 'react-hot-toast'
-import { FcInfo } from 'react-icons/fc'
+import { InformationCircleIcon } from '@heroicons/react/solid'
 import { FieldValues, useForm } from 'react-hook-form'
 import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 // For V1 Periphery
@@ -46,7 +46,7 @@ export const useOpenLoanHandler = () => {
 
   useEffect(() => {
     if (!provider) {
-      toast('Please connect wallet.', { icon: <FcInfo /> })
+      toast('Please connect wallet.', { icon: <InformationCircleIcon /> })
       return
     }
 
@@ -256,7 +256,7 @@ export const useOpenLoanHandler = () => {
 
   function getPosMgr() {
     if (token0 == token1) {
-      toast('Token values must be different', { icon: <FcInfo /> })
+      toast('Token values must be different', { icon: <InformationCircleIcon /> })
       return
     }
     let pairsAddress =
@@ -283,7 +283,7 @@ export const useOpenLoanHandler = () => {
         }
       }
     } else {
-      toast('Please connect wallet', { icon: <FcInfo /> })
+      toast('Please connect wallet', { icon: <InformationCircleIcon /> })
     }
   }
 

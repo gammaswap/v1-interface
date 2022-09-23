@@ -1,5 +1,5 @@
 import type {NextPage} from 'next'
-import {BsArrowDownShort} from 'react-icons/bs'
+import { ArrowDownIcon } from '@heroicons/react/outline'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 import {useRepayLoanHandler} from '../../src/hooks/useRepayLoanHandler'
@@ -21,10 +21,10 @@ const Repayloan: NextPage = () => {
     approveBtn: 'w-full bg-blue-400 m-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
     repayBtn: 'w-full bg-green-400 m-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-green-400 hover:border-green-300',
     invalidBtn: 'w-full my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
-    allAmountsDiv: 'flex flex-col border-2 border-gray-800 shadow-lg p-4 rounded-2xl',
+    allAmountsDiv: 'flex flex-col border-2 mt-3 border-gray-800 shadow-lg p-4 rounded-2xl',
     amountsDiv: 'flex justify-between py-2 text-white',
     downIcon: 'flex justify-center',
-    dropDownIcon: 'w-12 h-8',
+    dropDownIcon: 'w-5 h-5',
     sectionHeader: 'font-semibold text-gray-200 w-full',
   }
 
@@ -69,7 +69,7 @@ const Repayloan: NextPage = () => {
           </div>
 
           <div className={style.downIcon}>
-            <BsArrowDownShort className={style.dropDownIcon} style={{color: 'white'}} />
+            <ArrowDownIcon className={style.dropDownIcon} style={{color: 'white'}} />
           </div>
 
           <div className={style.allAmountsDiv}>

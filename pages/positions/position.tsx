@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import { usePositionHandler } from '../../src/hooks/usePositionHandler'
 import PositionTableRow from '../../src/components/Positions/PositionTableRow'
-import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs'
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 
 const PositionPage: NextPage = () => {
   const { positions } = usePositionHandler()
@@ -15,7 +15,7 @@ const PositionPage: NextPage = () => {
     tableHeading: 'py-3 w-[20%] font-medium text-white flex align-center',
     tableBodyRow: 'bg-white border-b bg-gray-800 border-gray-700',
     tableBodyDefinition: 'py-4 px-6',
-    arrow: 'mt-2 text-2xl cursor-pointer',
+    arrow: 'mt-2 w-4 h-4 text-2xl cursor-pointer',
     allArrows: 'flex justify-end',
     rightAlign: 'justify-end',
     leftAlign: 'justify-start',
@@ -48,8 +48,8 @@ const PositionPage: NextPage = () => {
           : null}
 
         <div className={style.allArrows}>
-          <BsArrowLeftShort className={style.arrow} />
-          <BsArrowRightShort className={style.arrow} />
+          <ArrowLeftIcon className={style.arrow} />
+          <ArrowRightIcon className={style.arrow} />
         </div>
       </div>
     </div>
