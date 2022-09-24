@@ -24,6 +24,7 @@ export const useWithdrawLiquidityHandler = () => {
   const [enableRemove, setEnableRemove] = useState<Boolean>(false)
   const [uniPrice, setUniPrice] = useState<string>('0')
   const [liqInTokB, setLiqInTokB] = useState<number>(0)
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
   let DEPOSIT_POOL_ADDRESS = '0x3eFadc5E507bbdA54dDb4C290cc3058DA8163152'
 
@@ -359,6 +360,8 @@ export const useWithdrawLiquidityHandler = () => {
   }
 
   return {
+    selectedIndex,
+    setSelectedIndex,
     sliderPercentage,
     changeSliderPercentage,
     sliderPercentChange,

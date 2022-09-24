@@ -1,8 +1,6 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import { FiSettings } from 'react-icons/fi'
-import { MdOutlineSwapVert } from 'react-icons/md'
-import { BsChevronDown } from 'react-icons/bs'
+import { SwitchVerticalIcon, CogIcon } from '@heroicons/react/outline'
 import TokenSelectorModal from '../../src/components/TokenSelectorModal'
 import { useRebalanceHandler } from '../../src/hooks/useRebalanceHandler'
 import { SlippageModal } from '../../src/components/Positions/SlippageModal'
@@ -37,13 +35,13 @@ const Rebalance: NextPage = () => {
     topBarHeading: 'text-white',
     swapHeading: 'text-xl',
     topBarSettings: 'text-white text-xl',
-    settingSVG: 'cursor-pointer',
+    settingSVG: 'cursor-pointer w-6 h-6',
     middleBar: 'flex flex-col',
     firstInputBox:
       'bg-primaryV3-2 my-3 rounded-2xl p-6 text-3xl border-2 border-primaryV3-2 hover:border-primaryV3-3 flex justify-between',
     firstInput: 'bg-transparent placeholder:text-textV1-4 outline-none mb-6 w-full text-4xl text-gray-300 mt-4',
     swapIconBox: 'flex justify-center items-center',
-    swapIcon: 'text-white text-center text-2xl cursor-pointer',
+    swapIcon: 'text-white w-4 h-4 text-center text-2xl cursor-pointer',
     secondInputBox:
       'bg-primaryV3-2 my-3 rounded-2xl p-6 text-3xl border-2 border-primaryV3-2 hover:border-primaryV3-3 flex justify-between',
     secondInput: 'bg-transparent placeholder:text-textV1-4 outline-none mb-6 w-full text-4xl text-gray-300 mt-4',
@@ -73,7 +71,7 @@ const Rebalance: NextPage = () => {
               <p className={style.swapHeading}>Rebalance</p>
             </div>
             <div className={style.topBarSettings}>
-              <FiSettings className={style.settingSVG} onClick={openSlippage} />
+              <CogIcon className={style.settingSVG} onClick={openSlippage} />
             </div>
           </div>
           <div className={style.middleBar}>
@@ -97,14 +95,14 @@ const Rebalance: NextPage = () => {
                       <Image src={tokenASelected.imgPath} width={32} height={32} />
                     </div>
                     <div className={style.tokenSelectorTicker}>{tokenASelected.symbol}</div>
-                    <MdOutlineSwapVert className={style.dropdownArrow} />
+                    <SwitchVerticalIcon className={style.dropdownArrow} />
                   </div>
                   <div className={style.tokenBalance}>Balance: {0}</div>
                 </div>
               )}
             </div>
             <div className={style.swapIconBox}>
-              <MdOutlineSwapVert onClick={swapTokenInputs} className={style.swapIcon} />
+              <SwitchVerticalIcon onClick={swapTokenInputs} className={style.swapIcon} />
             </div>
             <div className={style.secondInputBox}>
               <input
@@ -125,7 +123,7 @@ const Rebalance: NextPage = () => {
                       <Image src={tokenBSelected.imgPath} width={32} height={32} />
                     </div>
                     <div className={style.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
-                    <MdOutlineSwapVert className={style.dropdownArrow} />
+                    <SwitchVerticalIcon className={style.dropdownArrow} />
                   </div>
                   <div className={style.tokenBalance}>Balance: {0}</div>
                 </div>

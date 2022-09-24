@@ -1,8 +1,8 @@
 import type { NextPage } from "next"
-import { HiOutlineInformationCircle } from "react-icons/hi"
+import { InformationCircleIcon } from "@heroicons/react/outline"
+import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/outline"
 import Link from "next/link"
 import PoolTableRow from "../../src/components/Pools/PoolTableRow"
-import { BsArrowLeftShort, BsArrowRightShort } from "react-icons/bs"
 import { usePoolsHandler } from "../../src/hooks/usePoolsHandler"
 
 const Pools: NextPage = () => {
@@ -19,8 +19,8 @@ const Pools: NextPage = () => {
     tableView: "overflow-x-auto relative bg-white mx-20",
     tableContainer: "p-4 rounded-lg bg-gray-50 bg-gray-700 text-gray-400",
     tableHead: "flex text-xs text-gray-700 uppercase pl-2 pr-4 border-b border-gray-500",
-    tableHeading: "flex align-center py-3 overflow-hidden mr-2 ml-2",
-    infoSvg: "ml-2 text-lg",
+    tableHeading: "flex align-center py-3",
+    infoSvg: "ml-2 w-4 h-4 text-lg",
     poolHeading: "pb-12 pt-6 pl-3 text-xl",
     topHeading: "flex justify-between",
     createPool: "flex justify-center items-center",
@@ -31,7 +31,7 @@ const Pools: NextPage = () => {
     totalBorrowedHead: "w-[16%] justify-end font-medium text-white",
     borrowApyVariableHead: "w-[16%] justify-end font-medium text-white",
     borrowApyStableHead: "w-[16%] justify-end font-medium text-white",
-    arrow: "mt-2 text-2xl cursor-pointer",
+    arrow: "mt-2 w-4 h-4 text-2xl cursor-pointer",
     allArrows: "flex justify-end",
   }
 
@@ -91,17 +91,17 @@ const Pools: NextPage = () => {
             </div>
             <div className={style.tableHeading + " " + style.borrowApyVariableHead}>
               <p>Borrow APY, variable</p>
-              <HiOutlineInformationCircle className={style.infoSvg} />
+              <InformationCircleIcon className={style.infoSvg} />
             </div>
             <div className={style.tableHeading + " " + style.borrowApyStableHead}>
               <p>Borrow APY, stable</p>
-              <HiOutlineInformationCircle className={style.infoSvg} />
+              <InformationCircleIcon className={style.infoSvg} />
             </div>
           </div>
           {poolData && poolData.length > 0 ? poolData.map((pool, index) => <PoolTableRow key={index} pool={pool} />) : null}
           <div className={style.allArrows}>
-            <BsArrowLeftShort className={style.arrow} />
-            <BsArrowRightShort className={style.arrow} />
+            <ArrowLeftIcon className={style.arrow} />
+            <ArrowRightIcon className={style.arrow} />
           </div>
         </div>
       </div>

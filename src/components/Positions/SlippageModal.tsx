@@ -1,4 +1,4 @@
-import { MdOutlineClose } from 'react-icons/md'
+import { XIcon } from '@heroicons/react/outline'
 import { useRebalanceHandler } from '../../hooks/useRebalanceHandler'
 
 type SlippageProps = {
@@ -14,7 +14,7 @@ export const SlippageModal = ({ openSlippage }: SlippageProps) => {
     slippageTopbar: 'flex justify-between items-center mb-4',
     slippageTopHeading: 'text-textV1-1 font-semibold text-lg',
     slippageCancel: 'text-textV1-1 text-lg',
-    closeIcon: 'cursor-pointer',
+    closeIcon: 'cursor-pointer w-6 h-6',
     slippageMiddle: 'flex flex-col border rounded-2xl border-primaryV3-1 py-4 px-2',
     slippageHeading: 'text-md text-white mb-2',
     slippageTextBoxDiv: 'flex justify-between',
@@ -40,7 +40,7 @@ export const SlippageModal = ({ openSlippage }: SlippageProps) => {
               <p>Slippage</p>
             </div>
             <div className={style.slippageCancel}>
-              <MdOutlineClose className={style.closeIcon} onClick={openSlippage} />
+              <XIcon className={style.closeIcon} onClick={openSlippage} />
             </div>
           </div>
 
