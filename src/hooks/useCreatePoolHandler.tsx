@@ -17,7 +17,7 @@ export const useCreatePoolHandler = () => {
   useEffect(() => {
     async function fetchContract() {
       if (!provider) {
-        console.log('Please connect wallet.')
+        notifyError('Please connect wallet.')
         return
       }
 
@@ -59,7 +59,6 @@ export const useCreatePoolHandler = () => {
       let poolAddress = res.events[0].address
       let msg = 'Pool created successfully at address: ' + poolAddress
       notifySuccess(msg)
-      console.log(msg)
       resetParameters()
     } catch (e) {
       let errorMsg = "Pool not created: "

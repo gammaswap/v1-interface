@@ -170,15 +170,13 @@ export const useOpenLoanHandler = () => {
                 toast.dismiss(loading)
               })
               .catch((err) => {
-                console.log(err)
                 notifyDismiss(loading)
-                notifyError('Borrow liquidity was unsuccessful')
+                notifyError('Borrow liquidity was unsuccessful: ' + err)
               })
           })
           .catch((err) => {
-            console.log(err)
             notifyDismiss(loading)
-            notifyError('Create loan was unsuccessful')
+            notifyError('Create loan was unsuccessful' + err)
           })
       }
     }
