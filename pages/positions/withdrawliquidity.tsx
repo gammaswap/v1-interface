@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import { Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import Slider from 'rc-slider'
 import { Tab } from '@headlessui/react'
 import 'rc-slider/assets/index.css'
@@ -8,7 +8,10 @@ import { ArrowDownIcon, ArrowLeftIcon } from '@heroicons/react/outline'
 import { useWithdrawLiquidityHandler } from '../../src/hooks/useWithdrawLiquidityHandler'
 
 const WithdrawLiquidity: NextPage = () => {
+
   const {
+    selectedIndex,
+    setSelectedIndex,
     sliderPercentage,
     changeSliderPercentage,
     sliderPercentChange,
@@ -21,20 +24,20 @@ const WithdrawLiquidity: NextPage = () => {
 
   const style = {
     wrapper: 'w-full h-full flex justify-center',
-    container: 'mt-4 bg-neutrals-800 w-[30rem] h-[47rem] rounded-xl p-4',
+    container: 'mt-4 bg-neutrals-800 w-[30rem] rounded-xl p-4',
     headerContainer: 'flex text-xxs',
     backButton: 'w-7 h-7 mt-0.5 cursor-pointer hover:bg-neutrals-700 p-1 rounded-full',
     formHeader: 'font-semibold text-lg text-neutrals-100 ml-4',
     tabsContainer: 'flex rounded-lg w-1/4 p-0.5 bg-neutrals-900 bg-opacity-40 drop-shadow-md space-x-2 font-normal ml-auto',
     tab: 'text-neutrals-600 w-1/2 rounded-md hover:bg-neutrals-800 hover:text-neutrals-300',
     activeTab: 'outline outline-2 outline-offset-2 outline-accents-royalBlue/50 bg-accents-royalBlue w-1/2 rounded-md',
-    buttonDiv: 'flex space-x-5 mt-7',
+    buttonDiv: 'flex space-x-5',
     confirmButton: 'w-1/2 bg-blue-400 rounded-lg py-3 px-5 text-xl font-semibold cursor-pointer text-white text-center border-2 border-blue-400 hover:border-blue-300',
     successButton: 'w-1/2 bg-green-400 rounded-lg py-3 px-5 text-xl font-semibold cursor-pointer text-white text-center border-2 border-green-400 hover:border-green-300',
     invalidatedButton: 'w-1/2 rounded-lg py-3 px-5 text-xl font-semibold text-gray-600 text-center border-2 border-gray-700',
     withdrawHeading: 'w-screen text-left',
     sliderContainer: 'bg-neutrals-700 drop-shadow-md mt-5 p-4 rounded-lg',
-    sectionHeader: 'font-semibold mt-1 text-neutrals-400 w-full',
+    sectionHeader: 'font-semibold text-neutrals-400 w-full',
     sliderPercent: 'text-6xl text-neutrals-100 mt-2',
     percentageBoxContainer: 'flex justify-center space-x-8 mt-5',
     percentageBox: 'bg-neutrals-800 text-neutrals-100 py-2 px-5 cursor-pointer drop-shadow-sm rounded-lg hover:text-primary-blue',
@@ -42,23 +45,32 @@ const WithdrawLiquidity: NextPage = () => {
     lpTokensPooledAmount: 'flex items-center',
     lpTokensPooledPair: 'flex space-x-2',
     lpTokensPooledIcons: 'relative w-[2rem] h-[1.5rem] self-center',
-    tokenAIcon: 'mt-0.5',
-    tokenBIcon: 'absolute top-0.5 right-0 -z-10',
+    lpTokenAIcon: 'mt-0.5',
+    lpTokenBIcon: 'absolute top-0.5 right-0 -z-10',
     lpTokensPooledSymbol: 'text-lg',
-    earnedTokensContainer: 'bg-neutrals-700 drop-shadow-md mt-5 p-4 rounded-lg',
+    lpTokensEarnedTokensContainer: 'bg-neutrals-700 drop-shadow-md mt-5 p-4 rounded-lg',
     lpTokensPNLContainer: 'mt-5 flex',
     lpTokensProfitsLossesContainer: '',
     profitsLosses: 'text-secondary-jungleGreen',
     lpTokensPNLGraph: 'w-64 h-32 bg-neutrals-800 rounded-md drop-shadow-md flex justify-center items-center text-neutrals-200/20 ml-auto',
-    pooledTokensContainer: 'drop-shadow-md p-4 bg-neutrals-700 rounded-lg text-neutrals-100 mt-5',
-    totalPriceContainer: 'flex flex-col items-end text-gray-500 text-sm mt-2',
-    unitTokenConversion: 'font-semibold',
+    lpTokensPooledTokensContainer: 'drop-shadow-md p-4 bg-neutrals-700 rounded-lg text-neutrals-100 mt-5',
+    reserveTokensPooledTokensContainer: 'drop-shadow-md p-4 bg-neutrals-700 rounded-lg text-neutrals-100 mt-5',
+    reserveTokensPooledContainer: 'flex',
+    reserveTokensPooledAmount: 'flex items-center',
+    reserveTokensPooledPair: 'flex space-x-2 ml-auto',
+    reserveTokensPooledSymbol: 'text-neutrals-100',
+    reserveTokensEarnedTokensContainer: 'bg-neutrals-700 drop-shadow-md p-4 rounded-lg text-neutrals-100 mt-5',
+    reserveTokensPNLContainer: 'mt-5 flex',
+    reserveTokensProfitsLossesContainer: '',
+    reserveTokensPNLGraph: 'w-64 h-32 bg-neutrals-800 rounded-md drop-shadow-md flex justify-center items-center text-neutrals-200/20 ml-auto',
+    reserveTokenAIcon: 'flex items-center',
+    reserveTokenBIcon: 'flex items-center',
   }
 
   return (
     <div className={style.wrapper}>
-      <div className={style.container}>
-        <Tab.Group>
+      <div className={`${style.container} ${selectedIndex ? 'h-[49rem]' : 'h-[46rem]'}`}>
+        <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
           <div className={style.headerContainer}>
             <ArrowLeftIcon className={style.backButton}/>
             <div className={style.formHeader}>Withdraw Liquidity</div>
@@ -130,16 +142,16 @@ const WithdrawLiquidity: NextPage = () => {
           <Tab.Panels>
             {/* LP tokens tab */}
             <Tab.Panel>
-              <div className={style.pooledTokensContainer}>
+              <div className={style.lpTokensPooledTokensContainer}>
                 <div className={style.sectionHeader}>Pooled</div>
                 <div className={style.lpTokensPooledContainer}>
                   <h1 className={style.lpTokensPooledAmount}>322.3422</h1>
                   <div className={style.lpTokensPooledPair}>
                     <div className={style.lpTokensPooledIcons}>
-                      <div className={style.tokenAIcon}>
+                      <div className={style.lpTokenAIcon}>
                         <Image src={"/crypto/uni.svg"} width={20} height={20} />
                       </div>
-                      <div className={style.tokenBIcon}>
+                      <div className={style.lpTokenBIcon}>
                         <Image src={"/crypto/eth.svg"} width={20} height={20} />
                       </div>
                     </div>
@@ -147,16 +159,16 @@ const WithdrawLiquidity: NextPage = () => {
                   </div>
                 </div>
               </div>
-              <div className={style.earnedTokensContainer}>
+              <div className={style.lpTokensEarnedTokensContainer}>
                 <div className={style.sectionHeader}>Fees Earned</div>
                 <div className={style.lpTokensPooledContainer}>
                   <h1 className={style.lpTokensPooledAmount}>28.3422</h1>
                   <div className={style.lpTokensPooledPair}>
                     <div className={style.lpTokensPooledIcons}>
-                      <div className={style.tokenAIcon}>
+                      <div className={style.lpTokenAIcon}>
                         <Image src={"/crypto/uni.svg"} width={20} height={20} />
                       </div>
-                      <div className={style.tokenBIcon}>
+                      <div className={style.lpTokenBIcon}>
                         <Image src={"/crypto/eth.svg"} width={20} height={20} />
                       </div>
                     </div>
@@ -172,12 +184,67 @@ const WithdrawLiquidity: NextPage = () => {
                 </div>
               </div>
             </Tab.Panel>
+            {/* Reserve Tokens Tab */}
             <Tab.Panel>
-              <div>Reserve Token</div>
+              <div className={style.reserveTokensPooledTokensContainer}>
+                <div className={style.sectionHeader}>Pooled</div>
+                
+                <div className={style.reserveTokensPooledContainer}>
+                  <h1 className={style.reserveTokensPooledAmount}>168.8921</h1>
+                  <div className={style.reserveTokensPooledPair}>
+                    <div className={style.reserveTokenAIcon}>
+                      <Image src={"/crypto/uni.svg"} width={20} height={20} />
+                    </div>
+                    <div className={style.lpTokensPooledSymbol}>UNI</div>
+                  </div>
+                </div>
+                
+                <div className={style.reserveTokensPooledContainer}>
+                  <h1 className={style.reserveTokensPooledAmount}>72.2959</h1>
+                  <div className={style.reserveTokensPooledPair}>
+                    <div className={style.reserveTokenBIcon}>
+                      <Image src={"/crypto/eth.svg"} width={20} height={20} />
+                    </div>
+                    <div className={style.lpTokensPooledSymbol}>ETH</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={style.reserveTokensEarnedTokensContainer}>
+                <div className={style.sectionHeader}>Fees Earned</div>
+                
+                <div className={style.reserveTokensPooledContainer}>
+                  <h1 className={style.reserveTokensPooledAmount}>168.8921</h1>
+                  <div className={style.reserveTokensPooledPair}>
+                    <div className={style.reserveTokenAIcon}>
+                      <Image src={"/crypto/uni.svg"} width={20} height={20} />
+                    </div>
+                    <div className={style.reserveTokensPooledSymbol}>UNI</div>
+                  </div>
+                </div>
+                
+                <div className={style.reserveTokensPooledContainer}>
+                  <h1 className={style.reserveTokensPooledAmount}>72.2959</h1>
+                  <div className={style.reserveTokensPooledPair}>
+                    <div className={style.reserveTokenBIcon}>
+                      <Image src={"/crypto/eth.svg"} width={20} height={20} />
+                    </div>
+                    <div className={style.reserveTokensPooledSymbol}>ETH</div>
+                  </div>
+                </div>
+                
+                <div className={style.reserveTokensPNLContainer}>
+                  <div className={style.reserveTokensProfitsLossesContainer}>
+                    <h1 className={style.sectionHeader}>Profits & Losses</h1>
+                    <div className={style.profitsLosses}>+38.2983 (6.79%)</div>
+                  </div>
+                  <div className={style.reserveTokensPNLGraph}>Coming Soon</div>
+                </div>
+              </div>
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
-        <div className={style.buttonDiv}>
+        <div className={`${style.buttonDiv} ${selectedIndex ? 'mt-6' : 'mt-6'}`}>
           <div
             className={style.confirmButton}
             onClick={() => {
