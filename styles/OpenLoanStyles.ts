@@ -32,4 +32,6 @@ export const OpenLoanStyles = {
   confirmButtonContainer: 'pb-4 w-full',
   interestRateText: 'w-full text-right text-gray-200 pr-4',
   spacer: 'p-5',
+  balanceContainer: 'flex',
+  tokenBalance: 'font-semibold text-sm text-neutrals-600 tracking-wide text-right mt-2.5'
 }

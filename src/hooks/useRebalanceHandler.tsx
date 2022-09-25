@@ -5,6 +5,7 @@ import PositionManager from '../../abis/v1-periphery/PositionManager.sol/Positio
 import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
 import { Contract, ethers } from 'ethers'
 import { notifySuccess, notifyError } from '../hooks/useNotification'
+import { getTokenBalance } from '../utils/getSmartContract'
 
 export const useRebalanceHandler = () => {
   const { accountInfo, connectWallet, provider } = useContext(WalletContext)
@@ -32,10 +33,28 @@ export const useRebalanceHandler = () => {
   const [posManager, setPosManager] = useState<Contract | null>(null)
   const [gammaPool, setGammaPool] = useState<Contract | null>(null)
   const [loanLiquidity, setLoanLiquidity] = useState<string>('')
+  const [tokenABalance, setTokenABalance] = useState<string>('0')
+  const [tokenBBalance, setTokenBBalance] = useState<string>('0')
 
   const openSlippage = () => {
     setIsSlippageOpen((prevState) => !prevState)
   }
+
+  const getTokenBalanceAsync = async (setTokenBalance: Dispatch<SetStateAction<string>>, token: Token) => {
+    if (provider && token.address) {
+      let accountAddress = accountInfo?.address || ''
+      let balance = await getTokenBalance(accountAddress, token.address, token.symbol, provider)
+      setTokenBalance(balance || '0')
+    }
+  }
+
+  useEffect(() => {
+    getTokenBalanceAsync(setTokenABalance, tokenASelected)
+  }, [provider, tokenASelected])
+
+  useEffect(() => {
+    getTokenBalanceAsync(setTokenBBalance, tokenBSelected)
+  }, [provider, tokenBSelected])
 
   const handleSlippageMinutes = (e: ChangeEvent<HTMLInputElement> | string) => {
     let minuteInput: string
@@ -268,5 +287,7 @@ export const useRebalanceHandler = () => {
     changeSlippagePercent,
     swapTokenInputs,
     rebalance,
+    tokenABalance,
+    tokenBBalance,
   }
 }
