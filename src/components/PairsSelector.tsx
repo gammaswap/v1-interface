@@ -74,6 +74,7 @@ const PairsSelector = ({token0, token1, setToken0, setToken1}: PairsSelectorProp
             isOpen={isOpen}
             setIsOpen={setIsOpen}
             setTokenSelected={ tokenNumber === 0 ? setToken0 : setToken1 }
+            secondToken={tokenNumber === 0 ? token1 : token0}
         />
       </>
     )

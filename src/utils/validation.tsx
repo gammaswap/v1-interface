@@ -1,73 +1,84 @@
-import { BigNumber, constants, Contract, ethers, Signer } from "ethers"
-import { ChangeEvent, Dispatch, SetStateAction } from "react"
-import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from "../hooks/useNotification"
-import ERC20 from "@uniswap/v2-core/build/ERC20.json"
+import { BigNumber, constants, Contract, ethers, Signer } from 'ethers'
+import { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from '../hooks/useNotification'
+import ERC20 from '@uniswap/v2-core/build/ERC20.json'
 
 function validateNumberStr(numberInputStr: string) {
   let strToSet = ''
   let i = numberInputStr.indexOf('.')
 
-  if (i < 0) { // no decimal
+  if (i < 0) {
+    // no decimal
     strToSet = numberInputStr.replace(/[^0-9]/g, '')
-  } else if (i == 0) { // decimal first
-    strToSet = "0." + numberInputStr.substring(1).replace(/[^0-9]/g, '')
-  } else if (i > 0 && i + 1 < numberInputStr.length) { // decimal middle
+  } else if (i == 0) {
+    // decimal first
+    strToSet = '0.' + numberInputStr.substring(1).replace(/[^0-9]/g, '')
+  } else if (i > 0 && i + 1 < numberInputStr.length) {
+    // decimal middle
     strToSet =
       numberInputStr.substring(0, i + 1).replace(/[^0-9\.]/g, '') +
       numberInputStr.substring(i + 1).replace(/[^0-9]/g, '')
-  } else { // decimal last
+  } else {
+    // decimal last
     strToSet = numberInputStr.replace(/[^0-9\.]/g, '')
   }
   return strToSet
 }
 
-export function handleNumberInput(
-  event: ChangeEvent<HTMLInputElement>,
-  setInputStr: Dispatch<SetStateAction<string>>,
-) {
+export function handleNumberInput(event: ChangeEvent<HTMLInputElement>, setInputStr: Dispatch<SetStateAction<string>>) {
   setInputStr(validateNumberStr(event.target.value))
 }
 
-export async function ensureAllowance(
-  account: string | null,
-  erc20Address: string,
+export const validateAllowance = async (
+  accountAddress: string,
+  erc20: Contract,
   amountBN: BigNumber,
-  posMgrAddress: string,
-  signer: Signer | undefined
-) {
+  spenderContract: string
+) => {
+  let loading = notifyLoading('Checking allowance')
   try {
-    let erc20 = new ethers.Contract(erc20Address, ERC20.abi, signer)
-
-    // check enough balance
-    let balanceBN = await erc20.balanceOf(account)
+    let amountStr = ethers.utils.formatUnits(amountBN, 18)
+    let balanceBN = await erc20.balanceOf(accountAddress)
     if (balanceBN < amountBN) {
-      notifyError(
-        'Not enough ' + erc20.symbol + '. Requested: ' + amountBN + 
-        ' Balance ' + balanceBN
-      )
+      notifyDismiss(loading)
+      notifyError('Not enough funds. Requested: ' + amountStr + ' Balance ' + ethers.utils.formatUnits(balanceBN, 18))
+      return
     }
-    // check enough allowance
-    let allowance = await erc20.allowance(account, posMgrAddress)
+
+    let allowance = await erc20.allowance(accountAddress, spenderContract)
+    notifyDismiss(loading)
     if (allowance < amountBN) {
-      return approve(erc20, posMgrAddress)
+      return await doApprove(erc20, spenderContract)
+    } else {
+      return true
     }
-  } catch (e) {
-    if (typeof e === 'string') {
-      notifyError('checkAllowance: ' + e)
-    } else if (e instanceof Error) {
-      notifyError('checkAllowance: ' + e.message)
-    }
+  } catch (err) {
+    console.log(err)
+    notifyDismiss(loading)
+    notifyError('An error occurred while processing allowance')
+    return
   }
 }
 
-async function approve(fromTokenContract: Contract, spender: string) {
-  let tx = await fromTokenContract.approve(spender, constants.MaxUint256)
-  let loading = notifyLoading('Waiting for approval')
-  let receipt = await tx.wait()
-  notifyDismiss(loading)
-  if (receipt.status == 1) {
-    notifySuccess('Approval completed')
-    return
+export const doApprove = async (erc20: Contract, spender: string) => {
+  let loadingApproval = notifyLoading('Waiting for approval')
+  try {
+    let tx = await erc20.approve(spender, constants.MaxUint256)
+    let receipt = await tx.wait()
+    notifyDismiss(loadingApproval)
+    if (receipt.status == 1) {
+      notifySuccess('Approval completed')
+      return true
+    }
+    notifyError('Approval failed')
+    return false
+  } catch (err: any) {
+    notifyDismiss(loadingApproval)
+    if (err?.code === 'ACTION_REJECTED') {
+      notifyError('User rejected the transaction')
+    } else {
+      notifyError('An error occurred while processing the approval request. Please try again')
+    }
+    return false
   }
-  notifySuccess('Approval failed')
 }
