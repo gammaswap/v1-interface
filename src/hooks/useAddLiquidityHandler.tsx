@@ -8,7 +8,7 @@ import { BasicContractContext } from '../../src/context/BasicContractContext'
 
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
-import { doApprove, validateAllowance } from '../utils/validation'
+import { doApprove, handleNumberInput, validateAllowance } from '../utils/validation'
 import IERC20 from '../../abis/v1-periphery/interfaces/external/IERC20.sol/IERC20.json'
 
 export const useAddLiquidityHandler = () => {
@@ -123,7 +123,7 @@ export const useAddLiquidityHandler = () => {
             return
           }
 
-          validateTokenInput(tokenInput, setTokenInputVal)
+          handleNumberInput(e, setTokenInputVal)
 
           // const tokenAAddr = tokenContracts?.tokenAContract?.address as string
           // const tokenBAddr = tokenContracts?.tokenBContract?.address as string
@@ -138,7 +138,7 @@ export const useAddLiquidityHandler = () => {
       }
       return null
     },
-    [validateTokenInput]
+    [handleNumberInput]
   )
 
   // TODO: We need an environment that has uni contracts deployed

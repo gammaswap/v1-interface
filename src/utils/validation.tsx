@@ -1,7 +1,6 @@
 import { BigNumber, constants, Contract, ethers, Signer } from 'ethers'
 import { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from '../hooks/useNotification'
-import ERC20 from '@uniswap/v2-core/build/ERC20.json'
 
 function validateNumberStr(numberInputStr: string) {
   let strToSet = ''
@@ -25,8 +24,11 @@ function validateNumberStr(numberInputStr: string) {
   return strToSet
 }
 
-export function handleNumberInput(event: ChangeEvent<HTMLInputElement>, setInputStr: Dispatch<SetStateAction<string>>) {
-  setInputStr(validateNumberStr(event.target.value))
+export function handleNumberInput(
+  event: ChangeEvent<HTMLInputElement> | string,
+  setInputStr: Dispatch<SetStateAction<string>>
+) {
+  setInputStr(validateNumberStr(typeof event !== 'string' ? event.target.value : event))
 }
 
 export const validateAllowance = async (
