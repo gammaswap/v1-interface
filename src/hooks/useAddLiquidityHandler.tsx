@@ -239,7 +239,7 @@ export const useAddLiquidityHandler = () => {
   const addLpLiquidity = async () => {
     if (posManager && accountInfo?.address && provider) {
       let tokenContract = new ethers.Contract(
-        tokenASelected.address,
+        process.env.NEXT_PUBLIC_CFMM_ADDRESS || '',
         IERC20.abi,
         accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
       )
@@ -254,7 +254,7 @@ export const useAddLiquidityHandler = () => {
       try {
         if (approval) {
           const DepositNoPullParams = {
-            cfmm: tokenASelected.address,
+            cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
             protocol: 1,
             lpTokens: parseFloat(tokenAInputVal),
             to: accountInfo.address,
