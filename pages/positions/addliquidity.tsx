@@ -78,6 +78,8 @@ const AddLiquidity: NextPage = () => {
     setTokenBSelected,
     addLiquidity,
     addLpLiquidity,
+    tokenABalance,
+    tokenBBalance
   } = useAddLiquidityHandler()
 
   return (
@@ -127,7 +129,7 @@ const AddLiquidity: NextPage = () => {
                       <div className={style.reserveToken.tokenSelectorTicker}>{tokenASelected.symbol}</div>
                       <ChevronDownIcon className={style.reserveToken.dropdownArrow} />
                     </div>
-                    <div className={style.lpToken.tokenBalance}>Balance: {0}</div>
+                    <div className={style.lpToken.tokenBalance}>Balance: {tokenABalance}</div>
                   </div>
                 </div>
                 <div>
@@ -169,7 +171,7 @@ const AddLiquidity: NextPage = () => {
                       <div className={style.reserveToken.tokenSelectorTicker}>{tokenASelected.symbol}</div>
                       <ChevronDownIcon className={style.reserveToken.dropdownArrow} />
                     </div>
-                    <div className={style.reserveToken.tokenBalance}>Balance: {0}</div>
+                    <div className={style.reserveToken.tokenBalance}>Balance: {tokenABalance}</div>
                   </div>
                 </div>
                 {/* slot for token B */}
@@ -207,7 +209,7 @@ const AddLiquidity: NextPage = () => {
                         <div className={style.reserveToken.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
                         <ChevronDownIcon className={style.reserveToken.dropdownArrow} />
                       </div>
-                      <div className={style.reserveToken.tokenBalance}>Balance: {0}</div>
+                      <div className={style.reserveToken.tokenBalance}>Balance: {tokenBBalance}</div>
                     </div>
                   )}
                 </div>

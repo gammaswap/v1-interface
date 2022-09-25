@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
 import SelectCollateralModal from '../../src/components/OpenLoan/SelectCollateralModal'
-import { FaInfoCircle } from 'react-icons/fa'
-import { ChevronDownIcon } from '@heroicons/react/solid'
+import { ChevronDownIcon, InformationCircleIcon } from '@heroicons/react/solid'
 import PairsSelector from '../../src/components/PairsSelector'
 import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
 import { Tooltip } from '../../src/components/Tooltip'
@@ -10,19 +9,22 @@ import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 const style = OpenLoanStyles
 
 const tips = {
-  maxltv: 'The Maximum LTV ratio represents the maximum borrowing power of a ' +
+  maxltv:
+    'The Maximum LTV ratio represents the maximum borrowing power of a ' +
     'specific collateral. For example, if a collateral has an LTV of 75%, the ' +
     'user can borrow up to 0.75 worth of ETH in the principal currency for ' +
     'every 1 ETH worth of collateral.',
-  threshold: 'This represents the threshold at which a borrow position will ' +
+  threshold:
+    'This represents the threshold at which a borrow position will ' +
     'be considered undercollateralized and subject to liquidation for each ' +
     'collateral. For example, if a collateral has a liquidation threshold of ' +
     '80%, it means that the position will be liquidated when the debt value is ' +
     'worth 80% of the collateral value.',
-  penalty: 'When a liquidation occurs, liquidations repay up to 50% of the ' +
+  penalty:
+    'When a liquidation occurs, liquidations repay up to 50% of the ' +
     'outstanding borrowed amount on behalf of the borrower. In return, they ' +
     'can buy the collateral at a discount and keep the difference (liquidation ' +
-    'penalty) as a bonus.'
+    'penalty) as a bonus.',
 }
 
 const OpenLoanPage: NextPage = () => {
@@ -53,6 +55,8 @@ const OpenLoanPage: NextPage = () => {
     buttonText,
     tooltipText,
     setTooltipText,
+    token0Balance,
+    token1Balance,
   } = useOpenLoanHandler()
 
   return (
@@ -63,24 +67,28 @@ const OpenLoanPage: NextPage = () => {
           <div className={style.vStackItem}>
             <PairsSelector token0={token0} token1={token1} setToken0={setToken0} setToken1={setToken1} />
           </div>
+          <div className={style.balanceContainer} style={{ justifyContent: 'space-around' }}>
+            <p className={style.tokenBalance}>Balance: {token0Balance}</p>
+            <p className={style.tokenBalance}>Balance: {token1Balance}</p>
+          </div>
           <div className={style.vStackItem}>
             <Tooltip message={tooltipText}>
               <div className={style.infoGroup}>
                 <div className={style.loanInfoButton} onMouseOver={() => setTooltipText(tips.maxltv)}>
                   <div className={style.infoIcon}>
-                    <FaInfoCircle />
+                    <InformationCircleIcon />
                   </div>
                   MaxLTV --%
                 </div>
                 <div className={style.loanInfoButton} onMouseOver={() => setTooltipText(tips.threshold)}>
                   <div className={style.infoIcon}>
-                    <FaInfoCircle />
+                    <InformationCircleIcon />
                   </div>
                   Liquidation Threshold --%
                 </div>
                 <div className={style.loanInfoButton} onMouseOver={() => setTooltipText(tips.penalty)}>
                   <div className={style.infoIcon}>
-                    <FaInfoCircle />
+                    <InformationCircleIcon />
                   </div>
                   Liquidation Penalty --%
                 </div>
@@ -110,7 +118,13 @@ const OpenLoanPage: NextPage = () => {
                 {collateralButtonText}
                 <ChevronDownIcon className={style.dropdownArrow} />
               </div>
-              <SelectCollateralModal token0={token0} token1={token1} isOpen={isOpen} setIsOpen={setIsOpen} setCollateralType={setCollateralType} />
+              <SelectCollateralModal
+                token0={token0}
+                token1={token1}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                setCollateralType={setCollateralType}
+              />
             </div>
           </div>
           <div className={style.vStackItem}>

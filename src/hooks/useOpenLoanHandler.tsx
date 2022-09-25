@@ -8,12 +8,13 @@ import IERC20 from '../../abis/v0-hackathon/ERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import { CollateralType } from '../components/OpenLoan/CollateralType'
 import toast from 'react-hot-toast'
-import { FcInfo } from 'react-icons/fc'
+import { InformationCircleIcon } from '@heroicons/react/solid'
 import { FieldValues, useForm } from 'react-hook-form'
 import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 // For V1 Periphery
 import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
+import { getTokenBalance } from '../utils/getSmartContract'
 
 const style = OpenLoanStyles
 
@@ -43,10 +44,12 @@ export const useOpenLoanHandler = () => {
   const [buttonText, setButtonText] = useState<string>('Confirm')
   const [collateral1Class, setCollateral1Class] = useState<string>('')
   const [tooltipText, setTooltipText] = useState<string>('')
+  const [token0Balance, setToken0Balance] = useState<string>('0')
+  const [token1Balance, setToken1Balance] = useState<string>('0')
 
   useEffect(() => {
     if (!provider) {
-      toast('Please connect wallet.', { icon: <FcInfo /> })
+      toast('Please connect wallet.', { icon: <InformationCircleIcon /> })
       return
     }
 
@@ -72,6 +75,22 @@ export const useOpenLoanHandler = () => {
       }
     }
   }, [provider])
+
+  const getTokenBalanceAsync = async (setTokenBalance: Dispatch<SetStateAction<string>>, token: Token) => {
+    if (provider && token.address) {
+      let accountAddress = accountInfo?.address || ''
+      let balance = await getTokenBalance(accountAddress, token.address, token.symbol, provider)
+      setTokenBalance(balance || '0')
+    }
+  }
+
+  useEffect(() => {
+    getTokenBalanceAsync(setToken0Balance, token0)
+  }, [provider, token0])
+
+  useEffect(() => {
+    getTokenBalanceAsync(setToken1Balance, token1)
+  }, [provider, token1])
 
   async function openLoanHandler(data: FieldValues) {
     if (!accountInfo || !accountInfo.address) {
@@ -254,7 +273,7 @@ export const useOpenLoanHandler = () => {
 
   function getPosMgr() {
     if (token0 == token1) {
-      toast('Token values must be different', { icon: <FcInfo /> })
+      toast('Token values must be different', { icon: <InformationCircleIcon /> })
       return
     }
     let pairsAddress =
@@ -281,7 +300,7 @@ export const useOpenLoanHandler = () => {
         }
       }
     } else {
-      toast('Please connect wallet', { icon: <FcInfo /> })
+      toast('Please connect wallet', { icon: <InformationCircleIcon /> })
     }
   }
 
@@ -451,5 +470,7 @@ export const useOpenLoanHandler = () => {
     buttonText,
     tooltipText,
     setTooltipText,
+    token0Balance,
+    token1Balance,
   }
 }

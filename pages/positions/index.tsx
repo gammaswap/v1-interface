@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePositionsHandler } from '../../src/hooks/usePositionsHandler'
-import { AiOutlineDown } from 'react-icons/ai'
+import { ChevronDownIcon } from "@heroicons/react/outline"
 
 const style = {
   createPositionButtonContainer: 'mx-auto flex flex-col justify-center items-center w-1/8 mt-10',
@@ -21,7 +21,7 @@ const style = {
   viewButtonDiv: 'w-full flex justify-end',
   viewButton: 'text-white bg-primaryV1-7 rounded-md px-8 py-2',
   topBarBtns: 'flex justify-between w-full px-2',
-  arrow: 'text-sm',
+  arrow: 'text-sm w-4 h-4',
   selectBox:
     'flex justify-between items-center border-y border-x border-slate-200 hover:border-slate-300 w-full py-1 px-2 rounded-lg cursor-pointer',
   selectOptions: 'absolute top-10 bg-white shadow-2xl rounded-lg border-y border-x border-slate-200 z-50',
@@ -43,7 +43,7 @@ const PositionsMenu: NextPage = () => {
         <div className={style.selectPositionTypeDiv}>
           <div className={style.selectBox} onClick={openOrCloseSelectBox}>
             <p>{selectedOption || 'All'}</p>
-            <AiOutlineDown className={style.arrow} />
+            <ChevronDownIcon className={style.arrow} />
           </div>
           {isSelectOpen ? (
             <div className={style.selectOptions}>
