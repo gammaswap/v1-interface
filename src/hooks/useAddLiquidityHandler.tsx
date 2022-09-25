@@ -110,20 +110,18 @@ export const useAddLiquidityHandler = () => {
     fetchContract()
   }, [provider])
 
-  const getTokenBalanceAsync = async (setTokenBalance: Dispatch<SetStateAction<string>>, token: Token) => {
-    if (provider && token.address) {
-      let accountAddress = accountInfo?.address || ''
-      let balance = await getTokenBalance(accountAddress, token.address, token.symbol, provider)
-      setTokenBalance(balance || '0')
-    }
-  }
-
   useEffect(() => {
-    getTokenBalanceAsync(setTokenABalance, tokenASelected)
+    let accountAddress = accountInfo?.address || ''
+    if (provider && tokenASelected.address) {
+      getTokenBalance(accountAddress, tokenASelected.address, tokenASelected.symbol, provider, setTokenABalance)
+    }
   }, [provider, tokenASelected])
 
   useEffect(() => {
-    getTokenBalanceAsync(setTokenBBalance, tokenBSelected)
+    let accountAddress = accountInfo?.address || ''
+    if (provider && tokenBSelected.address) {
+      getTokenBalance(accountAddress, tokenBSelected.address, tokenBSelected.symbol, provider, setTokenBBalance)
+    }
   }, [provider, tokenBSelected])
 
   // if called on change of token A or B input vals, validate and update estimated output value
@@ -282,6 +280,13 @@ export const useAddLiquidityHandler = () => {
     }
   }
 
+  const maxTokenA = () => {
+    setTokenAInputVal(tokenABalance)
+  }
+  const maxTokenB = () => {
+    setTokenBInputVal(tokenBBalance)
+  }
+
   return {
     handleTokenInput,
     setTokenAInputVal,
@@ -301,5 +306,7 @@ export const useAddLiquidityHandler = () => {
     addLpLiquidity,
     tokenABalance,
     tokenBBalance,
+    maxTokenA,
+    maxTokenB,
   }
 }

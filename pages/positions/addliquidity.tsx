@@ -79,7 +79,9 @@ const AddLiquidity: NextPage = () => {
     addLiquidity,
     addLpLiquidity,
     tokenABalance,
-    tokenBBalance
+    tokenBBalance,
+    maxTokenA,
+    maxTokenB,
   } = useAddLiquidityHandler()
 
   return (
@@ -116,7 +118,9 @@ const AddLiquidity: NextPage = () => {
                       placeholder="0.0"
                       className={style.lpToken.tokenInput}
                     />
-                    <div className={style.lpToken.maxButton}>MAX</div>
+                    <div className={style.lpToken.maxButton} onClick={maxTokenA}>
+                      MAX
+                    </div>
                   </div>
                   <div className={style.lpToken.tokenSelectorContainer}>
                     <div
@@ -158,7 +162,9 @@ const AddLiquidity: NextPage = () => {
                       placeholder="0.0"
                       className={style.reserveToken.tokenInput}
                     />
-                    <div className={style.reserveToken.maxButton}>MAX</div>
+                    <div className={style.reserveToken.maxButton} onClick={maxTokenA}>
+                      MAX
+                    </div>
                   </div>
                   <div className={style.reserveToken.tokenSelectorContainer}>
                     <div
@@ -184,7 +190,9 @@ const AddLiquidity: NextPage = () => {
                       placeholder="0.0"
                       className={style.reserveToken.tokenInput}
                     />
-                    <div className={style.reserveToken.maxButton}>MAX</div>
+                    <div className={style.reserveToken.maxButton} onClick={maxTokenB}>
+                      MAX
+                    </div>
                   </div>
                   {/**
                    * renders "select token" button by default

@@ -1,9 +1,10 @@
-import { useContext } from 'react'
+import { Dispatch, SetStateAction, useContext } from 'react'
 import { BigNumber, Contract, ethers } from 'ethers'
 import { Provider } from '@ethersproject/providers'
 import { AccountInfo } from '../context/WalletContext'
 import { notifyError } from '../hooks/useNotification'
 import IERC20 from '../../abis/v1-periphery/interfaces/external/IERC20.sol/IERC20.json'
+import { Token } from '../components/Tokens'
 
 const erc20ABI = require('erc-20-abi')
 const { abi: IUniswapV2FactoryABI } = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
@@ -112,13 +113,15 @@ export const getTokenBalance = async (
   accountAddress: string,
   tokenAddress: string,
   tokenSymbol: string,
-  provider: Provider
+  provider: Provider,
+  setTokenBalance: Dispatch<SetStateAction<string>>
 ) => {
   try {
     let token = new ethers.Contract(tokenAddress, IERC20.abi, provider)
     let balance = await token.balanceOf(accountAddress)
-    return ethers.utils.formatEther(balance)
+    setTokenBalance(ethers.utils.formatEther(balance))
   } catch (err) {
+    setTokenBalance('0')
     notifyError(`An error occurred while fetching ${tokenSymbol} balance`)
   }
 }
