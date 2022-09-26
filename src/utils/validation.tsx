@@ -39,11 +39,10 @@ export const validateAllowance = async (
 ) => {
   let loading = notifyLoading('Checking allowance')
   try {
-    let amountStr = ethers.utils.formatUnits(amountBN, 18)
     let balanceBN = await erc20.balanceOf(accountAddress)
-    if (balanceBN < amountBN) {
+    if (parseFloat(ethers.utils.formatEther(balanceBN)) < parseFloat(amountBN.toString())) {
       notifyDismiss(loading)
-      notifyError('Not enough funds. Requested: ' + amountStr + ' Balance ' + ethers.utils.formatUnits(balanceBN, 18))
+      notifyError('Not enough funds. Requested: ' + amountBN + ' Balance ' + ethers.utils.formatUnits(balanceBN, 18))
       return
     }
 

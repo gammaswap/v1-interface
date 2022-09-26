@@ -24,10 +24,10 @@ type ModalProps = {
   isOpen: boolean
   setIsOpen: Dispatch<SetStateAction<boolean>>
   setTokenSelected: Dispatch<SetStateAction<Token>>
-  secondToken: Token
+  otherToken: Token
 }
 
-const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected, secondToken }: ModalProps): ReactElement => {
+const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected, otherToken }: ModalProps): ReactElement => {
   // headlessUI requires at LEAST one focusable element
   const closeIconRef = useRef(null)
 
@@ -35,7 +35,7 @@ const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected, secondToken }
    * bubbles up selected token state to parent component
    */
   const handleSelectedToken = (tokenSelected: Token) => {
-    if (secondToken.address !== tokenSelected.address) {
+    if (otherToken.address !== tokenSelected.address) {
       setTokenSelected(tokenSelected)
       setIsOpen(false)
     } else {
