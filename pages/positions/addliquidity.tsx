@@ -244,6 +244,8 @@ const AddLiquidity: NextPage = () => {
         setIsOpen={setIsOpen}
         setTokenSelected={tokenSelected === 'tokenA' ? setTokenASelected : setTokenBSelected}
         otherToken={tokenSelected === 'tokenA' ? tokenBSelected : tokenASelected}
+        prevTokenA={tokenASelected}
+        prevTokenB={tokenBSelected}
       />
     </>
   )

@@ -25,9 +25,18 @@ type ModalProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>
   setTokenSelected: Dispatch<SetStateAction<Token>>
   otherToken: Token
+  prevTokenA: Token
+  prevTokenB: Token
 }
 
-const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected, otherToken }: ModalProps): ReactElement => {
+const TokenSelectorModal = ({
+  isOpen,
+  setIsOpen,
+  setTokenSelected,
+  otherToken,
+  prevTokenA,
+  prevTokenB,
+}: ModalProps): ReactElement => {
   // headlessUI requires at LEAST one focusable element
   const closeIconRef = useRef(null)
 
@@ -63,7 +72,9 @@ const TokenSelectorModal = ({ isOpen, setIsOpen, setTokenSelected, otherToken }:
               </div>
               <hr className={style.headingBreak}></hr>
               <div className={style.tokensContainer}>
-                {Tokens.map((token, index) => {
+                {Tokens.filter(
+                  (token) => token.address !== prevTokenA.address && token.address !== prevTokenB.address
+                ).map((token, index) => {
                   return (
                     <div key={index} className={style.tokenContainer} onClick={() => handleSelectedToken(token)}>
                       <img src={token.imgPath} className={style.tokenImg} />
