@@ -40,20 +40,18 @@ export const useRebalanceHandler = () => {
     setIsSlippageOpen((prevState) => !prevState)
   }
 
-  const getTokenBalanceAsync = async (setTokenBalance: Dispatch<SetStateAction<string>>, token: Token) => {
-    if (provider && token.address) {
-      let accountAddress = accountInfo?.address || ''
-      let balance = await getTokenBalance(accountAddress, token.address, token.symbol, provider)
-      setTokenBalance(balance || '0')
-    }
-  }
-
   useEffect(() => {
-    getTokenBalanceAsync(setTokenABalance, tokenASelected)
+    let accountAddress = accountInfo?.address || ''
+    if (provider && tokenASelected.address) {
+      getTokenBalance(accountAddress, tokenASelected.address, tokenASelected.symbol, provider, setTokenABalance)
+    }
   }, [provider, tokenASelected])
 
   useEffect(() => {
-    getTokenBalanceAsync(setTokenBBalance, tokenBSelected)
+    let accountAddress = accountInfo?.address || ''
+    if (provider && tokenBSelected.address) {
+      getTokenBalance(accountAddress, tokenBSelected.address, tokenBSelected.symbol, provider, setTokenBBalance)
+    }
   }, [provider, tokenBSelected])
 
   const handleSlippageMinutes = (e: ChangeEvent<HTMLInputElement> | string) => {

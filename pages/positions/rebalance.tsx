@@ -151,6 +151,7 @@ const Rebalance: NextPage = () => {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         setTokenSelected={tokenSelected === 'tokenA' ? setTokenASelected : setTokenBSelected}
+        otherToken={tokenSelected === 'tokenA' ? tokenBSelected : tokenASelected}
       />
     </>
   )
