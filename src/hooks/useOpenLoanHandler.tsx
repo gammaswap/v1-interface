@@ -10,12 +10,21 @@ import { CollateralType } from '../components/OpenLoan/CollateralType'
 import toast from 'react-hot-toast'
 import { InformationCircleIcon } from '@heroicons/react/solid'
 import { FieldValues, useForm } from 'react-hook-form'
-import { OpenLoanStyles } from '../../styles/OpenLoanStyles'
 // For V1 Periphery
 import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
 
-const style = OpenLoanStyles
+const style = {
+  invalidatedButton: ' w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
+  confirmButton: 'w-full bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
+  confirmGrey: 'bg-[#274060] w-full rounded-2xl text-gray-500 inline-flex place-content-center py-2 font-semibold',
+  confirmInsuffBal: 'bg-red-400 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold',
+  confirmGreen: 'bg-green-300 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold',
+  confirmButtonContainer: 'pb-4 w-full',
+  numberInputContainer: 'bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full',
+  numberInputHidden: 'p-4 border-2 invisible',
+  numberInput: 'bg-transparent placeholder:text-gray-600 outline-none w-full text-3xl text-gray-300',
+}
 
 export const useOpenLoanHandler = () => {
   const { provider, accountInfo } = useContext(WalletContext)
