@@ -1,10 +1,9 @@
 import type { NextPage } from 'next'
+import Image from 'next/image'
 import SelectCollateralModal from '../../src/components/OpenLoan/SelectCollateralModal'
-import { ChevronDownIcon, InformationCircleIcon } from '@heroicons/react/solid'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
+import { ChevronDownIcon, ArrowLeftIcon, InformationCircleIcon } from '@heroicons/react/outline'
 import PairsSelector from '../../src/components/PairsSelector'
 import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
-import { Tooltip } from '../../src/components/Tooltip'
 
 export const OpenLoanStyles = {
   wrapper: 'w-full h-full flex justify-center',
@@ -13,7 +12,10 @@ export const OpenLoanStyles = {
   backButton: 'w-7 h-7 mt-0.5 cursor-pointer hover:bg-neutrals-700 p-1 rounded-full',
   formHeader: 'font-semibold text-lg text-neutrals-100 ml-4',
   selectPairContainer: 'bg-neutrals-700 mt-3 p-4 drop-shadow-md rounded-lg',
-  infoIcon: '',
+  loanAmountContainer: 'bg-neutrals-700 rounded-lg drop-shadow-md mt-5 p-4',
+  loanAmountHeader: 'flex space-x-1 items-center',
+  sectionHeader: 'font-semibold text-neutrals-400',
+  infoIcon: 'text-neutrals-400 w-4 h-4 cursor-pointer hover:text-neutrals-100',
   vStack: 'items-center flex-col',
   vStackItem: 'mt-3',
   numberInputContainer: 'bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full',
@@ -32,7 +34,6 @@ export const OpenLoanStyles = {
   confirmButton: 'w-full bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
   infoGroup: 'inline-flex w-full place-content-center pt-1',
   loanInfoButton: 'bg-primaryV2-4 rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex mr-2 px-2 py-1 items-center hover:bg-primaryV2-3 hover:shadow-primaryV2-3/30 tooltip',
-  sectionHeader: 'font-semibold text-gray-200 w-full',
   collateralHeader: 'inline-flex w-full place-content-start',
   collateralHeaderText: 'font-semibold text-gray-200',
   selectCollateralButton: 'bg-[#274060] rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex px-2 py-1 items-center mx-4',
@@ -43,6 +44,20 @@ export const OpenLoanStyles = {
   confirmButtonContainer: 'pb-4 w-full',
   interestRateText: 'w-full text-right text-gray-200 pr-4',
   spacer: 'p-5',
+
+  tokenUserInputContainer: 'flex justify-around mt-2',
+  
+  tokenAmountContainer: '',
+  loanAmountInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-2xl text-neutrals-200',
+  maxButton: 'w-[2rem] text-center bg-neutrals-900 bg-opacity-60 drop-shadow-lg cursor-pointer hover:bg-opacity-70 text-xxs font-normal p-0.5 rounded-sm text-accents-royalBlue text-opacity-50 hover:text-opacity-80 mt-1',
+
+  tokenPairContainer: '',
+  tokenPairContent: 'flex space-x-3',
+  tokenPairIcons: 'relative w-[2rem] h-[2rem] self-center',
+  tokenAIcon: 'mt-0.5',
+  tokenBIcon: 'absolute top-0.5 -right-1 -z-10',
+  tokenPairSymbol: 'text-lg',
+  tokenPairBalance: 'font-semibold text-xxs text-neutrals-600 tracking-wide text-right mt-2'
 }
 
 const tips = {
@@ -61,7 +76,7 @@ const tips = {
     'penalty) as a bonus.'
 }
 
-const OpenLoanPage: NextPage = () => {
+const OpenLoan: NextPage = () => {
   const style = OpenLoanStyles
   const {
     token0,
@@ -102,8 +117,39 @@ const OpenLoanPage: NextPage = () => {
         <div className={style.selectPairContainer}>
           <PairsSelector token0={token0} token1={token1} setToken0={setToken0} setToken1={setToken1} />
         </div>
-        <div className={style.vStackItem}>
-          <div className={style.sectionHeader}>Your Loan Amount</div>
+        <div className={style.loanAmountContainer}>
+          <div className={style.loanAmountHeader}>
+            <h2 className={style.sectionHeader}>Loan Amount</h2>
+            <InformationCircleIcon className={style.infoIcon} />
+          </div>
+          <div className={style.tokenUserInputContainer}>
+            {/* input side w/ max */}              
+            <div className={style.tokenAmountContainer}>
+              <input
+                type="text"
+                // onChange={(e) => handleTokenInput(e, setTokenAInputVal, setTokenBInputVal)}
+                // value={tokenAInputVal}
+                placeholder="0.0"
+                className={style.loanAmountInput}
+              />
+              <div className={style.maxButton}>MAX</div>
+            </div>
+            {/* tokens side w/ balance */}
+            <div className={style.tokenPairContainer}>
+              <div className={style.tokenPairContent}>
+                <div className={style.tokenPairIcons}>
+                  <div className={style.tokenAIcon}>
+                    <Image src={"/crypto/eth.svg"} width={26} height={26} />
+                  </div>
+                  <div className={style.tokenBIcon}>
+                    <Image src={"/crypto/uni.svg"} width={26} height={26} />
+                  </div>
+                </div>
+                <div className={style.tokenPairSymbol}>ETH / UNI</div>
+              </div>
+              <div className={style.tokenPairBalance}>Balance: {0}</div>
+            </div>
+          </div>
         </div>
         <div className={style.vStackItem}>
           <div className={style.numberInputContainer}>
@@ -167,4 +213,4 @@ const OpenLoanPage: NextPage = () => {
   )
 }
 
-export default OpenLoanPage
+export default OpenLoan
