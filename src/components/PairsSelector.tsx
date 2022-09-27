@@ -6,14 +6,14 @@ import Image from 'next/image'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
 const style = {
-  header: "w-full font-semibold text-gray-200",
-  pairContainer: "inline-flex w-full mt-3",
-  tokenSelectorContainer: "px-6 text-gray-200 w-1/2",
-  nonSelectedTokenContent: "flex justify-center items-center bg-blue-500 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:shadow-blue-600/30",
-  tokenSelectorContent: "flex justify-between items-center bg-gray-700 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-gray-700/30 hover:bg-gray-900 hover:shadow-gray-900/30",
+  header: "font-semibold text-neutrals-400 w-full",
+  pairContainer: "flex justify-around items-center w-full mt-2",
+  tokenSelectorContainer: 'text-neutrals-100',
+  tokenSelectorContent: 'w-full flex items-center space-x-2 rounded-xl text-xl bg-neutrals-800 drop-shadow-md cursor-pointer p-2 hover:bg-neutrals-600',
+  nonSelectedTokenContent: 'w-full flex items-center bg-primary-blue rounded-xl text-xl font-medium cursor-pointer py-2 px-3 shadow-md shadow-blue-300/20 hover:bg-blue-400 hover:shadow-blue-400/20',
   tokenSelectorIcon: "flex items-center",
-  tokenSelectorTicker: "mx-2",
-  dropdownArrow: "w-12 h-8",
+  tokenSelectorTicker: "",
+  dropdownArrow: "w-8 h-8",
 }
 
 type PairsSelectorProps = {
@@ -38,7 +38,7 @@ const PairsSelector = ({token0, token1, setToken0, setToken1}: PairsSelectorProp
 
     return (
       <>
-        <div className={style.header}> Select a Token Pair</div>
+        <div className={style.header}>Select Token Pair</div>
         <div className={style.pairContainer}>
             <div className={style.tokenSelectorContainer}>
                 <div className={style.tokenSelectorContent} onClick={() => onOpenToken(0)} >
@@ -52,12 +52,7 @@ const PairsSelector = ({token0, token1, setToken0, setToken1}: PairsSelectorProp
             <div className={style.tokenSelectorContainer}>
             {isTokenEmpty(token1) 
                 ? (
-                  <div className={style.nonSelectedTokenContent} onClick={() => onOpenToken(1)} >
-                      <div className={style.tokenSelectorIcon}>
-                          <Image src={token0.imgPath} width={0} height={32}/>
-                      </div>
-                      Select Token
-                  </div>
+                  <div className={style.nonSelectedTokenContent} onClick={() => onOpenToken(1)} >Select Token</div>
                 ) : (
                   <div className={style.tokenSelectorContent} onClick={() => onOpenToken(1)} >
                       <div className={style.tokenSelectorIcon}>
