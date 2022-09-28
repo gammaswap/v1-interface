@@ -1,10 +1,11 @@
 import type { NextPage } from 'next'
-import Image from 'next/image'
+import { useState } from 'react'
 import SelectCollateralModal from '../../src/components/OpenLoan/SelectCollateralModal'
-import { ChevronDownIcon, ArrowLeftIcon, InformationCircleIcon } from '@heroicons/react/outline'
+import { ChevronDownIcon, ArrowLeftIcon, CheckIcon, InformationCircleIcon } from '@heroicons/react/outline'
 import PairsSelector from '../../src/components/PairsSelector'
 import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
-import { TokenUserInput } from '../../src/components/OpenLoan/tokenUserInput'
+import { TokenUserInput } from '../../src/components/OpenLoan/TokenUserInput'
+import { Listbox } from '@headlessui/react'
 
 export const OpenLoanStyles = {
   wrapper: 'w-full h-full flex justify-center',
@@ -30,7 +31,7 @@ export const OpenLoanStyles = {
     'w-full h-min flex justify-between items-center bg-gray-700 rounded-2xl text-xl font-medium cursor-pointer p-2 mt-[-0.2rem] shadow-lg shadow-gray-700/30 hover:bg-gray-900 hover:shadow-gray-900/30',
   tokenSelectorIcon: 'flex items-center',
   tokenSelectorTicker: 'mx-2',
-  dropdownArrow: 'w-4 h-3',
+  dropdownArrow: 'w-4 h-4',
   invalidatedButton: ' w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
   confirmButton: 'w-full bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
   infoGroup: 'inline-flex w-full place-content-center pt-1',
@@ -45,6 +46,16 @@ export const OpenLoanStyles = {
   confirmButtonContainer: 'pb-4 w-full',
   interestRateText: 'w-full text-right text-gray-200 pr-4',
   spacer: 'p-5',
+
+  collateralAmountContainer: 'bg-neutrals-700 rounded-lg drop-shadow-md mt-5 p-4',
+  collateralTypeDropdownContainer: 'relative left-5 z-50',
+  collateralTypeDropdownButton: 'flex justify-around items-center bg-neutrals-800 py-2 rounded-lg cursor-pointer w-[12rem] drop-shadow-md text-sm hover:bg-neutrals-600',
+  collateralTypeDropdownOptions: 'absolute top-10 right-0 bg-neutrals-800 p-2 rounded-lg drop-shadow-md text-sm',
+  collateralTypeDropdownOption: 'flex items-center space-x-1 cursor-pointer p-1.5 rounded-md',
+  collateralTypeDropdownActiveOption: 'cursor-pointer p-1.5 rounded-md bg-accents-royalBlue',
+  checkIcon: 'w-4 h-4',
+  chosenCollateralTypeContainer: 'mt-4',
+
 }
 
 const tips = {
@@ -63,7 +74,16 @@ const tips = {
     'penalty) as a bonus.'
 }
 
+const collateralTypes = [
+  { id: 1, type: 'Liquidity Pool Tokens', unavailable: false },
+  { id: 2, type: 'Token A', unavailable: false },
+  { id: 3, type: 'Token B', unavailable: false },
+  { id: 5, type: 'Both Tokens', unavailable: false },
+]
+
 const OpenLoan: NextPage = () => {
+  const [collateralType, setCollateralType1] = useState(collateralTypes[0])
+
   const style = OpenLoanStyles
   const {
     token0,
@@ -94,6 +114,26 @@ const OpenLoan: NextPage = () => {
     setTooltipText,
   } = useOpenLoanHandler()
 
+  let collateralElems
+  switch (collateralType.type) {
+    case "Liquidity Pool Tokens":
+      collateralElems = <TokenUserInput />
+    break
+    case "Token A":
+      collateralElems = <TokenUserInput />
+    break
+    case "Token B":
+      collateralElems = <TokenUserInput />
+    break
+    case "Both Tokens":
+      collateralElems = (
+        <>
+          <TokenUserInput />
+          <TokenUserInput />
+        </>
+      )
+  }
+
   return (
     <div className={style.wrapper}>
       <div className={style.container}>
@@ -111,53 +151,36 @@ const OpenLoan: NextPage = () => {
           </div>
           <TokenUserInput />
         </div>
-        <div className={style.vStackItem}>
-          <div className={style.numberInputContainer}>
-            <input
-              type="text"
-              value={loanAmtStr}
-              placeholder="0.0"
-              className={style.numberInput}
-              {...register('loanAmt', {
-                onChange: (e) => handleNumberInput(e, setLoanAmtStr, setLoanAmt),
-              })}
-            />
+        <div className={style.collateralAmountContainer}>
+          <div className={style.loanAmountHeader}>
+            <h2 className={style.sectionHeader}>Collateral</h2>
+            <InformationCircleIcon className={style.infoIcon} />
+            {/* Collateral Type Dropdown */}
+            <Listbox as="div" className={style.collateralTypeDropdownContainer} value={collateralType} onChange={setCollateralType1}>
+              <Listbox.Button className={style.collateralTypeDropdownButton}>
+                <h1 className={""}>{collateralType.type}</h1>
+                <ChevronDownIcon className={style.dropdownArrow}/>
+              </Listbox.Button>
+              <Listbox.Options className={style.collateralTypeDropdownOptions}>
+                {collateralTypes.map(type => (
+                  <Listbox.Option
+                    key={type.id}
+                    value={type}
+                    disabled={type.unavailable}
+                  >
+                    {({ active, selected }) => (
+                      <div className={`${style.collateralTypeDropdownOption} ${active && style.collateralTypeDropdownActiveOption}`}>
+                        {selected && <CheckIcon className={style.checkIcon} />}
+                        <h1>{type.type}</h1>
+                      </div>
+                    )}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Listbox>
           </div>
-        </div>
-        <div className={style.vStackItem}>
-          <div className={style.collateralHeader}>
-            <div className={style.collateralHeaderText}>Your Collateral</div>
-            <div className={style.selectCollateralButton} onClick={() => setIsOpen(true)}>
-              {collateralButtonText}
-              <ChevronDownIcon className={style.dropdownArrow} />
-            </div>
-            <SelectCollateralModal token0={token0} token1={token1} isOpen={isOpen} setIsOpen={setIsOpen} setCollateralType={setCollateralType} />
-          </div>
-        </div>
-        <div className={style.vStackItem}>
-          <div className={style.numberInputContainer}>
-            <input
-              type="text"
-              value={collateralAmt0Str}
-              placeholder="0.0"
-              className={style.numberInput}
-              {...register('collateralAmt0', {
-                onChange: (e) => handleNumberInput(e, setCollateralAmt0Str, setCollateralAmt0),
-              })}
-            />
-          </div>
-        </div>
-        <div className={style.vStackItem}>
-          <div className={collateral1Class}>
-            <input
-              type="text"
-              value={collateralAmt1Str}
-              placeholder="0.0"
-              className={style.numberInput}
-              {...register('collateralAmt1', {
-                onChange: (e) => handleNumberInput(e, setCollateralAmt1Str, setCollateralAmt1),
-              })}
-            />
+          <div className={style.chosenCollateralTypeContainer}>
+            {collateralElems}
           </div>
         </div>
         <div className={style.vStackItem}>
