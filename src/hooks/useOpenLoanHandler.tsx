@@ -6,7 +6,6 @@ import { WalletContext } from '../context/WalletContext'
 import PositionMgr from '../../abis/v0-hackathon/PositionManager.json'
 import IERC20 from '../../abis/v0-hackathon/ERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
-import { CollateralType } from '../components/OpenLoan/CollateralType'
 import toast from 'react-hot-toast'
 import { InformationCircleIcon } from '@heroicons/react/solid'
 import { FieldValues, useForm } from 'react-hook-form'
@@ -24,6 +23,14 @@ const style = {
   numberInputContainer: 'bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full',
   numberInputHidden: 'p-4 border-2 invisible',
   numberInput: 'bg-transparent placeholder:text-gray-600 outline-none w-full text-3xl text-gray-300',
+}
+
+enum CollateralType {
+  None,
+  LPToken,
+  Token0,
+  Token1,
+  Both
 }
 
 export const useOpenLoanHandler = () => {
@@ -113,6 +120,7 @@ export const useOpenLoanHandler = () => {
 
       try {
         let erc20
+        // TODO: adjust cases with new state, would probably want to ensureAllowance onChange of input
         switch (collateralType) {
           case CollateralType.LPToken:
             // TODO: currently no way to know get uniPair without factory

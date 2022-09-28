@@ -1,6 +1,5 @@
 import type { NextPage } from 'next'
 import { useState } from 'react'
-import SelectCollateralModal from '../../src/components/OpenLoan/SelectCollateralModal'
 import { ChevronDownIcon, ArrowLeftIcon, CheckIcon, InformationCircleIcon } from '@heroicons/react/outline'
 import PairsSelector from '../../src/components/PairsSelector'
 import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
@@ -78,6 +77,7 @@ const tips = {
     'penalty) as a bonus.'
 }
 
+// TODO: need to figure whether to use this or enums
 const collateralTypes = [
   { id: 1, type: 'Liquidity Pool Tokens', unavailable: false },
   { id: 2, type: 'Token A', unavailable: false },
@@ -86,6 +86,7 @@ const collateralTypes = [
 ]
 
 const OpenLoan: NextPage = () => {
+  // TODO: this state needs to be updated and moved into handler
   const [collateralType, setCollateralType1] = useState(collateralTypes[0])
 
   const style = OpenLoanStyles
@@ -118,6 +119,7 @@ const OpenLoan: NextPage = () => {
     setTooltipText,
   } = useOpenLoanHandler()
 
+  // TODO: needs to be updated and moved into handler
   let collateralElems
   switch (collateralType.type) {
     case "Liquidity Pool Tokens":
@@ -151,6 +153,7 @@ const OpenLoan: NextPage = () => {
         <div className={style.loanAmountContainer}>
           <div className={style.loanAmountHeader}>
             <h2 className={style.sectionHeader}>Loan Amount</h2>
+            {/* need to add popup for info */}
             <InformationCircleIcon className={style.infoIcon} />
           </div>
           <TokenUserInput collateralType={collateralTypes[0].type} token0={token0} token1={token1}  />
@@ -158,6 +161,7 @@ const OpenLoan: NextPage = () => {
         <div className={style.collateralAmountContainer}>
           <div className={style.loanAmountHeader}>
             <h2 className={style.sectionHeader}>Collateral</h2>
+            {/* need to add popup for info */}
             <InformationCircleIcon className={style.infoIcon} />
             {/* Collateral Type Dropdown */}
             <Listbox as="div" className={style.collateralTypeDropdownContainer} value={collateralType} onChange={setCollateralType1}>
@@ -191,6 +195,7 @@ const OpenLoan: NextPage = () => {
           <div className={style.loanMetric}>
             <div className={style.loanMetricHeader}>
               <h2>Interest Rate</h2>
+              {/* need to add popup for info */}
               <InformationCircleIcon className={style.infoIcon}/>
             </div>
             <p className={style.metricValue}>11.32%</p>
@@ -198,6 +203,7 @@ const OpenLoan: NextPage = () => {
           <div className={style.loanMetric}>
             <div className={style.loanMetricHeader}>
               <h2>Health Rate</h2>
+              {/* need to add popup for info */}
               <InformationCircleIcon className={style.infoIcon}/>
             </div>
             <p className={style.metricValue}>2.44</p>
@@ -205,11 +211,13 @@ const OpenLoan: NextPage = () => {
           <div className={style.loanMetric}>
             <div className={style.loanMetricHeader}>
               <h2>Calculated Gains</h2>
+              {/* need to add popup for info */}
               <InformationCircleIcon className={style.infoIcon}/>
             </div>
             <p className={`${style.metricValue} text-secondary-jungleGreen`}>+ $29.1030</p>
           </div>
         </div>
+        {/* TODO: need to add logic */}
         <div className={style.buttonDiv}>
           <div
             className={style.confirmButton}
