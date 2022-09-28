@@ -48,14 +48,13 @@ export const OpenLoanStyles = {
   spacer: 'p-5',
 
   collateralAmountContainer: 'bg-neutrals-700 rounded-lg drop-shadow-md mt-5 p-4',
-  collateralTypeDropdownContainer: 'relative left-5 z-50',
-  collateralTypeDropdownButton: 'flex justify-around items-center bg-neutrals-800 py-2 rounded-lg cursor-pointer w-[12rem] drop-shadow-md text-sm hover:bg-neutrals-600',
-  collateralTypeDropdownOptions: 'absolute top-10 right-0 bg-neutrals-800 p-2 rounded-lg drop-shadow-md text-sm',
+  collateralTypeDropdownContainer: 'relative left-5 z-50 text-neutrals-100 text-sm',
+  collateralTypeDropdownButton: 'flex justify-around items-center bg-neutrals-800 py-2 rounded-lg cursor-pointer w-[12rem] drop-shadow-md hover:bg-neutrals-600',
+  collateralTypeDropdownOptions: 'absolute top-10 right-0 bg-neutrals-800 p-2 rounded-lg drop-shadow-md',
   collateralTypeDropdownOption: 'flex items-center space-x-1 cursor-pointer p-1.5 rounded-md',
   collateralTypeDropdownActiveOption: 'cursor-pointer p-1.5 rounded-md bg-accents-royalBlue',
   checkIcon: 'w-4 h-4',
   chosenCollateralTypeContainer: 'mt-4',
-
 }
 
 const tips = {
@@ -117,19 +116,19 @@ const OpenLoan: NextPage = () => {
   let collateralElems
   switch (collateralType.type) {
     case "Liquidity Pool Tokens":
-      collateralElems = <TokenUserInput />
+      collateralElems = <TokenUserInput collateralType={collateralType.type} token0={token0} token1={token1} />
     break
     case "Token A":
-      collateralElems = <TokenUserInput />
+      collateralElems = <TokenUserInput collateralType={collateralType.type} token0={token0} token1={token1}  />
     break
     case "Token B":
-      collateralElems = <TokenUserInput />
+      collateralElems = <TokenUserInput collateralType={collateralType.type} token0={token0} token1={token1}  />
     break
     case "Both Tokens":
       collateralElems = (
         <>
-          <TokenUserInput />
-          <TokenUserInput />
+          <TokenUserInput collateralType={"Token A"} token0={token0} token1={token1}  />
+          <TokenUserInput collateralType={"Token B"} token0={token0} token1={token1}  />
         </>
       )
   }
@@ -149,7 +148,7 @@ const OpenLoan: NextPage = () => {
             <h2 className={style.sectionHeader}>Loan Amount</h2>
             <InformationCircleIcon className={style.infoIcon} />
           </div>
-          <TokenUserInput />
+          <TokenUserInput collateralType={collateralTypes[0].type} token0={token0} token1={token1}  />
         </div>
         <div className={style.collateralAmountContainer}>
           <div className={style.loanAmountHeader}>
@@ -158,7 +157,7 @@ const OpenLoan: NextPage = () => {
             {/* Collateral Type Dropdown */}
             <Listbox as="div" className={style.collateralTypeDropdownContainer} value={collateralType} onChange={setCollateralType1}>
               <Listbox.Button className={style.collateralTypeDropdownButton}>
-                <h1 className={""}>{collateralType.type}</h1>
+                <h1>{collateralType.type}</h1>
                 <ChevronDownIcon className={style.dropdownArrow}/>
               </Listbox.Button>
               <Listbox.Options className={style.collateralTypeDropdownOptions}>
