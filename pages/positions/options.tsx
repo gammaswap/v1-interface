@@ -43,7 +43,7 @@ const Options: NextPage = () => {
               <div className={style.optionsButtonPrimary}>
                 <div className={style.buttonTitle}>Short Liquidity</div>
                 <div className={style.buttonText}>
-                  Borrow liquidity or open a loan if you're long volatility and hedge against impermanent loss.
+                  Borrow liquidity to hedge against impermanent loss.
                 </div>
               </div>
               <div className={style.optionsButtonSecondary}>
