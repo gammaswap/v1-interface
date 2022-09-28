@@ -12,6 +12,7 @@ import { FieldValues, useForm } from 'react-hook-form'
 // For V1 Periphery
 import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
+import { getTokenBalance } from '../utils/getSmartContract'
 
 const style = {
   invalidatedButton: ' w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
@@ -59,6 +60,8 @@ export const useOpenLoanHandler = () => {
   const [buttonText, setButtonText] = useState<string>('Confirm')
   const [collateral1Class, setCollateral1Class] = useState<string>('')
   const [tooltipText, setTooltipText] = useState<string>('')
+  const [token0Balance, setToken0Balance] = useState<string>('0')
+  const [token1Balance, setToken1Balance] = useState<string>('0')
 
   useEffect(() => {
     if (!provider) {
@@ -88,6 +91,20 @@ export const useOpenLoanHandler = () => {
       }
     }
   }, [provider])
+
+  useEffect(() => {
+    let accountAddress = accountInfo?.address || ''
+    if (provider && token0.address) {
+      getTokenBalance(accountAddress, token0.address, token0.symbol, provider, setToken0Balance)
+    }
+  }, [provider, token0])
+
+  useEffect(() => {
+    let accountAddress = accountInfo?.address || ''
+    if (provider && token1.address) {
+      getTokenBalance(accountAddress, token1.address, token1.symbol, provider, setToken1Balance)
+    }
+  }, [provider, token1])
 
   async function openLoanHandler(data: FieldValues) {
     if (!accountInfo || !accountInfo.address) {
@@ -187,15 +204,13 @@ export const useOpenLoanHandler = () => {
                 toast.dismiss(loading)
               })
               .catch((err) => {
-                console.log(err)
                 notifyDismiss(loading)
-                notifyError('Borrow liquidity was unsuccessful')
+                notifyError('Borrow liquidity was unsuccessful: ' + err)
               })
           })
           .catch((err) => {
-            console.log(err)
             notifyDismiss(loading)
-            notifyError('Create loan was unsuccessful')
+            notifyError('Create loan was unsuccessful' + err)
           })
       }
     }
@@ -470,5 +485,7 @@ export const useOpenLoanHandler = () => {
     buttonText,
     tooltipText,
     setTooltipText,
+    token0Balance,
+    token1Balance,
   }
 }

@@ -1,9 +1,10 @@
-import { useContext } from 'react'
+import { Dispatch, SetStateAction, useContext } from 'react'
 import { BigNumber, Contract, ethers } from 'ethers'
 import { Provider } from '@ethersproject/providers'
 import { AccountInfo } from '../context/WalletContext'
 import { notifyError } from '../hooks/useNotification'
-
+import IERC20 from '../../abis/v1-periphery/interfaces/external/IERC20.sol/IERC20.json'
+import { Token } from '../components/Tokens'
 
 const erc20ABI = require('erc-20-abi')
 const { abi: IUniswapV2FactoryABI } = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
@@ -19,7 +20,7 @@ export type TokenContracts = {
 export const getTokenContracts = (
   tokenAAddr: string,
   tokenBAddr: string,
-  provider: Provider,
+  provider: Provider
 ): TokenContracts | null => {
   try {
     const tokenAContract = new ethers.Contract(tokenAAddr, erc20ABI, provider)
@@ -44,7 +45,11 @@ export const getEstimatedOutput = async (
   inputAmt: string,
   provider: Provider
 ): Promise<AmountsOut | undefined> => {
-  const routerContract = new ethers.Contract(process.env.NEXT_PUBLIC_IUNISWAP_V2_ROUTER_02_ADDR as string, IUniswapV2Router02ABI, provider as Provider)
+  const routerContract = new ethers.Contract(
+    process.env.NEXT_PUBLIC_IUNISWAP_V2_ROUTER_02_ADDR as string,
+    IUniswapV2Router02ABI,
+    provider as Provider
+  )
   let convertedInput = ethers.utils.parseEther(inputAmt)
   const amountsOut = await routerContract.getAmountsOut(convertedInput, [tokenAddrs[0], tokenAddrs[1]])
   return amountsOut
@@ -52,16 +57,16 @@ export const getEstimatedOutput = async (
 
 export const calcPoolKey = (cfmm: string, protocol: number): string => {
   let abi = new ethers.utils.AbiCoder()
-  let bytesData = abi.encode(["address", "uint24"], [cfmm, protocol])
+  let bytesData = abi.encode(['address', 'uint24'], [cfmm, protocol])
   return ethers.utils.solidityKeccak256(['bytes'], [bytesData])
 }
 
 // /**
 //  * Gets token pair address non-negotiably,
 //  * creates it if doesn't exist otherwise returns exsisting pair
-//  * @param tokenAAddr 
-//  * @param tokenBAddr 
-//  * @param FactoryContract 
+//  * @param tokenAAddr
+//  * @param tokenBAddr
+//  * @param FactoryContract
 //  * @returns a pair address of type string
 //  */
 // const getLiquidityPair = async (
@@ -80,9 +85,9 @@ export const calcPoolKey = (cfmm: string, protocol: number): string => {
 
 // /**
 //  * Checks if the current token pair exists or not
-//  * @param tokenAAddr 
-//  * @param tokenBAddr 
-//  * @param FactoryContract 
+//  * @param tokenAAddr
+//  * @param tokenBAddr
+//  * @param FactoryContract
 //  * @returns a boolean whether the pair exists or not
 //  */
 // const ifPairExists = async (
@@ -97,9 +102,26 @@ export const calcPoolKey = (cfmm: string, protocol: number): string => {
 
 /**
  * shortened function of the original format wei to ethers func
- * @param weiNumber 
+ * @param weiNumber
  * @returns the number in ethers of type string
  */
 const formatEther = (weiNumber: number | BigNumber): string => {
   return ethers.utils.formatEther(weiNumber)
+}
+
+export const getTokenBalance = async (
+  accountAddress: string,
+  tokenAddress: string,
+  tokenSymbol: string,
+  provider: Provider,
+  setTokenBalance: Dispatch<SetStateAction<string>>
+) => {
+  try {
+    let token = new ethers.Contract(tokenAddress, IERC20.abi, provider)
+    let balance = await token.balanceOf(accountAddress)
+    setTokenBalance(ethers.utils.formatEther(balance))
+  } catch (err) {
+    setTokenBalance('0')
+    notifyError(`An error occurred while fetching ${tokenSymbol} balance`)
+  }
 }

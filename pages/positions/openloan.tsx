@@ -71,10 +71,11 @@ const tips = {
     'collateral. For example, if a collateral has a liquidation threshold of ' +
     '80%, it means that the position will be liquidated when the debt value is ' +
     'worth 80% of the collateral value.',
-  penalty: 'When a liquidation occurs, liquidations repay up to 50% of the ' +
+  penalty:
+    'When a liquidation occurs, liquidations repay up to 50% of the ' +
     'outstanding borrowed amount on behalf of the borrower. In return, they ' +
     'can buy the collateral at a discount and keep the difference (liquidation ' +
-    'penalty) as a bonus.'
+    'penalty) as a bonus.',
 }
 
 // TODO: need to figure whether to use this or enums
@@ -117,6 +118,8 @@ const OpenLoan: NextPage = () => {
     buttonText,
     tooltipText,
     setTooltipText,
+    token0Balance,
+    token1Balance,
   } = useOpenLoanHandler()
 
   // TODO: needs to be updated and moved into handler

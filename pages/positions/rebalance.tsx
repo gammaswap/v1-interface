@@ -27,6 +27,8 @@ const Rebalance: NextPage = () => {
     openSlippage,
     swapTokenInputs,
     rebalance,
+    tokenABalance,
+    tokenBBalance,
   } = useRebalanceHandler()
   const style = {
     wrapper: 'w-screen flex justify-center items-center',
@@ -97,7 +99,7 @@ const Rebalance: NextPage = () => {
                     <div className={style.tokenSelectorTicker}>{tokenASelected.symbol}</div>
                     <SwitchVerticalIcon className={style.dropdownArrow} />
                   </div>
-                  <div className={style.tokenBalance}>Balance: {0}</div>
+                  <div className={style.tokenBalance}>Balance: {tokenABalance}</div>
                 </div>
               )}
             </div>
@@ -125,7 +127,7 @@ const Rebalance: NextPage = () => {
                     <div className={style.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
                     <SwitchVerticalIcon className={style.dropdownArrow} />
                   </div>
-                  <div className={style.tokenBalance}>Balance: {0}</div>
+                  <div className={style.tokenBalance}>Balance: {tokenBBalance}</div>
                 </div>
               )}
             </div>
@@ -149,6 +151,7 @@ const Rebalance: NextPage = () => {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         setTokenSelected={tokenSelected === 'tokenA' ? setTokenASelected : setTokenBSelected}
+        otherToken={tokenSelected === 'tokenA' ? tokenBSelected : tokenASelected}
       />
     </>
   )
