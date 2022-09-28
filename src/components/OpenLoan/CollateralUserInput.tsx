@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { Token } from '../Tokens'
 
 const style = {
-  tokenUserInputContainer: 'flex justify-around mt-2',
+  CollateralUserInputContainer: 'flex justify-around mt-2',
   tokenAmountContainer: '',
   loanAmountInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-2xl text-neutrals-200',
   maxButton: 'w-[2rem] text-center bg-neutrals-900 bg-opacity-60 drop-shadow-lg cursor-pointer hover:bg-opacity-70 text-xxs font-normal p-0.5 rounded-sm text-accents-royalBlue text-opacity-50 hover:text-opacity-80 mt-1',
@@ -15,15 +15,15 @@ const style = {
   tokenPairBalance: 'font-semibold text-xxs text-neutrals-600 tracking-wide text-right mt-2',
 }
 
-interface TokenUserInputProps {
+interface CollateralUserInputProps {
   collateralType: string
   token0: Token
   token1: Token
 }
 
-export const TokenUserInput = ({ collateralType, token0, token1 }: TokenUserInputProps) => {
+export const CollateralUserInput = ({ collateralType, token0, token1 }: CollateralUserInputProps) => {
   return (
-    <div className={style.tokenUserInputContainer}>
+    <div className={style.CollateralUserInputContainer}>
       {/* input side w/ max */}
       <div className={style.tokenAmountContainer}>
         <input
