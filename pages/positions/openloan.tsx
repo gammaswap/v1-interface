@@ -9,7 +9,7 @@ import { Listbox } from '@headlessui/react'
 
 export const OpenLoanStyles = {
   wrapper: 'w-full h-full flex justify-center',
-  container: 'mt-4 bg-neutrals-800 w-[30rem] h-[38rem] rounded-xl p-4',
+  container: 'mt-4 bg-neutrals-800 w-[30rem] rounded-xl p-4',
   headerContainer: 'flex text-xxs',
   backButton: 'w-7 h-7 mt-0.5 cursor-pointer hover:bg-neutrals-700 p-1 rounded-full',
   formHeader: 'font-semibold text-lg text-neutrals-100 ml-4',
@@ -18,8 +18,6 @@ export const OpenLoanStyles = {
   loanAmountHeader: 'flex space-x-1 items-center',
   sectionHeader: 'font-semibold text-neutrals-400',
   infoIcon: 'text-neutrals-400 w-4 h-4 cursor-pointer hover:text-neutrals-100',
-  vStack: 'items-center flex-col',
-  vStackItem: 'mt-3',
   numberInputContainer: 'bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full',
   numberInputHidden: 'p-4 border-2 invisible',
   numberInput: 'bg-transparent placeholder:text-gray-600 outline-none w-full text-3xl text-gray-300',
@@ -32,8 +30,6 @@ export const OpenLoanStyles = {
   tokenSelectorIcon: 'flex items-center',
   tokenSelectorTicker: 'mx-2',
   dropdownArrow: 'w-4 h-4',
-  invalidatedButton: ' w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
-  confirmButton: 'w-full bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
   infoGroup: 'inline-flex w-full place-content-center pt-1',
   loanInfoButton: 'bg-primaryV2-4 rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex mr-2 px-2 py-1 items-center hover:bg-primaryV2-3 hover:shadow-primaryV2-3/30 tooltip',
   collateralHeader: 'inline-flex w-full place-content-start',
@@ -43,18 +39,27 @@ export const OpenLoanStyles = {
   confirmGrey: 'bg-[#274060] w-full rounded-2xl text-gray-500 inline-flex place-content-center py-2 font-semibold',
   confirmInsuffBal: 'bg-red-400 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold',
   confirmGreen: 'bg-green-300 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold',
-  confirmButtonContainer: 'pb-4 w-full',
+  confirmButtonContainer: 'w-full',
   interestRateText: 'w-full text-right text-gray-200 pr-4',
   spacer: 'p-5',
-
+  
   collateralAmountContainer: 'bg-neutrals-700 rounded-lg drop-shadow-md mt-5 p-4',
-  collateralTypeDropdownContainer: 'relative left-5 z-50 text-neutrals-100 text-sm',
+  collateralTypeDropdownContainer: 'relative left-3 text-neutrals-100 text-sm',
   collateralTypeDropdownButton: 'flex justify-around items-center bg-neutrals-800 py-2 rounded-lg cursor-pointer w-[12rem] drop-shadow-md hover:bg-neutrals-600',
-  collateralTypeDropdownOptions: 'absolute top-10 right-0 bg-neutrals-800 p-2 rounded-lg drop-shadow-md',
+  collateralTypeDropdownOptions: 'absolute top-0 right-30 w-full bg-neutrals-800 p-2 rounded-lg drop-shadow-md',
   collateralTypeDropdownOption: 'flex items-center space-x-1 cursor-pointer p-1.5 rounded-md',
   collateralTypeDropdownActiveOption: 'cursor-pointer p-1.5 rounded-md bg-accents-royalBlue',
   checkIcon: 'w-4 h-4',
   chosenCollateralTypeContainer: 'mt-4',
+  
+  loanMetricsContainer: 'flex space-x-5 mt-5 text-neutrals-100',
+  loanMetric: 'bg-neutrals-700 w-1/3 py-3 drop-shadow-md rounded-lg',
+  loanMetricHeader: 'flex justify-center items-center space-x-1 text-xxs',
+  metricValue: 'text-center',
+  
+  buttonDiv: 'flex text-xl font-semibold space-x-5 mt-6',
+  confirmButton: 'w-1/2 bg-primary-blue text-center py-3 px-5 rounded-lg cursor-pointer',
+  invalidatedButton: 'w-1/2 disabled text-center py-3 px-5 rounded-lg text-gray-600 border-2 border-gray-700',
 }
 
 const tips = {
@@ -135,7 +140,7 @@ const OpenLoan: NextPage = () => {
 
   return (
     <div className={style.wrapper}>
-      <div className={style.container}>
+      <div className={`${style.container} ${collateralType.type == "Both Tokens" ? "h-[45rem]" : "h-[41rem]"}`}>
         <div className={style.headerContainer}>
           <ArrowLeftIcon className={style.backButton} />
           <div className={style.formHeader}>Open a Loan</div>
@@ -182,13 +187,37 @@ const OpenLoan: NextPage = () => {
             {collateralElems}
           </div>
         </div>
-        <div className={style.vStackItem}>
-          <div className={style.interestRateText}>Interest Rate --%</div>
+        <div className={style.loanMetricsContainer}>
+          <div className={style.loanMetric}>
+            <div className={style.loanMetricHeader}>
+              <h2>Interest Rate</h2>
+              <InformationCircleIcon className={style.infoIcon}/>
+            </div>
+            <p className={style.metricValue}>11.32%</p>
+          </div>
+          <div className={style.loanMetric}>
+            <div className={style.loanMetricHeader}>
+              <h2>Health Rate</h2>
+              <InformationCircleIcon className={style.infoIcon}/>
+            </div>
+            <p className={style.metricValue}>2.44</p>
+          </div>
+          <div className={style.loanMetric}>
+            <div className={style.loanMetricHeader}>
+              <h2>Calculated Gains</h2>
+              <InformationCircleIcon className={style.infoIcon}/>
+            </div>
+            <p className={`${style.metricValue} text-secondary-jungleGreen`}>+ $29.1030</p>
+          </div>
         </div>
-        <div className={style.vStackItem}>
-          <button className={confirmStyle} type="submit">
-            {buttonText}
-          </button>
+        <div className={style.buttonDiv}>
+          <div
+            className={style.confirmButton}
+            // onClick={() => approveTransaction}
+          >
+            Approve
+          </div>
+          <div className={style.invalidatedButton}>Remove</div>
         </div>
       </div>
     </div>
