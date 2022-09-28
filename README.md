@@ -29,3 +29,9 @@ Now when the server runs Next.js will add the variable `NEXT_PUBLIC_ROPSTEN_API_
 `.env.local` file will always override the default set. So, if you want to run the `.env.development` or `.env.production` file then `.env.local` should be removed from the project otherwise development or production file will be overridden by local file.
 
 Run `next dev` to load development environment variables and `next start` to load production environment variables
+
+## Steps to deploy subgraph
+
+This guide contains the required steps that are need to deploy the GammaSwap subgraph on local environment
+
+[README.md](https://github.com/gammaswap/v1-subgraph/blob/subgraph-base/README.md)

@@ -5,11 +5,15 @@ import { Provider } from '@ethersproject/providers'
 import { BigNumber, Contract, ethers } from 'ethers'
 import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } from '../../src/utils/getSmartContract'
 import { BasicContractContext } from '../../src/context/BasicContractContext'
+import { getTokenBalance } from '../utils/getSmartContract'
 
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
-import { notifyError } from './useNotification'
+import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
+import { doApprove, handleNumberInput, validateAllowance } from '../utils/validation'
+import IERC20 from '../../abis/v1-periphery/interfaces/external/IERC20.sol/IERC20.json'
 
 export const useAddLiquidityHandler = () => {
+  const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
   // holds state of user amount inputted for each of the token input fields
   const [tokenAInputVal, setTokenAInputVal] = useState<string>('')
   const [tokenBInputVal, setTokenBInputVal] = useState<string>('')
@@ -22,6 +26,8 @@ export const useAddLiquidityHandler = () => {
     address: '',
     decimals: 18,
   })
+  const [tokenABalance, setTokenABalance] = useState<string>('0')
+  const [tokenBBalance, setTokenBBalance] = useState<string>('0')
 
   const [posManager, setPosManager] = useState<Contract | null>(null)
 
@@ -75,7 +81,6 @@ export const useAddLiquidityHandler = () => {
       provider as Provider
     )
     setTokenContracts(fetchedTokenContracts)
-    console.log(tokenContracts)
     // validates and gets new esimated output only on tokenAInputVal
     handleTokenInput(tokenAInputVal, setTokenAInputVal, setTokenBInputVal)
   }, [tokenASelected, tokenBSelected])
@@ -83,12 +88,12 @@ export const useAddLiquidityHandler = () => {
   useEffect(() => {
     async function fetchContract() {
       if (!provider) {
-        console.log('Please connect wallet.')
+        notifyError('Please connect wallet.')
         return
       }
 
       // Position Manager contract address
-      let address = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
+      let address = POSITION_MANAGER_ADDRESS || ''
 
       // Variable to hold Position Manager contract
       let _posManager = null
@@ -104,6 +109,20 @@ export const useAddLiquidityHandler = () => {
     }
     fetchContract()
   }, [provider])
+
+  useEffect(() => {
+    let accountAddress = accountInfo?.address || ''
+    if (provider && tokenASelected.address) {
+      getTokenBalance(accountAddress, tokenASelected.address, tokenASelected.symbol, provider, setTokenABalance)
+    }
+  }, [provider, tokenASelected])
+
+  useEffect(() => {
+    let accountAddress = accountInfo?.address || ''
+    if (provider && tokenBSelected.address) {
+      getTokenBalance(accountAddress, tokenBSelected.address, tokenBSelected.symbol, provider, setTokenBBalance)
+    }
+  }, [provider, tokenBSelected])
 
   // if called on change of token A or B input vals, validate and update estimated output value
   const handleTokenInput = useCallback(
@@ -121,7 +140,7 @@ export const useAddLiquidityHandler = () => {
             return
           }
 
-          validateTokenInput(tokenInput, setTokenInputVal)
+          handleNumberInput(e, setTokenInputVal)
 
           // const tokenAAddr = tokenContracts?.tokenAContract?.address as string
           // const tokenBAddr = tokenContracts?.tokenBContract?.address as string
@@ -136,7 +155,7 @@ export const useAddLiquidityHandler = () => {
       }
       return null
     },
-    [validateTokenInput]
+    [handleNumberInput]
   )
 
   // TODO: We need an environment that has uni contracts deployed
@@ -156,26 +175,116 @@ export const useAddLiquidityHandler = () => {
 
   const addLiquidity = async () => {
     if (posManager && accountInfo) {
-      try {
-        const DepositReservesParams = {
-          cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
-          amountsDesired: [BigNumber.from(parseFloat(tokenAInputVal)), BigNumber.from(parseFloat(tokenBInputVal))],
-          amountsMin: [0, 0],
-          to: accountInfo.address,
-          protocol: 1,
-          deadline: ethers.constants.MaxUint256,
+      if (posManager && accountInfo?.address && provider) {
+        let tokenAContract = new ethers.Contract(
+          tokenASelected.address,
+          IERC20.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+
+        let approvalA = await validateAllowance(
+          accountInfo.address,
+          tokenAContract,
+          BigNumber.from(parseFloat(tokenAInputVal)),
+          POSITION_MANAGER_ADDRESS || ''
+        )
+
+        let tokenBContract = new ethers.Contract(
+          tokenBSelected.address,
+          IERC20.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+
+        let approvalB = await validateAllowance(
+          accountInfo.address,
+          tokenBContract,
+          BigNumber.from(parseFloat(tokenBInputVal)),
+          POSITION_MANAGER_ADDRESS || ''
+        )
+
+        let loading = notifyLoading('Waiting for transaction to complete')
+        try {
+          if (approvalA && approvalB) {
+            const DepositReservesParams = {
+              cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+              amountsDesired: [BigNumber.from(parseFloat(tokenAInputVal)), BigNumber.from(parseFloat(tokenBInputVal))],
+              amountsMin: [0, 0],
+              to: accountInfo.address,
+              protocol: 1,
+              deadline: ethers.constants.MaxUint256,
+            }
+            let tx = await posManager.depositReserves(DepositReservesParams, {
+              gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT,
+            })
+            let res = await tx.wait()
+            const { args } = res.events[0]
+            let message = 'Add Liquidity Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
+            notifyDismiss(loading)
+            notifySuccess(message)
+          } else {
+            notifyDismiss('Waiting for transaction to complete')
+          }
+        } catch (e: any) {
+          notifyDismiss(loading)
+          if (e?.code === 'ACTION_REJECTED') {
+            notifyError('User rejected the transaction')
+          } else {
+            notifyError('An error occurred while adding LP Token Liquidity. Please try again')
+          }
         }
-        let tx = await posManager.depositReserves(DepositReservesParams)
-        let res = await tx.wait()
-        const { args } = res.events[0]
-        console.log(args.pool)
-        console.log(args.reservesLen.toNumber())
-        console.log(args.shares.toNumber())
-      } catch (e) {
-        notifyError('An error occurred while adding liquidity. Please try again')
-        return e
       }
     }
+  }
+
+  const addLpLiquidity = async () => {
+    if (posManager && accountInfo?.address && provider) {
+      let tokenContract = new ethers.Contract(
+        process.env.NEXT_PUBLIC_CFMM_ADDRESS || '',
+        IERC20.abi,
+        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+      )
+
+      let approval = await validateAllowance(
+        accountInfo.address,
+        tokenContract,
+        BigNumber.from(parseFloat(tokenAInputVal)),
+        POSITION_MANAGER_ADDRESS || ''
+      )
+      let loading = notifyLoading('Waiting for transaction to complete')
+      try {
+        if (approval) {
+          const DepositNoPullParams = {
+            cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+            protocol: 1,
+            lpTokens: parseFloat(tokenAInputVal),
+            to: accountInfo.address,
+            deadline: ethers.constants.MaxUint256,
+          }
+          let tx = await posManager.depositNoPull(DepositNoPullParams, { gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT })
+          let res = await tx.wait()
+          const { args } = res.events[0]
+          let message = 'Add Liquidity Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
+          notifyDismiss(loading)
+          notifySuccess(message)
+        } else {
+          notifyDismiss(loading)
+        }
+      } catch (e: any) {
+        notifyDismiss(loading)
+        if (e?.code === 'ACTION_REJECTED') {
+          notifyError('User rejected the transaction')
+        } else {
+          notifyError('An error occurred while adding LP Token Liquidity. Please try again')
+        }
+      }
+    }
+  }
+
+  const maxTokenA = () => {
+    setTokenAInputVal(tokenABalance)
+  }
+  const maxTokenB = () => {
+    setTokenBInputVal(tokenBBalance)
   }
 
   return {
@@ -194,5 +303,10 @@ export const useAddLiquidityHandler = () => {
     setTokenASelected,
     setTokenBSelected,
     addLiquidity,
+    addLpLiquidity,
+    tokenABalance,
+    tokenBBalance,
+    maxTokenA,
+    maxTokenB,
   }
 }

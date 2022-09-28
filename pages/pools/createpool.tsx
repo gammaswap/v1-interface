@@ -43,7 +43,6 @@ const CreatePool: NextPage = () => {
 
   function openOrCloseSelectBox() {
     setIsSelectOpen((prevState) => !prevState)
-    console.log(isSelectOpen)
   }
 
   useEffect(() => {
