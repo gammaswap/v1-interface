@@ -2,8 +2,10 @@ import type { NextPage } from "next"
 import { InformationCircleIcon } from "@heroicons/react/outline"
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/outline"
 import Link from "next/link"
-import PoolTableRow from "../../src/components/Pools/PoolTableRow"
+import { PoolTableRow, PoolData } from "../../src/components/Pools/PoolTableRow"
 import { usePoolsHandler } from "../../src/hooks/usePoolsHandler"
+import { useState } from "react"
+import PoolDetailsModal from "../../src/components/Pools/PoolDetailsModal"
 
 const Pools: NextPage = () => {
   const style = {
@@ -35,7 +37,14 @@ const Pools: NextPage = () => {
     allArrows: "flex justify-end",
   }
 
-  const { poolData } = usePoolsHandler()
+  const { poolsData } = usePoolsHandler()
+  const [isDetailsOpen, setIsDetailsOpen] = useState<boolean>(false)
+  const [selectedPoolData, setSelectedPoolData] = useState<PoolData>()
+
+  const openPoolDetails = (poolData: PoolData): void => {
+    setSelectedPoolData(poolData)
+    setIsDetailsOpen(true)
+  }
 
   return (
     <div className={style.wrapper}>
@@ -98,13 +107,18 @@ const Pools: NextPage = () => {
               <InformationCircleIcon className={style.infoSvg} />
             </div>
           </div>
-          {poolData && poolData.length > 0 ? poolData.map((pool, index) => <PoolTableRow key={index} pool={pool} />) : null}
+          {poolsData && poolsData.length > 0 ? poolsData.map((poolData, index) => <PoolTableRow key={index} poolData={poolData} clickHandler={openPoolDetails} />) : null}
           <div className={style.allArrows}>
             <ArrowLeftIcon className={style.arrow} />
             <ArrowRightIcon className={style.arrow} />
           </div>
         </div>
       </div>
+      <PoolDetailsModal
+        isOpen={isDetailsOpen}
+        setIsOpen={setIsDetailsOpen}
+        poolData={selectedPoolData}
+      />
     </div>
   )
 }

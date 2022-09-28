@@ -4,7 +4,8 @@ import { notifyError } from './useNotification'
 import { PoolCreatedQuery } from '../utils/graphQLQuery'
 
 type PoolType = {
-  asset: string
+  name: string
+  address: string
   totalSupply: string
   supplyApy: string
   totalBorrowed: string
@@ -13,7 +14,7 @@ type PoolType = {
 }
 
 export const usePoolsHandler = () => {
-  const [poolData, setPoolData] = useState<PoolType[]>([])
+  const [poolsData, setPoolsData] = useState<PoolType[]>([])
 
   useEffect(() => {
     const fetchPoolsData = async () => {
@@ -25,7 +26,8 @@ export const usePoolsHandler = () => {
         for (let i = 0; i < result.poolCreateds.length; i++) {
           let obj: PoolType = {
             supplyApy: '0',
-            asset: result.poolCreateds[i].pool,
+            name: result.poolCreateds[i].pool,
+            address: "",
             totalSupply: result.poolCreateds[i].protocol,
             totalBorrowed: result.poolCreateds[i].protocolId,
             borrowApyVariable: result.poolCreateds[i].cfmm,
@@ -35,18 +37,19 @@ export const usePoolsHandler = () => {
           // TODO: Below line will be used when we get the data from subgraph with the same keys as we have defined in PoolType
           // setPoolData((poolData) => [...poolData, result.poolCreateds[i]])
         }
-        setPoolData(data)
+        setPoolsData(data)
       }
     }
 
     if (process.env.NEXT_PUBLIC_SUBGRAPH_URL) {
-      if (poolData?.length === 0) {
+      if (poolsData?.length === 0) {
         fetchPoolsData()
       }
     } else {
-      setPoolData([
+      setPoolsData([
         {
-          asset: 'Binance',
+          name: 'Binance',
+          address: process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS || "",
           totalSupply: '20,223,182,626',
           supplyApy: '895',
           totalBorrowed: '20,960,370',
@@ -54,7 +57,8 @@ export const usePoolsHandler = () => {
           borrowApyStable: '394',
         },
         {
-          asset: 'Coinbase Exchange',
+          name: 'Coinbase Exchange',
+          address: process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS || "",
           totalSupply: '2,815,007,914',
           supplyApy: '945',
           totalBorrowed: '1,756,438',
@@ -62,7 +66,8 @@ export const usePoolsHandler = () => {
           borrowApyStable: '5196',
         },
         {
-          asset: 'Gate.io',
+          name: 'Gate.io',
+          address: process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS || "",
           totalSupply: '1,652,717,489',
           supplyApy: '549',
           totalBorrowed: '2,658,869',
@@ -71,7 +76,7 @@ export const usePoolsHandler = () => {
         },
       ])
     }
-  }, [poolData])
+  }, [])
 
-  return { poolData }
+  return { poolsData }
 }
