@@ -1,104 +1,130 @@
-import type {NextPage} from 'next'
-import { ArrowDownIcon } from '@heroicons/react/outline'
+import type { NextPage } from 'next'
+import { Fragment } from 'react'
+import { ArrowLeftIcon, ArrowDownIcon, InformationCircleIcon } from '@heroicons/react/outline'
+import { Tab } from '@headlessui/react'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
-import {useRepayLoanHandler} from '../../src/hooks/useRepayLoanHandler'
+import { useRepayLoanHandler } from '../../src/hooks/useRepayLoanHandler'
 
 const Repayloan: NextPage = () => {
-  const {repayAmt, repayAmtChange, changeSliderPercentage, percentages, approveTransaction, repayTransaction, enableRepay, loanAmount, repayCal} = useRepayLoanHandler()
+  const {
+    repayAmt,
+    repayAmtChange,
+    changeSliderPercentage,
+    percentages,
+    approveTransaction,
+    repayTransaction,
+    enableRepay,
+    loanAmount,
+    repayCal
+  } = useRepayLoanHandler()
 
   const style = {
-    wrapper: 'w-screen flex justify-center items-center',
-    content: 'bg-gray-900 w-[30rem] rounded-2xl p-4',
-    formHeader: 'flex justify-between items-center font-semibold text-xl text-gray-200 text-center',
+    wrapper: 'w-full h-full flex justify-center',
+    container: 'mt-4 bg-neutrals-800 w-[30rem] h-[40rem] rounded-xl p-4',
+    headerContainer: 'flex text-xxs',
+    backButton: 'w-7 h-7 mt-0.5 cursor-pointer hover:bg-neutrals-700 p-1 rounded-full',
+    formHeader: 'font-semibold text-lg text-neutrals-100 ml-4',
+    tabsContainer: 'flex rounded-lg w-1/4 p-0.5 bg-neutrals-900 bg-opacity-40 drop-shadow-md space-x-2 font-normal ml-auto',
+    tab: 'text-neutrals-600 w-1/2 rounded-md hover:bg-neutrals-800 hover:text-neutrals-300',
+    activeTab: 'outline outline-2 outline-offset-2 outline-accents-royalBlue/50 bg-accents-royalBlue w-1/2 rounded-md',
     withdrawHeading: 'w-screen',
     formLabel: 'flex pt-3 px-2 font-regular text-sm text-gray-200',
-    sliderStyle: 'border-2 border-gray-800 shadow-lg my-4 p-4 rounded-2xl',
-    sliderPercent: 'mb-5 text-7xl text-white',
-    percentageBox: 'flex justify-between p-4',
-    percentages: 'bg-gray-800 text-white text-center py-3 px-6 cursor-pointer rounded-lg font-semibold',
-    buttonDiv: 'flex justify-center',
-    approveBtn: 'w-full bg-blue-400 m-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
-    repayBtn: 'w-full bg-green-400 m-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-green-400 hover:border-green-300',
-    invalidBtn: 'w-full my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
-    allAmountsDiv: 'flex flex-col border-2 mt-3 border-gray-800 shadow-lg p-4 rounded-2xl',
-    amountsDiv: 'flex justify-between py-2 text-white',
+    sliderContainer: 'bg-neutrals-700 drop-shadow-md mt-5 p-4 rounded-lg',
+    sliderPercent: 'text-6xl text-neutrals-100 mt-2',
+    percentageBoxContainer: 'flex justify-center space-x-8 mt-5',
+    percentageBox: 'bg-neutrals-800 text-neutrals-100 py-2 px-5 cursor-pointer drop-shadow-sm rounded-lg hover:text-primary-blue',
+    buttonDiv: 'flex space-x-5 mt-6',
+    confirmButton: 'w-1/2 bg-blue-400 rounded-lg py-3 px-5 text-xl font-semibold cursor-pointer text-white text-center border-2 border-blue-400 hover:border-blue-300',
+    successButton: 'w-1/2 bg-green-400 rounded-lg py-3 px-5 text-xl font-semibold cursor-pointer text-white text-center border-2 border-green-400 hover:border-green-300',
+    invalidatedButton: 'w-1/2 rounded-lg py-3 px-5 text-xl font-semibold text-gray-600 text-center border-2 border-gray-700',
     downIcon: 'flex justify-center',
     dropDownIcon: 'w-5 h-5',
-    sectionHeader: 'font-semibold text-gray-200 w-full',
+    sectionHeader: 'font-semibold text-neutrals-400 w-full',
+    comingSoonPoster: 'bg-neutrals-900 h-[35rem] mt-5 rounded-lg flex justify-center items-center text-neutrals-200/20 text-xl',
   }
 
   return (
     <div className={style.wrapper}>
-      <div className={style.content}>
-        <div className={style.formHeader}>
-          <div className={style.withdrawHeading}>Repay Loan</div>
-        </div>
-
-        <div>
-          <div className={style.sliderStyle}>
-            <div className={style.sectionHeader}>Amount</div>
-            <p className={style.sliderPercent}>{repayAmt}%</p>
-            <Slider
-              onChange={repayAmtChange}
-              value={repayAmt}
-              handleStyle={{
-                borderColor: 'white',
-                borderWidth: '2px',
-                backgroundColor: '#abe2fb',
-                opacity: 1,
-              }}
-            />
-            <div className={style.percentageBox}>
-              {percentages && percentages.length > 0
-                ? percentages.map((percent) => {
-                    return (
-                      <p
-                        key={percent}
-                        className={style.percentages}
-                        onClick={() => {
-                          changeSliderPercentage(percent)
-                        }}
-                      >
-                        {percent === 100 ? 'Max' : `${percent}%`}
-                      </p>
-                    )
-                  })
-                : null}
-            </div>
+      <div className={style.container}>
+        <Tab.Group>
+          <div className={style.headerContainer}>
+            <ArrowLeftIcon className={style.backButton} />
+            <div className={style.formHeader}>Open a Loan</div>
+            <Tab.List className={style.tabsContainer}>
+              <Tab as={Fragment}>
+                {({ selected }) => (
+                  <button className={selected ?  style.activeTab : style.tab}>
+                    LP
+                  </button>
+                )}
+              </Tab>
+              <Tab as={Fragment}>
+                {({ selected }) => (
+                  <button className={selected ?  style.activeTab : style.tab}>
+                    Reserve
+                  </button>
+                )}
+              </Tab>
+            </Tab.List>
           </div>
-
-          <div className={style.downIcon}>
-            <ArrowDownIcon className={style.dropDownIcon} style={{color: 'white'}} />
-          </div>
-
-          <div className={style.allAmountsDiv}>
-            <div className={style.amountsDiv}>
-              <p>Loan Amount</p>
-              <p>{loanAmount}</p>
-            </div>
-            <div className={style.amountsDiv}>
-              <p>Repay Amount</p>
-              <p>{repayCal}</p>
-            </div>
-            <div className={style.amountsDiv}>
-              <p>Remaining Amount</p>
-              <p>{loanAmount - repayCal}</p>
-            </div>
-          </div>
-          <div className={style.buttonDiv}>
-            <div className={style.approveBtn} onClick={approveTransaction}>
-              Approve
-            </div>
-            {enableRepay ? (
-              <div className={style.repayBtn} onClick={repayTransaction}>
-                Repay
+          <Tab.Panels>
+            <Tab.Panel>
+              <div className={style.sliderContainer}>
+                <div className={style.sectionHeader}>Amount</div>
+                <h1 className={style.sliderPercent}>{repayAmt}%</h1>
+                <Slider
+                  onChange={repayAmtChange}
+                  value={repayAmt}
+                  className="mt-5"
+                  trackStyle={{
+                    backgroundColor: '#549AF0',
+                    height: '6px',
+                  }}
+                  railStyle={{ height: '6px' }}
+                  handleStyle={{
+                    borderColor: '#ECECED',
+                    width: '16px',
+                    height: '16px',
+                    borderWidth: '2px',
+                    backgroundColor: '#549AF0',
+                    opacity: 1,
+                  }}
+                />
+                <div className={style.percentageBoxContainer}>
+                  {percentages && percentages.length > 0
+                    ? percentages.map(percent => (
+                        <p
+                          key={percent}
+                          className={style.percentageBox}
+                          onClick={() => changeSliderPercentage(percent)}
+                        >
+                          {percent === 100 ? 'Max' : `${percent}%`}
+                        </p>
+                      )
+                    ) : null
+                  }
+                </div>
               </div>
-            ) : (
-              <div className={style.invalidBtn}>Repay</div>
-            )}
-          </div>
-        </div>
+
+              <div className={style.buttonDiv}>
+                <div className={style.confirmButton} onClick={approveTransaction}>
+                  Approve
+                </div>
+                {enableRepay ? (
+                  <div className={style.successButton} onClick={repayTransaction}>
+                    Confirm
+                  </div>
+                ) : (
+                  <div className={style.invalidatedButton}>Confirm</div>
+                )}
+              </div>
+            </Tab.Panel>
+            <Tab.Panel>
+              <div className={style.comingSoonPoster}>Coming Soon</div>
+            </Tab.Panel>
+          </Tab.Panels>
+        </Tab.Group>
       </div>
     </div>
   )

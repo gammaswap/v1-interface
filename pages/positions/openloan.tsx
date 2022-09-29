@@ -228,7 +228,7 @@ const OpenLoan: NextPage = () => {
           >
             Approve
           </div>
-          <div className={style.invalidatedButton}>Remove</div>
+          <div className={style.invalidatedButton}>Confirm</div>
         </div>
       </div>
     </div>
