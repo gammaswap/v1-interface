@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ChevronDownIcon, ArrowLeftIcon, CheckIcon, InformationCircleIcon } from '@heroicons/react/outline'
 import PairsSelector from '../../src/components/PairsSelector'
 import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
-import { TokenUserInput } from '../../src/components/OpenLoan/TokenUserInput'
+import { CollateralUserInput } from '../../src/components/OpenLoan/CollateralUserInput'
 import { Listbox } from '@headlessui/react'
 
 export const OpenLoanStyles = {
@@ -126,19 +126,19 @@ const OpenLoan: NextPage = () => {
   let collateralElems
   switch (collateralType.type) {
     case "Liquidity Pool Tokens":
-      collateralElems = <TokenUserInput collateralType={collateralType.type} token0={token0} token1={token1} />
+      collateralElems = <CollateralUserInput collateralType={collateralType.type} token0={token0} token1={token1} />
     break
     case "Token A":
-      collateralElems = <TokenUserInput collateralType={collateralType.type} token0={token0} token1={token1}  />
+      collateralElems = <CollateralUserInput collateralType={collateralType.type} token0={token0} token1={token1}  />
     break
     case "Token B":
-      collateralElems = <TokenUserInput collateralType={collateralType.type} token0={token0} token1={token1}  />
+      collateralElems = <CollateralUserInput collateralType={collateralType.type} token0={token0} token1={token1}  />
     break
     case "Both Tokens":
       collateralElems = (
         <>
-          <TokenUserInput collateralType={"Token A"} token0={token0} token1={token1}  />
-          <TokenUserInput collateralType={"Token B"} token0={token0} token1={token1}  />
+          <CollateralUserInput collateralType={"Token A"} token0={token0} token1={token1}  />
+          <CollateralUserInput collateralType={"Token B"} token0={token0} token1={token1}  />
         </>
       )
   }
@@ -159,7 +159,7 @@ const OpenLoan: NextPage = () => {
             {/* need to add popup for info */}
             <InformationCircleIcon className={style.infoIcon} />
           </div>
-          <TokenUserInput collateralType={collateralTypes[0].type} token0={token0} token1={token1}  />
+          <CollateralUserInput collateralType={collateralTypes[0].type} token0={token0} token1={token1}  />
         </div>
         <div className={style.collateralAmountContainer}>
           <div className={style.loanAmountHeader}>
