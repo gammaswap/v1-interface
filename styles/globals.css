@@ -9,3 +9,14 @@
     box-shadow: 0px 0px 9px #549AF0 !important;
     background-color: #549AF0 !important;
 }
+
+@layer base {
+    html {
+        @apply box-border;
+        @apply overflow-x-hidden;
+    }
+
+    html body {
+        @apply bg-neutrals-900 p-0 m-0;
+    }
+}

@@ -42,10 +42,10 @@ export const CollateralUserInput = ({ collateralType, token0, token1 }: Collater
             <>
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenAIcon}>
-                  <Image src={token0.imgPath} width={26} height={26} />
+                  <Image src={token0.imgPath} width={20} height={20} />
                 </div>
                 <div className={style.tokenBIcon}>
-                  {token1.imgPath && <Image src={token1.imgPath} width={26} height={26} />}
+                  {token1.imgPath && <Image src={token1.imgPath} width={20} height={20} />}
                 </div>
               </div>
               <div className={style.tokenPairSymbol}>{token0.symbol} / {token1.symbol}</div>
@@ -54,7 +54,7 @@ export const CollateralUserInput = ({ collateralType, token0, token1 }: Collater
             <>
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenAIcon}>
-                  <Image src={token0.imgPath} width={26} height={26} />
+                  <Image src={token0.imgPath} width={20} height={20} />
                 </div>
               </div>
               <div className={style.tokenPairSymbol}>{token0.symbol}</div>
@@ -64,7 +64,7 @@ export const CollateralUserInput = ({ collateralType, token0, token1 }: Collater
               {/* Token B */}
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenBIcon}>
-                  {token1.imgPath && <Image src={token1.imgPath} width={26} height={26} />}
+                  {token1.imgPath && <Image src={token1.imgPath} width={20} height={20} />}
                 </div>
               </div>
               <div className={style.tokenPairSymbol}>{token1.symbol}</div>
