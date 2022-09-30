@@ -1,11 +1,16 @@
 import {useState, useContext, useEffect} from 'react'
 import { ethers, Contract } from 'ethers'
+import Tokens, { Token } from '../components/Tokens'
 import { WalletContext } from '../context/WalletContext'
 import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
 import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
 import toast from 'react-hot-toast'
 
 export const useRepayLoanHandler = () => {
+  // TODO: remove once poolDetails is finished, context data will come from there
+  const [token0, setToken0] = useState<Token>(Tokens[0])
+  const [token1, setToken1] = useState<Token>(Tokens[2])
+
   const { accountInfo, provider, connectWallet } = useContext(WalletContext)
   const [repayAmt, setRepayAmt] = useState<number>(0)
   const [enableRepay, setEnableRepay] = useState<Boolean>(false)
@@ -126,6 +131,8 @@ export const useRepayLoanHandler = () => {
   }
 
   return {
+    token0,
+    token1,
     repayAmt,
     repayAmtChange,
     changeSliderPercentage,
