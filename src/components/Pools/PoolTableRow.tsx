@@ -1,7 +1,9 @@
+import { HexString } from "@coinbase/wallet-sdk/dist/types"
 import React from "react"
 
-type PoolProps = {
-  asset: string
+export type PoolData = {
+  name: string
+  address: string
   totalSupply: string
   supplyApy: string
   totalBorrowed: string
@@ -9,12 +11,13 @@ type PoolProps = {
   borrowApyStable: string
 }
 
-type PropsType = {
-  pool: PoolProps
+type PoolTableRowProps = {
+  poolData: PoolData
+  clickHandler: (poolData: PoolData) => void
 }
 
-const PoolTableRow = (props: PropsType) => {
-  const { pool } = props
+export const PoolTableRow = (props: PoolTableRowProps) => {
+  const { poolData, clickHandler} = props
 
   const style = {
     tableBodyRow: "flex border-b border-gray-500 pl-2 pr-4",
@@ -28,29 +31,27 @@ const PoolTableRow = (props: PropsType) => {
   }
 
   return (
-    <a href="">
+    <div onClick={() => clickHandler(poolData)}>
       <div className={style.tableBodyRow}>
         <div className={style.tableBodyDefinition + " " + style.assetHead}>
-          <p>{pool.asset}</p>
+          <p>{poolData.name}</p>
         </div>
         <div className={style.tableBodyDefinition + " " + style.totalSupplyHead}>
-          <p>{pool.totalSupply}M</p>
+          <p>{poolData.totalSupply}M</p>
         </div>
         <div className={style.tableBodyDefinition + " " + style.supplyApyHead}>
-          <p>{pool.supplyApy}%</p>
+          <p>{poolData.supplyApy}%</p>
         </div>
         <div className={style.tableBodyDefinition + " " + style.totalBorrowedHead}>
-          <p>{pool.totalBorrowed}M</p>
+          <p>{poolData.totalBorrowed}M</p>
         </div>
         <div className={style.tableBodyDefinition + " " + style.borrowApyVariableHead}>
-          <p>{pool.borrowApyVariable}%</p>
+          <p>{poolData.borrowApyVariable}%</p>
         </div>
         <div className={style.tableBodyDefinition + " " + style.borrowApyStableHead}>
-          <p>{pool.borrowApyStable}%</p>
+          <p>{poolData.borrowApyStable}%</p>
         </div>
       </div>
-    </a>
+    </div>
   )
 }
-
-export default PoolTableRow

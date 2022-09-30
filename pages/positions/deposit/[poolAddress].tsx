@@ -2,9 +2,10 @@ import type { NextPage } from 'next'
 import { Fragment } from 'react'
 import Image from 'next/image'
 import { ChevronDownIcon } from '@heroicons/react/solid'
-import TokenSelectorModal from '../../src/components/TokenSelectorModal'
+import TokenSelectorModal from '../../../src/components/TokenSelectorModal'
 import { Tab } from '@headlessui/react'
-import { useAddLiquidityHandler } from '../../src/hooks/useAddLiquidityHandler'
+import { useAddLiquidityHandler } from '../../../src/hooks/useAddLiquidityHandler'
+import { useRouter } from 'next/router'
 
 const AddLiquidityStyles = {
   reserveToken: {
@@ -60,6 +61,8 @@ const AddLiquidityStyles = {
 }
 
 const AddLiquidity: NextPage = () => {
+  const router = useRouter()
+  const { poolAddress } = router.query
   const style = AddLiquidityStyles
   const {
     handleTokenInput,

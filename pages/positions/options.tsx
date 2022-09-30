@@ -21,13 +21,13 @@ const Options: NextPage = () => {
       <div className={style.optionsContainer}>
         <h1 className={style.optionsHeader}>Open a New Position</h1>
         <div className={style.optionsButtonContainer}>
-          <Link href={'addliquidity'}>
+          <Link href={'deposit/0'}>
             <button className={style.optionsButtonContent}>
               <span className={style.hoveredOptionsButtonContent}></span>
               <div className={style.optionsButtonPrimary}>
-                <div className={style.buttonTitle}>Lend</div>
+                <div className={style.buttonTitle}>Provide Liquidity</div>
                 <div className={style.buttonText}>
-                  Provide liquidity with any ERC-20 Token pair.
+                  Lend liquidity with any ERC-20 Token pair.
                 </div>
               </div>
               <div className={style.optionsButtonSecondary}>
@@ -41,9 +41,9 @@ const Options: NextPage = () => {
             <button className={style.optionsButtonContent}>
             <span className={style.hoveredOptionsButtonContent}></span>
               <div className={style.optionsButtonPrimary}>
-                <div className={style.buttonTitle}>Borrow</div>
+                <div className={style.buttonTitle}>Short Liquidity</div>
                 <div className={style.buttonText}>
-                  Open a loan if you're long volatility and hedge against impermanent loss.
+                  Borrow liquidity to hedge against impermanent loss.
                 </div>
               </div>
               <div className={style.optionsButtonSecondary}>
