@@ -1,27 +1,33 @@
 import * as React from 'react'
-import { useState, useEffect, useContext, Dispatch, SetStateAction, useCallback, ChangeEvent } from 'react'
+import { useState, useEffect, useContext, Dispatch, SetStateAction, ChangeEvent } from 'react'
 import Tokens, { Token } from '../components/Tokens'
 import { WalletContext } from '../context/WalletContext'
 // TODO: import Factory from '../../abis/Factory.json'
-import PositionMgr from '../../abis/v0-hackathon/PositionManager.json'
-import IERC20 from '../../abis/v0-hackathon/ERC20.json'
-import { ethers, Contract, BigNumber, constants } from 'ethers'
+import IERC20 from '../../abis/v1-periphery/interfaces/external/IERC20.sol/IERC20.json'
+import { ethers, Contract, BigNumber } from 'ethers'
 import toast from 'react-hot-toast'
 import { InformationCircleIcon } from '@heroicons/react/solid'
 import { FieldValues, useForm } from 'react-hook-form'
 // For V1 Periphery
 import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
+import GammaPoolFactory from '../../abis/v1-core/GammaPoolFactory.sol/GammaPoolFactory.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
-import { getTokenBalance } from '../utils/getSmartContract'
+import { calcPoolKey, getTokenBalance } from '../utils/getSmartContract'
+import { validateAllowance } from '../utils/validation'
+import Protocols, { Protocol } from '../components/Protocols'
+import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
 
 const style = {
-  invalidatedButton: ' w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
-  confirmButton: 'w-full bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
+  invalidatedButton:
+    ' w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
+  confirmButton:
+    'w-full bg-blue-400 my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center cursor-pointer text-white mt-8 border-2 border-blue-400 hover:border-blue-300',
   confirmGrey: 'bg-[#274060] w-full rounded-2xl text-gray-500 inline-flex place-content-center py-2 font-semibold',
   confirmInsuffBal: 'bg-red-400 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold',
   confirmGreen: 'bg-green-300 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold',
   confirmButtonContainer: 'pb-4 w-full',
-  numberInputContainer: 'bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full',
+  numberInputContainer:
+    'bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full',
   numberInputHidden: 'p-4 border-2 invisible',
   numberInput: 'bg-transparent placeholder:text-gray-600 outline-none w-full text-3xl text-gray-300',
 }
@@ -31,10 +37,21 @@ enum CollateralType {
   LPToken,
   Token0,
   Token1,
-  Both
+  Both,
 }
 
+// TODO: need to figure whether to use this or enums
+const collateralTypes = [
+  { id: 1, type: 'Liquidity Pool Tokens', unavailable: false },
+  { id: 2, type: 'Token A', unavailable: false },
+  { id: 3, type: 'Token B', unavailable: false },
+  { id: 5, type: 'Both Tokens', unavailable: false },
+]
+
 export const useOpenLoanHandler = () => {
+  const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
+  const GAMMAFACTORY_ADDR = process.env.NEXT_PUBLIC_GAMMAFACTORY_ADDR || ''
+  const [collateralType, setCollateralType1] = useState(collateralTypes[0])
   const { provider, accountInfo } = useContext(WalletContext)
   const [token0, setToken0] = useState<Token>(Tokens[0])
   const [token1, setToken1] = useState<Token>({
@@ -43,10 +60,12 @@ export const useOpenLoanHandler = () => {
     address: '',
     decimals: 0,
   })
-  const [posManager, setPosManager] = useState<Contract | null>(null)
   const [peripheryPosManager, setPeripheryPosManager] = useState<Contract | null>(null)
+  const [protocol, setProtocol] = useState<Protocol>(Protocols[0])
+  const [gammaPoolFactory, setGammaPoolFactory] = useState<Contract | null>(null)
+  const [lpTokenBalance, setLpTokenBalance] = useState<string>('0')
 
-  const [collateralType, setCollateralType] = useState<CollateralType>(CollateralType.None)
+  // const [collateralType, setCollateralType] = useState<CollateralType>(CollateralType.None)
   const [collateralButtonText, setCollateralButtonText] = useState<string>('Select collateral type')
   const [confirmStyle, setConfirmStyle] = useState<string>(style.invalidatedButton)
   const [loanAmt, setLoanAmt] = useState<number>(0)
@@ -62,6 +81,7 @@ export const useOpenLoanHandler = () => {
   const [tooltipText, setTooltipText] = useState<string>('')
   const [token0Balance, setToken0Balance] = useState<string>('0')
   const [token1Balance, setToken1Balance] = useState<string>('0')
+  const [isApproved, setIsApproved] = useState<boolean>(false)
 
   useEffect(() => {
     if (!provider) {
@@ -69,26 +89,16 @@ export const useOpenLoanHandler = () => {
       return
     }
 
-    // Position Manager contract address
-    let pairsAddress =
-      process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
-        : '0xC6CB7f8c046756Bd33ad6b322a3b88B0CA9ceC1b'
-
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local') {
-      if (accountInfo && accountInfo?.address) {
-        setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
-      } else {
-        setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider))
-      }
+    if (accountInfo && accountInfo?.address) {
+      setPeripheryPosManager(
+        new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider.getSigner(accountInfo?.address))
+      )
+      setGammaPoolFactory(
+        new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider.getSigner(accountInfo?.address))
+      )
     } else {
-      if (accountInfo && accountInfo?.address) {
-        setPeripheryPosManager(
-          new ethers.Contract(pairsAddress, PositionManager.abi, provider.getSigner(accountInfo?.address))
-        )
-      } else {
-        setPeripheryPosManager(new ethers.Contract(pairsAddress, PositionManager.abi, provider))
-      }
+      setPeripheryPosManager(new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
+      setGammaPoolFactory(new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider))
     }
   }, [provider])
 
@@ -106,212 +116,211 @@ export const useOpenLoanHandler = () => {
     }
   }, [provider, token1])
 
-  async function openLoanHandler(data: FieldValues) {
+  useEffect(() => {
+    const getPoolData = async (cfmm: string, protocolId: number) => {
+      if (gammaPoolFactory && provider) {
+        let pool = await gammaPoolFactory.getPool(calcPoolKey(cfmm, protocolId))
+        if (pool && pool !== ethers.constants.AddressZero) {
+          let _gammaPool = null
+          if (accountInfo && accountInfo?.address) {
+            _gammaPool = new ethers.Contract(pool, GammaPool.abi, provider.getSigner(accountInfo.address))
+          } else {
+            _gammaPool = new ethers.Contract(pool, GammaPool.abi, provider)
+          }
+
+          if (_gammaPool) {
+            let res = await _gammaPool.balanceOf(accountInfo?.address)
+            console.log(res.toString())
+          }
+        }
+      }
+    }
+    if (token0.address && token1.address) {
+      getPoolData(process.env.NEXT_PUBLIC_CFMM_ADDRESS || '', protocol.id)
+    }
+  }, [token0, token1])
+
+  async function openLoanHandler() {
+    if (!collateralAmt0Str || !collateralAmt1Str || !loanAmtStr) {
+      notifyError('Please enter a valid amount and the amount must be positive')
+      return
+    }
     if (!accountInfo || !accountInfo.address) {
       notifyError('Wallet not connected.')
       return
     }
 
-    getPosMgr()
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local') {
-      if (!posManager) {
-        notifyError('Position manager not found.')
+    if (!gammaPoolFactory) {
+      await getGammaPoolFactory()
+    }
+
+    if (gammaPoolFactory) {
+      let pool = await gammaPoolFactory.getPool(calcPoolKey(process.env.NEXT_PUBLIC_CFMM_ADDRESS || '', protocol.id))
+      if (pool === ethers.constants.AddressZero) {
+        notifyError('Please create a pool before continuing')
         return
       }
+    }
 
-      if (!provider) {
-        notifyError('Provider not set.')
-        return
-      }
-
-      // unpack
-      let amt0BN = data.collateralAmt0
-        ? ethers.utils.parseUnits(data.collateralAmt0, token0.decimals)
-        : BigNumber.from(0)
-      let amt1BN = data.collateralAmt1
-        ? ethers.utils.parseUnits(data.collateralAmt1, token1.decimals)
-        : BigNumber.from(0)
-      let loanAmtBN = ethers.utils.parseUnits(data.loanAmt, 18) // 18 is from DepositPool.decimals
-      let collateralType = data.collateralType
-      let accountAddress = accountInfo.address ? accountInfo.address : ''
-
-      try {
-        let erc20
-        // TODO: adjust cases with new state, would probably want to ensureAllowance onChange of input
-        switch (collateralType) {
-          case CollateralType.LPToken:
-            // TODO: currently no way to know get uniPair without factory
-            // can't get it from position because there's no position yet
-            break
-          case CollateralType.Token0:
-            erc20 = new ethers.Contract(token0.address, IERC20.abi, provider)
-            await ensureAllowance(accountAddress, erc20, amt0BN, token0.decimals, token0.symbol)
-            break
-          case CollateralType.Token1:
-            // switch the amounts because amount comes from first input
-            amt1BN = amt0BN
-            amt0BN = BigNumber.from(0)
-            erc20 = new ethers.Contract(token1.address, IERC20.abi, provider)
-            await ensureAllowance(accountAddress, erc20, amt1BN, token1.decimals, token1.symbol)
-            break
-          case CollateralType.Both:
-            let erc20Token0 = new ethers.Contract(token0.address, IERC20.abi, provider)
-            let erc20Token1 = new ethers.Contract(token1.address, IERC20.abi, provider)
-            await ensureAllowance(accountAddress, erc20Token0, amt0BN, token0.decimals, token0.symbol).then(() =>
-              ensureAllowance(accountAddress, erc20Token1, amt1BN, token1.decimals, token1.symbol)
-            )
-            break
-          default:
-            notifyError('Invalid collateral type.')
-            return
+    if (!peripheryPosManager) {
+      await getPosMgr()
+    }
+    if (peripheryPosManager) {
+      let loan = await createLoan()
+      if (loan) {
+        const { args } = loan.events[1]
+        let tokenId = args.tokenId
+        console.log(tokenId)
+        if (tokenId) {
+          let collateral = await increaseCollateral(tokenId)
+          console.log(collateral)
+          if (collateral) {
+            let borrow = await borrowLiquidity(tokenId)
+            console.log(borrow)
+            if (borrow) {
+              notifySuccess('Successful')
+            }
+          }
         }
-        // TODO: wait for contract to handle collateral
-        let tx = await posManager.openPosition(
-          token0.address,
-          token1.address,
-          amt0BN,
-          amt1BN,
-          loanAmtBN,
-          accountAddress
-        )
-        let loading = notifyLoading('Waiting for block confirmation')
-        let receipt = await tx.wait()
-        if (receipt.status == 1) {
-          notifyDismiss(loading)
-          notifySuccess('Position opened successfully.')
-          return
-        }
-        notifyError('Open position was unsuccessful.')
-      } catch (e) {
-        if (typeof e === 'string') {
-          notifyError(e)
-        } else if (e instanceof Error) {
-          notifyError(e.message)
-        }
-      }
-    } else {
-      if (peripheryPosManager) {
-        let loading = notifyLoading('Waiting for block confirmation')
-        createLoan()
-          .then((res) => {
-            const { args } = res.events[1]
-            let tokenId = args.tokenId.toNumber()
-            console.log(tokenId)
-            borrowLiquidity(tokenId)
-              .then((result) => {
-                console.log(result)
-                toast.success('Open loan was successful')
-                toast.dismiss(loading)
-              })
-              .catch((err) => {
-                notifyDismiss(loading)
-                notifyError('Borrow liquidity was unsuccessful: ' + err)
-              })
-          })
-          .catch((err) => {
-            notifyDismiss(loading)
-            notifyError('Create loan was unsuccessful' + err)
-          })
       }
     }
   }
 
   async function createLoan() {
-    if (peripheryPosManager && accountInfo) {
-      let tx = await peripheryPosManager.createLoan(
-        process.env.NEXT_PUBLIC_CFMM_ADDRESS,
-        1,
-        accountInfo?.address,
-        ethers.constants.MaxUint256
-      )
-      return await tx.wait()
-    }
-  }
-
-  async function borrowLiquidity(tokenId: number) {
-    if (peripheryPosManager && accountInfo) {
-      const BorrowLiquidityParams = {
-        cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
-        protocol: 1,
-        tokenId: tokenId,
-        lpTokens: 1,
-        to: accountInfo?.address,
-        deadline: ethers.constants.MaxUint256,
-      }
-      let tx = await peripheryPosManager.borrowLiquidity(BorrowLiquidityParams)
-      return await tx.wait()
-    }
-  }
-
-  async function ensureAllowance(
-    account: string,
-    erc20: Contract,
-    amountBN: BigNumber,
-    decimals: number,
-    symbol: string
-  ) {
+    let loading = notifyLoading('Waiting for create loan')
     try {
-      let amountStr = ethers.utils.formatUnits(amountBN, decimals)
-
-      // check enough balance
-      let balanceBN = await erc20.balanceOf(account)
-      if (balanceBN < amountBN) {
-        notifyError(
-          'Not enough funds. Requested: ' + amountStr + ' Balance ' + ethers.utils.formatUnits(balanceBN, decimals)
+      if (peripheryPosManager && accountInfo) {
+        let tx = await peripheryPosManager.createLoan(
+          process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+          1,
+          accountInfo?.address,
+          ethers.constants.MaxUint256,
+          { gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT }
         )
+        notifyDismiss(loading)
+        return await tx.wait()
+      } else {
+        notifyDismiss(loading)
+        notifyError(
+          'An error occurred while fetching contract and user information. Please check you wallet is connected and try again'
+        )
+        return false
       }
-      // check enough allowance
-      let allowance = await erc20.allowance(account, posManager?.address)
-      if (allowance < amountBN) {
-        return approve(erc20, posManager?._address)
-      }
-    } catch (e) {
-      if (typeof e === 'string') {
-        notifyError('checkAllowance: ' + e)
-      } else if (e instanceof Error) {
-        notifyError('checkAllowance: ' + e.message)
-      }
+    } catch (err) {
+      notifyDismiss(loading)
+      notifyError('An error occurred while trying to create loan. Please try again.')
+      return false
     }
   }
 
-  async function approve(fromTokenContract: Contract, spender: string) {
-    let tx = await fromTokenContract.approve(spender, constants.MaxUint256)
-    let loading = notifyLoading('Waiting for approval')
-    let receipt = await tx.wait()
-    notifyDismiss(loading)
-    if (receipt.status == 1) {
-      notifySuccess('Approval completed')
-      return
+  const increaseCollateral = async (tokenId: string) => {
+    let loading = notifyLoading('Waiting for increase collateral')
+    try {
+      let amounts = ['0']
+      switch (collateralType.type) {
+        case 'Liquidity Pool Tokens':
+          amounts = [collateralAmt0Str]
+          break
+        case 'Token A':
+          amounts = [collateralAmt0Str]
+          break
+        case 'Token B':
+          amounts = [collateralAmt1Str]
+          break
+        case 'Both Tokens':
+          amounts = [collateralAmt0Str, collateralAmt1Str]
+          break
+      }
+      if (peripheryPosManager && accountInfo) {
+        const AddRemoveCollateralParams = {
+          cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+          protocol: protocol.id,
+          tokenId: tokenId,
+          amounts: amounts,
+          to: accountInfo?.address,
+          deadline: ethers.constants.MaxUint256,
+        }
+
+        let tx = await peripheryPosManager.increaseCollateral(AddRemoveCollateralParams, {
+          gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT,
+        })
+        notifyDismiss(loading)
+        return await tx.wait()
+      } else {
+        notifyDismiss(loading)
+        notifyError(
+          'An error occurred while fetching contract and user information. Please check you wallet is connected and try again'
+        )
+        return false
+      }
+    } catch (err) {
+      notifyDismiss(loading)
+      notifyError('An error occurred while trying to increase collateral. Please try again.')
+      return false
     }
-    notifySuccess('Approval failed')
   }
 
-  function getPosMgr() {
+  async function borrowLiquidity(tokenId: string) {
+    let loading = notifyLoading('Waiting for increase collateral')
+    try {
+      if (peripheryPosManager && accountInfo) {
+        const BorrowLiquidityParams = {
+          cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+          protocol: protocol.id,
+          tokenId: tokenId,
+          lpTokens: loanAmtStr,
+          to: accountInfo?.address,
+          deadline: ethers.constants.MaxUint256,
+        }
+        let tx = await peripheryPosManager.borrowLiquidity(BorrowLiquidityParams)
+        notifyDismiss(loading)
+        return await tx.wait()
+      } else {
+        notifyDismiss(loading)
+        notifyError(
+          'An error occurred while fetching contract and user information. Please check you wallet is connected and try again'
+        )
+        return false
+      }
+    } catch (err) {
+      notifyDismiss(loading)
+      notifyError('An error occurred while trying to borrow liquidity. Please try again.')
+      return false
+    }
+  }
+
+  const getPosMgr = async () => {
     if (token0 == token1) {
       toast('Token values must be different', { icon: <InformationCircleIcon /> })
       return
     }
-    let pairsAddress =
-      process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-        ? process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS || ''
-        : '0xC6CB7f8c046756Bd33ad6b322a3b88B0CA9ceC1b'
 
     //TODO: when the factory is available need to call it to get the pair's pool address to set
 
     if (provider) {
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local' && !posManager) {
+      if (!peripheryPosManager) {
         if (accountInfo && accountInfo?.address) {
-          setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
-        } else {
-          setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider))
-        }
-      } else if (!peripheryPosManager) {
-        if (accountInfo && accountInfo?.address) {
-          setPeripheryPosManager(
-            new ethers.Contract(pairsAddress, PositionManager.abi, provider.getSigner(accountInfo?.address))
+          await setPeripheryPosManager(
+            new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider.getSigner(accountInfo?.address))
           )
         } else {
-          setPeripheryPosManager(new ethers.Contract(pairsAddress, PositionManager.abi, provider))
+          await setPeripheryPosManager(new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
+        }
+      }
+    } else {
+      toast('Please connect wallet', { icon: <InformationCircleIcon /> })
+    }
+  }
+
+  const getGammaPoolFactory = async () => {
+    if (provider) {
+      if (!gammaPoolFactory) {
+        if (accountInfo && accountInfo?.address) {
+          await setGammaPoolFactory(
+            new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider.getSigner(accountInfo?.address))
+          )
+        } else {
+          await setGammaPoolFactory(new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider))
         }
       }
     } else {
@@ -344,15 +353,15 @@ export const useOpenLoanHandler = () => {
 
   useEffect(() => {
     setIsOpen(false)
-    setCollateralButtonText(getCollateralTypeButtonText(collateralType))
+    // setCollateralButtonText(getCollateralTypeButtonText(collateralType))
     setCollateralAmt1(0)
     setCollateralAmt1Str('')
-    setCollateral1Class(collateralType == CollateralType.Both ? style.numberInputContainer : style.numberInputHidden)
+    // setCollateral1Class(collateralType == CollateralType.Both ? style.numberInputContainer : style.numberInputHidden)
     validate()
   }, [collateralType])
 
   function resetCollateralType() {
-    setCollateralType(CollateralType.None)
+    // setCollateralType(CollateralType.None)
     setCollateralButtonText(getCollateralTypeButtonText(CollateralType.None))
     setConfirmStyle(style.invalidatedButton)
     setCollateral1Class(style.numberInputHidden)
@@ -370,11 +379,11 @@ export const useOpenLoanHandler = () => {
       setConfirmStyle(style.confirmGrey)
       return false
     }
-    if (collateralType == CollateralType.None) {
-      setButtonText('Collateral must be selected')
-      setConfirmStyle(style.confirmGrey)
-      return false
-    }
+    // if (collateralType == CollateralType.None) {
+    //   setButtonText('Collateral must be selected')
+    //   setConfirmStyle(style.confirmGrey)
+    //   return false
+    // }
     if (loanAmt <= 0) {
       setButtonText('Loan amount must be positive')
       setConfirmStyle(style.confirmGrey)
@@ -385,11 +394,11 @@ export const useOpenLoanHandler = () => {
       setConfirmStyle(style.confirmGrey)
       return false
     }
-    if (collateralType == CollateralType.Both && collateralAmt1 <= 0) {
-      setButtonText(token1.symbol + ' collateral amount must be positive')
-      setConfirmStyle(style.confirmGrey)
-      return false
-    }
+    // if (collateralType == CollateralType.Both && collateralAmt1 <= 0) {
+    //   setButtonText(token1.symbol + ' collateral amount must be positive')
+    //   setConfirmStyle(style.confirmGrey)
+    //   return false
+    // }
     setButtonText('Confirm')
     setConfirmStyle(style.confirmGreen)
     return true
@@ -403,7 +412,7 @@ export const useOpenLoanHandler = () => {
     if (!validate()) {
       return
     }
-    return openLoanHandler(data)
+    // return openLoanHandler(data)
   }
 
   // checks for non-numeric value inputs
@@ -458,6 +467,98 @@ export const useOpenLoanHandler = () => {
 
   setValue('collateralType', collateralType)
 
+  const approveTransaction = async () => {
+    if (collateralType.type === 'Token A' && !collateralAmt0Str) {
+      notifyError('Please enter a valid amount')
+      return
+    }
+
+    if (collateralType.type === 'Token B' && !collateralAmt1Str) {
+      notifyError('Please enter a valid amount')
+      return
+    }
+
+    if (collateralType.type === 'Both Tokens' && (!collateralAmt0Str || !collateralAmt1Str)) {
+      notifyError('Please enter a valid amount')
+      return
+    }
+
+    if (collateralType.type === 'Liquidity Pool Tokens' && !collateralAmt0Str) {
+      notifyError('Please enter a valid amount')
+      return
+    }
+
+    if (accountInfo?.address && provider) {
+      let approvalA, approvalB, approvalCFMM
+      if (collateralType.type === 'Token A' || collateralType.type === 'Both Tokens') {
+        let token0Contract = new ethers.Contract(
+          token0.address,
+          IERC20.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+
+        approvalA = await validateAllowance(
+          accountInfo.address,
+          token0Contract,
+          BigNumber.from(collateralAmt0Str),
+          POSITION_MANAGER_ADDRESS || ''
+        )
+
+        if (!approvalA) {
+          return
+        }
+      }
+
+      if (collateralType.type === 'Token B' || collateralType.type === 'Both Tokens') {
+        let token1Contract = new ethers.Contract(
+          token1.address,
+          IERC20.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+
+        approvalB = await validateAllowance(
+          accountInfo.address,
+          token1Contract,
+          BigNumber.from(collateralAmt1Str),
+          POSITION_MANAGER_ADDRESS || ''
+        )
+
+        if (!approvalB) {
+          return
+        }
+      }
+
+      if (collateralType.type === 'Liquidity Pool Tokens') {
+        let cfmmContract = new ethers.Contract(
+          process.env.NEXT_PUBLIC_CFMM_ADDRESS || '',
+          IERC20.abi,
+          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        )
+
+        approvalCFMM = await validateAllowance(
+          accountInfo.address,
+          cfmmContract,
+          BigNumber.from(collateralAmt0Str),
+          POSITION_MANAGER_ADDRESS || ''
+        )
+
+        if (!approvalCFMM) {
+          return
+        }
+      }
+      setIsApproved(true)
+
+      // if (collateralType.type === 'Liquidity Pool Tokens' && approvalCFMM) {
+      // } else if (collateralType.type === 'Both Tokens' && approvalA && approvalB) {
+      //   setIsApproved(true)
+      // } else if (collateralType.type === 'Token A' && approvalA) {
+      //   setIsApproved(true)
+      // } else if (collateralType.type === 'Token B' && approvalB) {
+      //   setIsApproved(true)
+      // }
+    }
+  }
+
   return {
     token0,
     token1,
@@ -473,7 +574,8 @@ export const useOpenLoanHandler = () => {
     setLoanAmt,
     collateralButtonText,
     isOpen,
-    setCollateralType,
+    collateralType,
+    setCollateralType1,
     collateralAmt0Str,
     setCollateralAmt0Str,
     setCollateralAmt0,
@@ -487,5 +589,10 @@ export const useOpenLoanHandler = () => {
     setTooltipText,
     token0Balance,
     token1Balance,
+    approveTransaction,
+    isApproved,
+    collateralTypes,
+    openLoanHandler,
+    lpTokenBalance,
   }
 }

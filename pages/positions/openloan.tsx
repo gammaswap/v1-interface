@@ -1,5 +1,4 @@
 import type { NextPage } from 'next'
-import { useState } from 'react'
 import { ChevronDownIcon, ArrowLeftIcon, CheckIcon, InformationCircleIcon } from '@heroicons/react/outline'
 import PairsSelector from '../../src/components/PairsSelector'
 import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
@@ -17,7 +16,8 @@ export const OpenLoanStyles = {
   loanAmountHeader: 'flex space-x-1 items-center',
   sectionHeader: 'font-semibold text-neutrals-400',
   infoIcon: 'text-neutrals-400 w-4 h-4 cursor-pointer hover:text-neutrals-100',
-  numberInputContainer: 'bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full',
+  numberInputContainer:
+    'bg-gray-800 rounded-2xl p-4 border-2 border-gray-800 hover:border-gray-600 flex justify-between w-full',
   numberInputHidden: 'p-4 border-2 invisible',
   numberInput: 'bg-transparent placeholder:text-gray-600 outline-none w-full text-3xl text-gray-300',
   nonSelectedTokenContainer: 'flex items-center text-gray-200',
@@ -30,10 +30,12 @@ export const OpenLoanStyles = {
   tokenSelectorTicker: 'mx-2',
   dropdownArrow: 'w-4 h-4',
   infoGroup: 'inline-flex w-full place-content-center pt-1',
-  loanInfoButton: 'bg-primaryV2-4 rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex mr-2 px-2 py-1 items-center hover:bg-primaryV2-3 hover:shadow-primaryV2-3/30 tooltip',
+  loanInfoButton:
+    'bg-primaryV2-4 rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex mr-2 px-2 py-1 items-center hover:bg-primaryV2-3 hover:shadow-primaryV2-3/30 tooltip',
   collateralHeader: 'inline-flex w-full place-content-start',
   collateralHeaderText: 'font-semibold text-gray-200',
-  selectCollateralButton: 'bg-[#274060] rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex px-2 py-1 items-center mx-4',
+  selectCollateralButton:
+    'bg-[#274060] rounded-2xl text-slate-200 text-[8px] font-semibold inline-flex px-2 py-1 items-center mx-4',
   chrevronIcon: 'ml-1',
   confirmGrey: 'bg-[#274060] w-full rounded-2xl text-gray-500 inline-flex place-content-center py-2 font-semibold',
   confirmInsuffBal: 'bg-red-400 w-full rounded-2xl text-slate-200 inline-flex place-content-center py-2 font-semibold',
@@ -41,33 +43,36 @@ export const OpenLoanStyles = {
   confirmButtonContainer: 'w-full',
   interestRateText: 'w-full text-right text-gray-200 pr-4',
   spacer: 'p-5',
-  
+
   collateralAmountContainer: 'bg-neutrals-700 rounded-lg drop-shadow-md mt-5 p-4',
   collateralTypeDropdownContainer: 'relative left-3 text-neutrals-100 text-sm',
-  collateralTypeDropdownButton: 'flex justify-around items-center bg-neutrals-800 py-2 rounded-lg cursor-pointer w-[12rem] drop-shadow-md hover:bg-neutrals-600',
+  collateralTypeDropdownButton:
+    'flex justify-around items-center bg-neutrals-800 py-2 rounded-lg cursor-pointer w-[12rem] drop-shadow-md hover:bg-neutrals-600',
   collateralTypeDropdownOptions: 'absolute top-0 right-30 w-full bg-neutrals-800 p-2 rounded-lg drop-shadow-md',
   collateralTypeDropdownOption: 'flex items-center space-x-1 cursor-pointer p-1.5 rounded-md',
   collateralTypeDropdownActiveOption: 'cursor-pointer p-1.5 rounded-md bg-accents-royalBlue',
   checkIcon: 'w-4 h-4',
   chosenCollateralTypeContainer: 'mt-4',
-  
+
   loanMetricsContainer: 'flex space-x-5 mt-5 text-neutrals-100',
   loanMetric: 'bg-neutrals-700 w-1/3 py-3 drop-shadow-md rounded-lg',
   loanMetricHeader: 'flex justify-center items-center space-x-1 text-xxs',
   metricValue: 'text-center',
-  
+
   buttonDiv: 'flex text-xl font-semibold space-x-5 mt-6',
   confirmButton: 'w-1/2 bg-primary-blue text-center py-3 px-5 rounded-lg cursor-pointer',
   invalidatedButton: 'w-1/2 disabled text-center py-3 px-5 rounded-lg text-gray-600 border-2 border-gray-700',
 }
 
 const tips = {
-  maxltv: 'The Maximum LTV ratio represents the maximum borrowing power of a ' +
-  'specific collateral. For example, if a collateral has an LTV of 75%, the ' +
-  'user can borrow up to 0.75 worth of ETH in the principal currency for ' +
-  'every 1 ETH worth of collateral.',
-  threshold: 'This represents the threshold at which a borrow position will ' +
-  'be considered undercollateralized and subject to liquidation for each ' +
+  maxltv:
+    'The Maximum LTV ratio represents the maximum borrowing power of a ' +
+    'specific collateral. For example, if a collateral has an LTV of 75%, the ' +
+    'user can borrow up to 0.75 worth of ETH in the principal currency for ' +
+    'every 1 ETH worth of collateral.',
+  threshold:
+    'This represents the threshold at which a borrow position will ' +
+    'be considered undercollateralized and subject to liquidation for each ' +
     'collateral. For example, if a collateral has a liquidation threshold of ' +
     '80%, it means that the position will be liquidated when the debt value is ' +
     'worth 80% of the collateral value.',
@@ -78,18 +83,7 @@ const tips = {
     'penalty) as a bonus.',
 }
 
-// TODO: need to figure whether to use this or enums
-const collateralTypes = [
-  { id: 1, type: 'Liquidity Pool Tokens', unavailable: false },
-  { id: 2, type: 'Token A', unavailable: false },
-  { id: 3, type: 'Token B', unavailable: false },
-  { id: 5, type: 'Both Tokens', unavailable: false },
-]
-
 const OpenLoan: NextPage = () => {
-  // TODO: this state needs to be updated and moved into handler
-  const [collateralType, setCollateralType1] = useState(collateralTypes[0])
-
   const style = OpenLoanStyles
   const {
     token0,
@@ -106,7 +100,6 @@ const OpenLoan: NextPage = () => {
     setLoanAmt,
     collateralButtonText,
     isOpen,
-    setCollateralType,
     collateralAmt0Str,
     setCollateralAmt0Str,
     setCollateralAmt0,
@@ -120,32 +113,85 @@ const OpenLoan: NextPage = () => {
     setTooltipText,
     token0Balance,
     token1Balance,
+    approveTransaction,
+    isApproved,
+    collateralType,
+    setCollateralType1,
+    collateralTypes,
+    openLoanHandler,
+    lpTokenBalance
   } = useOpenLoanHandler()
 
   // TODO: needs to be updated and moved into handler
   let collateralElems
   switch (collateralType.type) {
-    case "Liquidity Pool Tokens":
-      collateralElems = <CollateralUserInput collateralType={collateralType.type} token0={token0} token1={token1} />
-    break
-    case "Token A":
-      collateralElems = <CollateralUserInput collateralType={collateralType.type} token0={token0} token1={token1}  />
-    break
-    case "Token B":
-      collateralElems = <CollateralUserInput collateralType={collateralType.type} token0={token0} token1={token1}  />
-    break
-    case "Both Tokens":
+    case 'Liquidity Pool Tokens':
+      collateralElems = (
+        <CollateralUserInput
+          token0Balance={token0Balance}
+          token1Balance={token1Balance}
+          collateralType={collateralType.type}
+          token0={token0}
+          token1={token1}
+          inputValue={collateralAmt0Str}
+          setTokenValue={setCollateralAmt0Str}
+        />
+      )
+      break
+    case 'Token A':
+      collateralElems = (
+        <CollateralUserInput
+          token0Balance={token0Balance}
+          token1Balance={''}
+          collateralType={collateralType.type}
+          token0={token0}
+          token1={token1}
+          inputValue={collateralAmt0Str}
+          setTokenValue={setCollateralAmt0Str}
+        />
+      )
+      break
+    case 'Token B':
+      collateralElems = (
+        <CollateralUserInput
+          token0Balance={''}
+          token1Balance={token1Balance}
+          collateralType={collateralType.type}
+          token0={token0}
+          token1={token1}
+          inputValue={collateralAmt1Str}
+          setTokenValue={setCollateralAmt1Str}
+        />
+      )
+      break
+    case 'Both Tokens':
       collateralElems = (
         <>
-          <CollateralUserInput collateralType={"Token A"} token0={token0} token1={token1}  />
-          <CollateralUserInput collateralType={"Token B"} token0={token0} token1={token1}  />
+          <CollateralUserInput
+            token0Balance={token0Balance}
+            token1Balance={''}
+            collateralType={'Token A'}
+            token0={token0}
+            token1={token1}
+            inputValue={collateralAmt0Str}
+            setTokenValue={setCollateralAmt0Str}
+          />
+          <CollateralUserInput
+            token0Balance={''}
+            token1Balance={token1Balance}
+            collateralType={'Token B'}
+            token0={token0}
+            token1={token1}
+            inputValue={collateralAmt1Str}
+            setTokenValue={setCollateralAmt1Str}
+          />
         </>
       )
   }
 
   return (
     <div className={style.wrapper}>
-      <div className={`${style.container} ${collateralType.type == "Both Tokens" ? "h-[45rem]" : "h-[41rem]"}`}>
+      <div className={`${style.container} ${collateralType.type == 'Both Tokens' ? 'h-[45rem]' : 'h-[41rem]'}`}>
         <div className={style.headerContainer}>
           <ArrowLeftIcon className={style.backButton} />
           <div className={style.formHeader}>Open a Loan</div>
@@ -159,7 +205,15 @@ const OpenLoan: NextPage = () => {
             {/* need to add popup for info */}
             <InformationCircleIcon className={style.infoIcon} />
           </div>
-          <CollateralUserInput collateralType={collateralTypes[0].type} token0={token0} token1={token1}  />
+          <CollateralUserInput
+            token0Balance={lpTokenBalance}
+            token1Balance={''}
+            collateralType={collateralTypes[0].type}
+            token0={token0}
+            token1={token1}
+            inputValue={loanAmtStr}
+            setTokenValue={setLoanAmtStr}
+          />
         </div>
         <div className={style.collateralAmountContainer}>
           <div className={style.loanAmountHeader}>
@@ -167,20 +221,26 @@ const OpenLoan: NextPage = () => {
             {/* need to add popup for info */}
             <InformationCircleIcon className={style.infoIcon} />
             {/* Collateral Type Dropdown */}
-            <Listbox as="div" className={style.collateralTypeDropdownContainer} value={collateralType} onChange={setCollateralType1}>
+            <Listbox
+              as="div"
+              className={style.collateralTypeDropdownContainer}
+              value={collateralType}
+              onChange={setCollateralType1}
+              disabled={token0.address === '' || token1.address === ''}
+            >
               <Listbox.Button className={style.collateralTypeDropdownButton}>
                 <h1>{collateralType.type}</h1>
-                <ChevronDownIcon className={style.dropdownArrow}/>
+                <ChevronDownIcon className={style.dropdownArrow} />
               </Listbox.Button>
               <Listbox.Options className={style.collateralTypeDropdownOptions}>
-                {collateralTypes.map(type => (
-                  <Listbox.Option
-                    key={type.id}
-                    value={type}
-                    disabled={type.unavailable}
-                  >
+                {collateralTypes.map((type) => (
+                  <Listbox.Option key={type.id} value={type} disabled={type.unavailable}>
                     {({ active, selected }) => (
-                      <div className={`${style.collateralTypeDropdownOption} ${active && style.collateralTypeDropdownActiveOption}`}>
+                      <div
+                        className={`${style.collateralTypeDropdownOption} ${
+                          active && style.collateralTypeDropdownActiveOption
+                        }`}
+                      >
                         {selected && <CheckIcon className={style.checkIcon} />}
                         <h1>{type.type}</h1>
                       </div>
@@ -190,16 +250,14 @@ const OpenLoan: NextPage = () => {
               </Listbox.Options>
             </Listbox>
           </div>
-          <div className={style.chosenCollateralTypeContainer}>
-            {collateralElems}
-          </div>
+          <div className={style.chosenCollateralTypeContainer}>{collateralElems}</div>
         </div>
         <div className={style.loanMetricsContainer}>
           <div className={style.loanMetric}>
             <div className={style.loanMetricHeader}>
               <h2>Interest Rate</h2>
               {/* need to add popup for info */}
-              <InformationCircleIcon className={style.infoIcon}/>
+              <InformationCircleIcon className={style.infoIcon} />
             </div>
             <p className={style.metricValue}>11.32%</p>
           </div>
@@ -207,7 +265,7 @@ const OpenLoan: NextPage = () => {
             <div className={style.loanMetricHeader}>
               <h2>Health Rate</h2>
               {/* need to add popup for info */}
-              <InformationCircleIcon className={style.infoIcon}/>
+              <InformationCircleIcon className={style.infoIcon} />
             </div>
             <p className={style.metricValue}>2.44</p>
           </div>
@@ -215,20 +273,27 @@ const OpenLoan: NextPage = () => {
             <div className={style.loanMetricHeader}>
               <h2>Calculated Gains</h2>
               {/* need to add popup for info */}
-              <InformationCircleIcon className={style.infoIcon}/>
+              <InformationCircleIcon className={style.infoIcon} />
             </div>
             <p className={`${style.metricValue} text-secondary-jungleGreen`}>+ $29.1030</p>
           </div>
         </div>
         {/* TODO: need to add logic */}
         <div className={style.buttonDiv}>
-          <div
-            className={style.confirmButton}
-            // onClick={() => approveTransaction}
-          >
-            Approve
-          </div>
-          <div className={style.invalidatedButton}>Remove</div>
+          {token0.address && token1.address && !isApproved ? (
+            <div className={style.confirmButton} onClick={approveTransaction}>
+              Approve
+            </div>
+          ) : (
+            <div className={style.invalidatedButton}>Approve</div>
+          )}
+          {!isApproved ? (
+            <div className={style.invalidatedButton}>Remove</div>
+          ) : (
+            <div className={style.confirmButton} onClick={openLoanHandler}>
+              Remove
+            </div>
+          )}
         </div>
       </div>
     </div>
