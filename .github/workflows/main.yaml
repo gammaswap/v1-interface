@@ -15,6 +15,6 @@ jobs:
           node-version: 16
           registry-url: https://npm.pkg.github.com/
           scope: '@gammaswap'
-      - run: tsc --watch false
       - run: yarn
+      - run: tsc --watch false
       - run: yarn build
