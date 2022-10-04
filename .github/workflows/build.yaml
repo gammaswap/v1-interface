@@ -16,7 +16,7 @@ jobs:
           registry-url: https://npm.pkg.github.com/
           scope: '@gammaswap'
       - run: yarn
-          env:
+        env:
           NODE_AUTH_TOKEN: ${{secrets.GS_TOKEN}}
       - run: tsc --watch false
       - run: yarn build
