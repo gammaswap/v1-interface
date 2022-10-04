@@ -8,7 +8,12 @@
 
 ## Install Dependencies
 
-Install the necessary packages by using the command after you have installed yarn:
+1. Add .npmrc file in root folder with the following contents:
+```
+   @gammaswap:registry=https://npm.pkg.github.com/
+   //npm.pkg.github.com/:_authToken=<GITHUB_ACCESS_TOKEN>
+```
+2. Install the necessary packages by using the command after you have installed yarn:
 
 `yarn`
 

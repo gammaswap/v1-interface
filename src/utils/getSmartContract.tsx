@@ -3,7 +3,7 @@ import { BigNumber, Contract, ethers } from 'ethers'
 import { Provider } from '@ethersproject/providers'
 import { AccountInfo } from '../context/WalletContext'
 import { notifyError } from '../hooks/useNotification'
-import IERC20 from '../../abis/v1-periphery/interfaces/external/IERC20.sol/IERC20.json'
+import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
 import { Token } from '../components/Tokens'
 
 const erc20ABI = require('erc-20-abi')

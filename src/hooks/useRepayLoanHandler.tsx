@@ -2,8 +2,8 @@ import {useState, useContext, useEffect} from 'react'
 import { ethers, Contract } from 'ethers'
 import Tokens, { Token } from '../components/Tokens'
 import { WalletContext } from '../context/WalletContext'
-import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
-import GammaPool from '../../abis/v1-core/GammaPool.sol/GammaPool.json'
+import PosManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
+import GammaPool from '@gammaswap/v1-core/artifacts/contracts/GammaPool.sol/GammaPool.json'
 import toast from 'react-hot-toast'
 
 export const useRepayLoanHandler = () => {
