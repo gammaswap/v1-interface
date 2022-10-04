@@ -17,5 +17,4 @@ jobs:
           scope: '@gammaswap'
       - run: yarn
       - run: tsc --watch false
-      - run: 
       - run: yarn build
