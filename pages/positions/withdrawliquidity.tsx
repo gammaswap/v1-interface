@@ -52,21 +52,21 @@ const WithdrawLiquidity: NextPage = () => {
             <ArrowLeftIcon className={style.backButton}/>
             <div className={style.formHeader}>Withdraw Liquidity</div>
             <Tab.List className={style.tabsContainer}>
-                <Tab as={Fragment}>
-                  {({ selected }) => (
-                    <button className={selected ?  style.activeTab : style.tab}>
-                      LP
-                    </button>
-                  )}
-                </Tab>
-                <Tab as={Fragment}>
-                  {({ selected }) => (
-                    <button className={selected ?  style.activeTab : style.tab}>
-                      Reserve
-                    </button>
-                  )}
-                </Tab>
-              </Tab.List>
+              <Tab as={Fragment}>
+                {({ selected }) => (
+                  <button className={selected ?  style.activeTab : style.tab}>
+                    LP
+                  </button>
+                )}
+              </Tab>
+              <Tab as={Fragment}>
+                {({ selected }) => (
+                  <button className={selected ?  style.activeTab : style.tab}>
+                    Reserve
+                  </button>
+                )}
+              </Tab>
+            </Tab.List>
           </div>
           <div className={style.sliderContainer}>
             <div className={style.sectionHeader}>Amount</div>
@@ -142,10 +142,10 @@ const WithdrawLiquidity: NextPage = () => {
                 withdraw(sliderPercentage)
               }}
             >
-              Remove
+              Confirm
             </div>
           ) : (
-            <div className={style.invalidatedButton}>Remove</div>
+            <div className={style.invalidatedButton}>Confirm</div>
           )}
         </div>
       </div>
