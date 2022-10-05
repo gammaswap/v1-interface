@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { ethers, Contract } from 'ethers'
 import { WalletContext } from '../../src/context/WalletContext'
-import GammaPoolFactory from '../../abis/v1-core/GammaPoolFactory.sol/GammaPoolFactory.json'
+import GammaPoolFactory from '@gammaswap/v1-core/artifacts/contracts/GammaPoolFactory.sol/GammaPoolFactory.json'
 import { calcPoolKey } from '../../src/utils/getSmartContract'
 import Protocols, { Protocol } from '../components/Protocols'
 import {notifySuccess, notifyError} from '../../src/hooks/useNotification'

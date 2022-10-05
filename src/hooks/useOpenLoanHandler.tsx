@@ -3,14 +3,12 @@ import { useState, useEffect, useContext, Dispatch, SetStateAction, useCallback,
 import Tokens, { Token } from '../components/Tokens'
 import { WalletContext } from '../context/WalletContext'
 // TODO: import Factory from '../../abis/Factory.json'
-import PositionMgr from '../../abis/v0-hackathon/PositionManager.json'
-import IERC20 from '../../abis/v0-hackathon/ERC20.json'
+import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
 import toast from 'react-hot-toast'
 import { InformationCircleIcon } from '@heroicons/react/solid'
 import { FieldValues, useForm } from 'react-hook-form'
-// For V1 Periphery
-import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
+import PositionManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
 import { getTokenBalance } from '../utils/getSmartContract'
 
@@ -77,9 +75,9 @@ export const useOpenLoanHandler = () => {
 
     if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local') {
       if (accountInfo && accountInfo?.address) {
-        setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
+        setPosManager(new ethers.Contract(pairsAddress, PositionManager.abi, provider.getSigner(accountInfo?.address)))
       } else {
-        setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider))
+        setPosManager(new ethers.Contract(pairsAddress, PositionManager.abi, provider))
       }
     } else {
       if (accountInfo && accountInfo?.address) {
@@ -301,9 +299,9 @@ export const useOpenLoanHandler = () => {
     if (provider) {
       if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local' && !posManager) {
         if (accountInfo && accountInfo?.address) {
-          setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider.getSigner(accountInfo?.address)))
+          setPosManager(new ethers.Contract(pairsAddress, PositionManager.abi, provider.getSigner(accountInfo?.address)))
         } else {
-          setPosManager(new ethers.Contract(pairsAddress, PositionMgr.abi, provider))
+          setPosManager(new ethers.Contract(pairsAddress, PositionManager.abi, provider))
         }
       } else if (!peripheryPosManager) {
         if (accountInfo && accountInfo?.address) {

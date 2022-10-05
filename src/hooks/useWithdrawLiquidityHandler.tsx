@@ -1,13 +1,11 @@
 import { useState, useEffect, useContext } from 'react'
 import { WalletContext } from '../context/WalletContext'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
-import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
-import IUniswapV2Pair from '../../abis/v0-hackathon/IUniswapV2Pair.json'
-import IERC20 from '../../abis/v0-hackathon/ERC20.json'
+import PosManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
+import IUniswapV2Pair from '@uniswap/v2-periphery/build/IUniswapV2Pair.json'
 import { sqrt } from '../utils/mathFunctions'
 import Tokens, { Token } from '../components/Tokens'
-import TestGammaPool from '../../abis/v1-periphery/test/TestGammaPool.sol/TestGammaPool.json'
-import DepPool from '../../abis/v0-hackathon/DepositPool.json'
+import GammaPool from '@gammaswap/v1-core/artifacts/contracts/GammaPool.sol/GammaPool.json'
 import { notifyError, notifySuccess } from './useNotification'
 
 const ZEROMIN = 0
@@ -52,11 +50,11 @@ export const useWithdrawLiquidityHandler = () => {
           setPosManager(new ethers.Contract(address, PosManager.abi, provider))
         }
       } else {
-        if (accountInfo?.address) {
-          setDepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo.address)))
-        } else {
-          setDepPool(new ethers.Contract(address, DepPool.abi, provider))
-        }
+        // if (accountInfo?.address) {
+        //   setDepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo.address)))
+        // } else {
+        //   setDepPool(new ethers.Contract(address, DepPool.abi, provider))
+        // }
       }
     } else {
       notifyError('Please connect wallet')
@@ -113,11 +111,11 @@ export const useWithdrawLiquidityHandler = () => {
           setPosManager(new ethers.Contract(address, PosManager.abi, provider))
         }
       } else {
-        if (accountInfo && accountInfo?.address) {
-          setDepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
-        } else {
-          setDepPool(new ethers.Contract(address, DepPool.abi, provider))
-        }
+        // if (accountInfo && accountInfo?.address) {
+        //   setDepPool(new ethers.Contract(address, DepPool.abi, provider.getSigner(accountInfo?.address)))
+        // } else {
+        //   setDepPool(new ethers.Contract(address, DepPool.abi, provider))
+        // }
       }
     } else {
       notifyError('Please connect wallet')
@@ -180,11 +178,11 @@ export const useWithdrawLiquidityHandler = () => {
               if (accountInfo && accountInfo?.address) {
                 gammaPoolContract = new ethers.Contract(
                   address,
-                  TestGammaPool.abi,
+                  GammaPool.abi,
                   provider.getSigner(accountInfo?.address)
                 )
               } else {
-                gammaPoolContract = new ethers.Contract(address, TestGammaPool.abi, provider)
+                gammaPoolContract = new ethers.Contract(address, GammaPool.abi, provider)
               }
               let tx = await gammaPoolContract.approve(contractAddress, constants.MaxUint256.toString())
               return await tx.wait()
@@ -246,7 +244,7 @@ export const useWithdrawLiquidityHandler = () => {
 
         _depPool = new ethers.Contract(
           address,
-          DepPool.abi,
+          "",
           accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
         )
         if (_depPool) {
