@@ -90,104 +90,24 @@ const OpenLoan: NextPage = () => {
     token1,
     setToken0,
     setToken1,
-    validateBeforeSubmit,
-    handleNumberInput,
-    handleSubmit,
-    register,
-    setIsOpen,
     loanAmtStr,
     setLoanAmtStr,
-    setLoanAmt,
-    collateralButtonText,
-    isOpen,
-    collateralAmt0Str,
-    setCollateralAmt0Str,
-    setCollateralAmt0,
-    collateral1Class,
-    collateralAmt1Str,
-    setCollateralAmt1Str,
-    setCollateralAmt1,
-    confirmStyle,
-    buttonText,
-    tooltipText,
-    setTooltipText,
-    token0Balance,
-    token1Balance,
+    collateralType,
+    setCollateralType,
     approveTransaction,
     isApproved,
-    collateralType,
-    setCollateralType1,
     collateralTypes,
     openLoanHandler,
-    lpTokenBalance
+    lpTokenBalance,
+    token0Balance,
+    token1Balance,
+    collateralAmt0Str,
+    setCollateralAmt0Str,
+    collateralAmt1Str,
+    setCollateralAmt1Str,
   } = useOpenLoanHandler()
 
   // TODO: needs to be updated and moved into handler
-  let collateralElems
-  switch (collateralType.type) {
-    case 'Liquidity Pool Tokens':
-      collateralElems = (
-        <CollateralUserInput
-          token0Balance={token0Balance}
-          token1Balance={token1Balance}
-          collateralType={collateralType.type}
-          token0={token0}
-          token1={token1}
-          inputValue={collateralAmt0Str}
-          setTokenValue={setCollateralAmt0Str}
-        />
-      )
-      break
-    case 'Token A':
-      collateralElems = (
-        <CollateralUserInput
-          token0Balance={token0Balance}
-          token1Balance={''}
-          collateralType={collateralType.type}
-          token0={token0}
-          token1={token1}
-          inputValue={collateralAmt0Str}
-          setTokenValue={setCollateralAmt0Str}
-        />
-      )
-      break
-    case 'Token B':
-      collateralElems = (
-        <CollateralUserInput
-          token0Balance={''}
-          token1Balance={token1Balance}
-          collateralType={collateralType.type}
-          token0={token0}
-          token1={token1}
-          inputValue={collateralAmt1Str}
-          setTokenValue={setCollateralAmt1Str}
-        />
-      )
-      break
-    case 'Both Tokens':
-      collateralElems = (
-        <>
-          <CollateralUserInput
-            token0Balance={token0Balance}
-            token1Balance={''}
-            collateralType={'Token A'}
-            token0={token0}
-            token1={token1}
-            inputValue={collateralAmt0Str}
-            setTokenValue={setCollateralAmt0Str}
-          />
-          <CollateralUserInput
-            token0Balance={''}
-            token1Balance={token1Balance}
-            collateralType={'Token B'}
-            token0={token0}
-            token1={token1}
-            inputValue={collateralAmt1Str}
-            setTokenValue={setCollateralAmt1Str}
-          />
-        </>
-      )
-  }
 
   return (
     <div className={style.wrapper}>
@@ -225,7 +145,7 @@ const OpenLoan: NextPage = () => {
               as="div"
               className={style.collateralTypeDropdownContainer}
               value={collateralType}
-              onChange={setCollateralType1}
+              onChange={setCollateralType}
               disabled={token0.address === '' || token1.address === ''}
             >
               <Listbox.Button className={style.collateralTypeDropdownButton}>
@@ -250,7 +170,60 @@ const OpenLoan: NextPage = () => {
               </Listbox.Options>
             </Listbox>
           </div>
-          <div className={style.chosenCollateralTypeContainer}>{collateralElems}</div>
+          <div className={style.chosenCollateralTypeContainer}>
+            {collateralType.type === 'Liquidity Pool Tokens' ? (
+              <CollateralUserInput
+                token0Balance={lpTokenBalance}
+                token1Balance={''}
+                collateralType={collateralType.type}
+                token0={token0}
+                token1={token1}
+                inputValue={collateralAmt0Str}
+                setTokenValue={setCollateralAmt0Str}
+              />
+            ) : collateralType.type === 'Token A' ? (
+              <CollateralUserInput
+                token0Balance={token0Balance}
+                token1Balance={''}
+                collateralType={collateralType.type}
+                token0={token0}
+                token1={token1}
+                inputValue={collateralAmt0Str}
+                setTokenValue={setCollateralAmt0Str}
+              />
+            ) : collateralType.type === 'Token B' ? (
+              <CollateralUserInput
+                token0Balance={''}
+                token1Balance={token1Balance}
+                collateralType={collateralType.type}
+                token0={token0}
+                token1={token1}
+                inputValue={collateralAmt1Str}
+                setTokenValue={setCollateralAmt1Str}
+              />
+            ) : collateralType.type === 'Both Tokens' ? (
+              <>
+                <CollateralUserInput
+                  token0Balance={token0Balance}
+                  token1Balance={''}
+                  collateralType={'Token A'}
+                  token0={token0}
+                  token1={token1}
+                  inputValue={collateralAmt0Str}
+                  setTokenValue={setCollateralAmt0Str}
+                />
+                <CollateralUserInput
+                  token0Balance={''}
+                  token1Balance={token1Balance}
+                  collateralType={'Token B'}
+                  token0={token0}
+                  token1={token1}
+                  inputValue={collateralAmt1Str}
+                  setTokenValue={setCollateralAmt1Str}
+                />
+              </>
+            ) : null}
+          </div>
         </div>
         <div className={style.loanMetricsContainer}>
           <div className={style.loanMetric}>

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { ethers, Contract } from 'ethers'
 import { WalletContext } from '../../src/context/WalletContext'
-import GammaPoolFactory from '../../abis/v1-core/GammaPoolFactory.sol/GammaPoolFactory.json'
+import GammaPoolFactory from '@gammaswap/v1-core/artifacts/contracts/GammaPoolFactory.sol/GammaPoolFactory.json'
 import { calcPoolKey } from '../../src/utils/getSmartContract'
 import Protocols, { Protocol } from '../components/Protocols'
 import {notifySuccess, notifyError} from '../../src/hooks/useNotification'
@@ -44,6 +44,7 @@ export const useCreatePoolHandler = () => {
 
       // check if pool already exists
       let pool = await gammaPoolFactory.getPool(calcPoolKey(cfmmAddr, protocol.id))
+      console.log(pool)
       if (pool != ethers.constants.AddressZero) {
         notifyError('Pool already exsts at ' + pool)
         return
@@ -56,7 +57,9 @@ export const useCreatePoolHandler = () => {
       }
       let tx = await gammaPoolFactory.createPool(CreatePoolParams, { gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT })
       let res = await tx.wait()
+      console.log(res)
       let poolAddress = res.events[0].address
+      console.log(poolAddress)
       let msg = 'Pool created successfully at address: ' + poolAddress
       notifySuccess(msg)
       resetParameters()

@@ -48,7 +48,14 @@ export const CollateralUserInput = ({
           placeholder="0.0"
           className={style.loanAmountInput}
         />
-        <div className={style.maxButton}>MAX</div>
+        <div
+          className={style.maxButton}
+          onClick={() => {
+            setTokenValue(token0Balance || token1Balance)
+          }}
+        >
+          MAX
+        </div>
       </div>
       {/* tokens side w/ balance */}
       <div className={style.tokenPairContainer}>

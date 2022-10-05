@@ -10,6 +10,8 @@
     "@emotion/react": "11",
     "@emotion/styled": "11",
     "@ethersproject/providers": "^5.6.8",
+    "@gammaswap/v1-core": "^0.1.11",
+    "@gammaswap/v1-periphery": "^0.1.4",
     "@gammaswap/v1-sdk": "^1.0.0",
     "@headlessui/react": "^1.6.4",
     "@heroicons/react": "^1.0.6",
