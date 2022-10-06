@@ -320,11 +320,13 @@ export const useOpenLoanHandler = () => {
     setLoanAmtStr('')
     setCollateralAmt0Str('')
     setCollateralAmt1Str('')
+    setIsApproved(false)
   }, [token0, token1])
 
   useEffect(() => {
     setCollateralAmt0Str('')
     setCollateralAmt1Str('')
+    setIsApproved(false)
   }, [collateralType])
 
   setValue('collateralType', collateralType)
