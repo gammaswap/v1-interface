@@ -44,8 +44,9 @@ export const useCreatePoolHandler = () => {
 
       // check if pool already exists
       let pool = await gammaPoolFactory.getPool(calcPoolKey(cfmmAddr, protocol.id))
+      console.log(pool)
       if (pool != ethers.constants.AddressZero) {
-        notifyError("Pool already exsts at " + pool)
+        notifyError('Pool already exsts at ' + pool)
         return
       }
 
@@ -54,9 +55,11 @@ export const useCreatePoolHandler = () => {
         tokens: [token1Addr, token2Addr],
         protocol: protocol.id,
       }
-      let tx = await gammaPoolFactory.createPool(CreatePoolParams)
+      let tx = await gammaPoolFactory.createPool(CreatePoolParams, { gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT })
       let res = await tx.wait()
+      console.log(res)
       let poolAddress = res.events[0].address
+      console.log(poolAddress)
       let msg = 'Pool created successfully at address: ' + poolAddress
       notifySuccess(msg)
       resetParameters()
