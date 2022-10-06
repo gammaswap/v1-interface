@@ -61,7 +61,7 @@ export const validateAllowance = async (
   }
 }
 
-export const doApprove = async (erc20: Contract, spender: string) => {
+const doApprove = async (erc20: Contract, spender: string) => {
   let loadingApproval = notifyLoading('Waiting for approval')
   try {
     let tx = await erc20.approve(spender, constants.MaxUint256)

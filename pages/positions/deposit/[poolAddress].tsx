@@ -5,9 +5,20 @@ import { ChevronDownIcon } from '@heroicons/react/solid'
 import TokenSelectorModal from '../../../src/components/TokenSelectorModal'
 import { Tab } from '@headlessui/react'
 import { useAddLiquidityHandler } from '../../../src/hooks/useAddLiquidityHandler'
-import { useRouter } from 'next/router'
+import PairsSelector from '../../../src/components/PairsSelector'
 
 const AddLiquidityStyles = {
+  common: {
+    selectPairContainer: 'bg-neutrals-700 mt-3 p-4 drop-shadow-md rounded-lg',
+    tokenInputContainer: 'flex flex-col space-y-3',
+    tokenSelectorContainer: 'text-neutrals-100 mt-3',
+    tokenInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-3xl text-neutrals-200 mt-4',
+    tokenBalance: 'font-semibold text-sm text-neutrals-600 tracking-wide text-right mt-2.5',
+    invalidatedButton:
+      'disabled rounded-xl py-4 px-6 text-xl font-semibold tracking-wide text-center mt-20 text-neutrals-700 border-2 border-neutrals-700',
+    confirmButton:
+      'bg-primary-blue rounded-xl py-4 px-6 text-xl font-semibold text-center cursor-pointer mt-20 text-white hover:bg-gradient-to-tr hover:from-accents-royalBlue hover:via-primary-blue hover:to-cyan-400',
+  },
   reserveToken: {
     wrapper: 'w-full h-full flex justify-center',
     container: 'mt-20 bg-neutrals-800 w-[30rem] h-3/5 rounded-lg p-4 drop-shadow-lg',
@@ -19,30 +30,20 @@ const AddLiquidityStyles = {
     activeTab:
       'outline outline-2 outline-offset-2 outline-accents-royalBlue/50 bg-accents-royalBlue bg-text-lg w-1/2 rounded-md',
     tokenContainer: 'bg-neutrals-700 mt-4 rounded-xl p-4 drop-shadow-lg flex',
-    tokenInputContainer: 'flex flex-col space-y-3',
-    tokenInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-3xl text-neutrals-200 mt-4',
     maxButton:
       'w-[2rem] text-center bg-neutrals-900 bg-opacity-60 cursor-pointer drop-shadow-lg hover:bg-opacity-70 text-xxs font-normal p-0.5 rounded-sm text-accents-royalBlue text-opacity-50 hover:text-opacity-80',
-    tokenSelectorContainer: 'text-neutrals-100 mt-3',
     tokenSelectorContent:
       'w-full flex items-center rounded-xl text-xl bg-neutrals-800 drop-shadow-lg cursor-pointer p-2 hover:bg-neutrals-600',
     tokenSelectorIcon: 'flex items-center',
     tokenSelectorTicker: 'mx-2',
     dropdownArrow: 'w-12 h-8',
     extraContainer: 'flex items-center mt-2',
-    tokenBalance: 'font-semibold text-sm text-neutrals-600 tracking-wide text-right mt-2.5',
     nonSelectedTokenContainer: 'flex items-center w-2/3 text-neutrals-200',
     nonSelectedTokenContent:
       'w-full h-min flex justify-center items-center bg-primary-blue rounded-xl text-xl font-medium cursor-pointer p-2 shadow-md shadow-blue-300/20 hover:bg-blue-400 hover:shadow-blue-400/20',
-    invalidatedButton:
-      'disabled rounded-xl py-4 px-6 text-xl font-semibold tracking-wide text-center mt-20 text-neutrals-700 border-2 border-neutrals-700',
-    confirmButton:
-      'bg-primary-blue rounded-xl py-4 px-6 text-xl font-semibold text-center cursor-pointer mt-20 text-white hover:bg-gradient-to-tr hover:from-accents-royalBlue hover:via-primary-blue hover:to-cyan-400',
   },
   lpToken: {
     tokenContainer: 'bg-neutrals-700 mt-12 rounded-xl py-5 px-4 drop-shadow-lg flex',
-    tokenInputContainer: 'flex flex-col space-y-3',
-    tokenInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-3xl text-neutrals-200 mt-4',
     maxButton:
       'w-1/6 text-center bg-neutrals-900 bg-opacity-60 drop-shadow-lg cursor-pointer hover:bg-opacity-70 text-xxs font-normal p-0.5 rounded-sm text-accents-royalBlue text-opacity-50 hover:text-opacity-80',
     tokenSelectorContainer: 'text-neutrals-100 w-[18rem] mt-1',
@@ -52,17 +53,10 @@ const AddLiquidityStyles = {
     tokenAIcon: 'absolute top-1/4 left-0 z-10',
     tokenBIcon: 'mt-1.5 ml-1.5',
     lpTokenSymbol: 'text-xl',
-    tokenBalance: 'font-semibold text-sm text-neutrals-600 tracking-wide text-right mt-2.5',
-    invalidatedButton:
-      'disabled rounded-xl py-4 px-6 text-xl font-semibold tracking-wide text-center mt-40 text-neutrals-700 border-2 border-neutrals-700',
-    confirmButton:
-      'bg-primary-blue rounded-xl py-4 px-6 text-xl font-semibold text-center cursor-pointer mt-40 text-white hover:bg-gradient-to-tr hover:from-accents-royalBlue hover:via-primary-blue hover:to-cyan-400',
   },
 }
 
 const AddLiquidity: NextPage = () => {
-  const router = useRouter()
-  const { poolAddress } = router.query
   const style = AddLiquidityStyles
   const {
     handleTokenInput,
@@ -109,17 +103,20 @@ const AddLiquidity: NextPage = () => {
                 </Tab>
               </Tab.List>
             </div>
+            <div className={style.common.selectPairContainer}>
+              <PairsSelector token0={tokenASelected} token1={tokenBSelected} setToken0={setTokenASelected} setToken1={setTokenBSelected} />
+            </div>
             <Tab.Panels>
               {/* LP Token Pair TAB */}
               <Tab.Panel>
                 <div className={style.lpToken.tokenContainer}>
-                  <div className={style.lpToken.tokenInputContainer}>
+                  <div className={style.common.tokenInputContainer}>
                     <input
                       type="text"
                       onChange={(e) => handleTokenInput(e, setTokenAInputVal, setTokenBInputVal)}
                       value={tokenAInputVal}
                       placeholder="0.0"
-                      className={style.lpToken.tokenInput}
+                      className={style.common.tokenInput}
                     />
                     <div className={style.lpToken.maxButton} onClick={maxTokenA}>
                       MAX
@@ -136,17 +133,17 @@ const AddLiquidity: NextPage = () => {
                       <div className={style.reserveToken.tokenSelectorTicker}>{tokenASelected.symbol}</div>
                       <ChevronDownIcon className={style.reserveToken.dropdownArrow} />
                     </div>
-                    <div className={style.lpToken.tokenBalance}>Balance: {tokenABalance}</div>
+                    <div className={style.common.tokenBalance}>Balance: {tokenABalance}</div>
                   </div>
                 </div>
                 <div>
                   {/* TODO: validation for LP tokens */}
                   {isTokenEmpty(tokenASelected) ? (
-                    <div className={style.lpToken.invalidatedButton}>Select Token</div>
+                    <div className={style.common.invalidatedButton}>Select Token</div>
                   ) : tokenAInputVal === '' ? (
-                    <div className={style.lpToken.invalidatedButton}>Enter an Amount</div>
+                    <div className={style.common.invalidatedButton}>Enter an Amount</div>
                   ) : !isTokenEmpty(tokenASelected) && tokenAInputVal !== '' ? (
-                    <div className={style.lpToken.confirmButton} onClick={addLpLiquidity}>
+                    <div className={style.common.confirmButton} onClick={addLpLiquidity}>
                       Confirm
                     </div>
                   ) : null}
@@ -157,19 +154,19 @@ const AddLiquidity: NextPage = () => {
               <Tab.Panel>
                 {/* slot for token A */}
                 <div className={style.reserveToken.tokenContainer}>
-                  <div className={style.reserveToken.tokenInputContainer}>
+                  <div className={style.common.tokenInputContainer}>
                     <input
                       type="text"
                       onChange={(e) => handleTokenInput(e, setTokenAInputVal, setTokenBInputVal)}
                       value={tokenAInputVal}
                       placeholder="0.0"
-                      className={style.reserveToken.tokenInput}
+                      className={style.common.tokenInput}
                     />
                     <div className={style.reserveToken.maxButton} onClick={maxTokenA}>
                       MAX
                     </div>
                   </div>
-                  <div className={style.reserveToken.tokenSelectorContainer}>
+                  <div className={style.common.tokenSelectorContainer}>
                     <div
                       className={style.reserveToken.tokenSelectorContent}
                       onClick={() => handleTokenSelector('tokenA')}
@@ -180,18 +177,18 @@ const AddLiquidity: NextPage = () => {
                       <div className={style.reserveToken.tokenSelectorTicker}>{tokenASelected.symbol}</div>
                       <ChevronDownIcon className={style.reserveToken.dropdownArrow} />
                     </div>
-                    <div className={style.reserveToken.tokenBalance}>Balance: {tokenABalance}</div>
+                    <div className={style.common.tokenBalance}>Balance: {tokenABalance}</div>
                   </div>
                 </div>
                 {/* slot for token B */}
                 <div className={style.reserveToken.tokenContainer}>
-                  <div className={style.reserveToken.tokenInputContainer}>
+                  <div className={style.common.tokenInputContainer}>
                     <input
                       type="text"
                       onChange={(e) => handleTokenInput(e, setTokenBInputVal, setTokenAInputVal)}
                       value={tokenBInputVal}
                       placeholder="0.0"
-                      className={style.reserveToken.tokenInput}
+                      className={style.common.tokenInput}
                     />
                     <div className={style.reserveToken.maxButton} onClick={maxTokenB}>
                       MAX
@@ -209,7 +206,7 @@ const AddLiquidity: NextPage = () => {
                       <div className={style.reserveToken.nonSelectedTokenContent}>Select Token</div>
                     </div>
                   ) : (
-                    <div className={style.reserveToken.tokenSelectorContainer}>
+                    <div className={style.common.tokenSelectorContainer}>
                       <div
                         className={style.reserveToken.tokenSelectorContent}
                         onClick={() => handleTokenSelector('tokenB')}
@@ -220,17 +217,17 @@ const AddLiquidity: NextPage = () => {
                         <div className={style.reserveToken.tokenSelectorTicker}>{tokenBSelected.symbol}</div>
                         <ChevronDownIcon className={style.reserveToken.dropdownArrow} />
                       </div>
-                      <div className={style.reserveToken.tokenBalance}>Balance: {tokenBBalance}</div>
+                      <div className={style.common.tokenBalance}>Balance: {tokenBBalance}</div>
                     </div>
                   )}
                 </div>
                 <div>
                   {isTokenEmpty(tokenBSelected) ? (
-                    <div className={style.reserveToken.invalidatedButton}>Select Token</div>
+                    <div className={style.common.invalidatedButton}>Select Token</div>
                   ) : tokenAInputVal === '' || tokenBInputVal === '' ? (
-                    <div className={style.reserveToken.invalidatedButton}>Enter an Amount</div>
+                    <div className={style.common.invalidatedButton}>Enter an Amount</div>
                   ) : !isTokenEmpty(tokenBSelected) && tokenAInputVal !== '' && tokenBInputVal !== '' ? (
-                    <div className={style.reserveToken.confirmButton} onClick={addLiquidity}>
+                    <div className={style.common.confirmButton} onClick={addLiquidity}>
                       Confirm
                     </div>
                   ) : null}

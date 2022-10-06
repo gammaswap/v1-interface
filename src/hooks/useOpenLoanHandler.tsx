@@ -5,12 +5,12 @@ import { WalletContext } from '../context/WalletContext'
 // TODO: import Factory from '../../abis/Factory.json'
 import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
-import toast from 'react-hot-toast'
 import { InformationCircleIcon } from '@heroicons/react/solid'
 import { FieldValues, useForm } from 'react-hook-form'
 import PositionManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
 import { getTokenBalance } from '../utils/getSmartContract'
+import { notifyInfo } from './useNotification'
 
 const style = {
   invalidatedButton: ' w-full disabled my-2 rounded-2xl py-4 px-6 text-xl font-semibold flex justify-center items-center text-gray-600 mt-8 border-2 border-gray-700',
@@ -63,7 +63,7 @@ export const useOpenLoanHandler = () => {
 
   useEffect(() => {
     if (!provider) {
-      toast('Please connect wallet.', { icon: <InformationCircleIcon /> })
+      notifyInfo('Please connect wallet.')
       return
     }
 
@@ -198,8 +198,8 @@ export const useOpenLoanHandler = () => {
             borrowLiquidity(tokenId)
               .then((result) => {
                 console.log(result)
-                toast.success('Open loan was successful')
-                toast.dismiss(loading)
+                notifySuccess('Open loan was successful')
+                notifyDismiss(loading)
               })
               .catch((err) => {
                 notifyDismiss(loading)
@@ -286,7 +286,7 @@ export const useOpenLoanHandler = () => {
 
   function getPosMgr() {
     if (token0 == token1) {
-      toast('Token values must be different', { icon: <InformationCircleIcon /> })
+      notifyInfo('Token values must be different')
       return
     }
     let pairsAddress =
@@ -313,7 +313,7 @@ export const useOpenLoanHandler = () => {
         }
       }
     } else {
-      toast('Please connect wallet', { icon: <InformationCircleIcon /> })
+      notifyInfo('Please connect wallet')
     }
   }
 
