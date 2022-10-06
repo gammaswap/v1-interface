@@ -7,10 +7,10 @@ import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } fro
 import { BasicContractContext } from '../../src/context/BasicContractContext'
 import { getTokenBalance } from '../utils/getSmartContract'
 
-import PosManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
+import PosManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
 import { doApprove, handleNumberInput, validateAllowance } from '../utils/validation'
-import IERC20 from '../../abis/v1-periphery/interfaces/external/IERC20.sol/IERC20.json'
+import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
 
 export const useAddLiquidityHandler = () => {
   const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS

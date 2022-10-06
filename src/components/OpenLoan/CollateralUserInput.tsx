@@ -64,7 +64,7 @@ export const CollateralUserInput = ({
             <>
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenAIcon}>
-                  <Image src={token0.imgPath} width={26} height={26} />
+                  <Image src={token0.imgPath} width={20} height={20} />
                 </div>
                 {token1.imgPath ? (
                   <div className={style.tokenBIcon}>
@@ -80,7 +80,7 @@ export const CollateralUserInput = ({
             <>
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenAIcon}>
-                  <Image src={token0.imgPath} width={26} height={26} />
+                  <Image src={token0.imgPath} width={20} height={20} />
                 </div>
               </div>
               <div className={style.tokenPairSymbol}>{token0.symbol}</div>
@@ -90,7 +90,7 @@ export const CollateralUserInput = ({
               {/* Token B */}
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenBIcon}>
-                  <Image src={token1.imgPath} width={26} height={26} />
+                  {token1.imgPath && <Image src={token1.imgPath} width={20} height={20} />}
                 </div>
               </div>
               <div className={style.tokenPairSymbol}>{token1.symbol}</div>

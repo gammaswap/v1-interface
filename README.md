@@ -1,8 +1,19 @@
+<p align="center"><a href="https://gammaswap.com" target="_blank" rel="noopener noreferrer"><img width="100" src="https://gammaswap.com/assets/images/image02.svg" alt="Gammaswap logo"></a></p>
+
+<p align="center">
+  <a href="https://github.com/gammaswap/v1-interface/actions/workflows/main.yaml"><img src="https://github.com/gammaswap/v1-interface/actions/workflows/main.yaml/badge.svg?branch=main" alt="Build Status">
+</p>
+
 # Local Development
 
 ## Install Dependencies
 
-Install the necessary packages by using the command after you have installed yarn:
+1. Add .npmrc file in root folder with the following contents:
+```
+   @gammaswap:registry=https://npm.pkg.github.com/
+   //npm.pkg.github.com/:_authToken=<GITHUB_ACCESS_TOKEN>
+```
+2. Install the necessary packages by using the command after you have installed yarn:
 
 `yarn`
 
