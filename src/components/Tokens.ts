@@ -10,7 +10,7 @@ const Tokens: Array<Token> = [
     {
         imgPath: "/crypto/eth.svg",
         symbol: "ETH",
-        address: process.env.NEXT_PUBLIC_TOKEN_A_ADDR || '',
+        address: '',
         decimals: 18
     },
     {
@@ -22,7 +22,7 @@ const Tokens: Array<Token> = [
     {
         imgPath: "/crypto/uni.svg",
         symbol: "UNI",
-        address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        address: process.env.NEXT_PUBLIC_TOKEN_A_ADDR || '',
         decimals: 18
     },
     {

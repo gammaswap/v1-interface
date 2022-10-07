@@ -125,6 +125,7 @@ const AddLiquidity: NextPage = () => {
                 </div>
                 <div>
                   {/* TODO: validation for LP tokens */}
+                  {/* TODO: use ApproveConfirmButton */}
                   {isTokenEmpty(tokenASelected) ? (
                     <div className={style.common.invalidatedButton}>Select Token</div>
                   ) : tokenAInputVal === '' ? (
@@ -160,6 +161,7 @@ const AddLiquidity: NextPage = () => {
                     setTokenValue={setTokenBInputVal}
                   />
                 </div>
+                {/* TODO: use ApproveConfirmButton */}
                 <div>
                   {isTokenEmpty(tokenBSelected) ? (
                     <div className={style.common.invalidatedButton}>Select Token</div>
