@@ -71,7 +71,7 @@ export const LabeledUserInput = ({
                 ) : null}
               </div>
               <div className={style.tokenPairSymbol}>
-                {token0.symbol} {token1.address ? '/' + token1.symbol : null}
+                {token0.symbol} / {token1.symbol ? token1.symbol : "Select"}
               </div>
             </>
           ) : inputType == 'Token A' ? (
@@ -91,7 +91,7 @@ export const LabeledUserInput = ({
                   {token1.imgPath && <Image src={token1.imgPath} width={26} height={26} />}
                 </div>
               </div>
-              <div className={style.tokenPairSymbol}>{token1.symbol}</div>
+              <div className={style.tokenPairSymbol}>{token1.symbol ? token1.symbol : "Select Token"}</div>
             </>
           )}
         </div>

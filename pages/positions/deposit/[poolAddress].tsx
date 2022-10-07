@@ -1,28 +1,16 @@
 import type { NextPage } from 'next'
-import { Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import TokenSelectorModal from '../../../src/components/TokenSelectorModal'
 import { Tab } from '@headlessui/react'
+import { InformationCircleIcon } from '@heroicons/react/outline'
 import { useAddLiquidityHandler } from '../../../src/hooks/useAddLiquidityHandler'
 import PairsSelector from '../../../src/components/PairsSelector'
 import { LabeledUserInput } from '../../../src/components/Deposit/LabeledUserInput'
 
 const AddLiquidityStyles = {
   common: {
-    selectPairContainer: 'bg-neutrals-700 mt-3 p-4 drop-shadow-md rounded-lg',
-    tokenInputContainer: 'flex flex-col space-y-3',
-    tokenSelectorContainer: 'text-neutrals-100 mt-3',
-    tokenInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-3xl text-neutrals-200 mt-4',
-    tokenBalance: 'font-semibold text-sm text-neutrals-600 tracking-wide text-right mt-2.5',
-    invalidatedButton:
-      'disabled rounded-xl py-4 px-6 text-xl font-semibold tracking-wide text-center mt-20 text-neutrals-700 border-2 border-neutrals-700',
-    confirmButton:
-      'bg-primary-blue rounded-xl py-4 px-6 text-xl font-semibold text-center cursor-pointer mt-20 text-white hover:bg-gradient-to-tr hover:from-accents-royalBlue hover:via-primary-blue hover:to-cyan-400',
-    depositHeader: 'flex space-x-1 items-center',
-    sectionHeading: 'font-semibold text-neutrals-400',
-  },
-  reserveToken: {
     wrapper: 'w-full h-full flex justify-center',
-    container: 'mt-20 bg-neutrals-800 w-[30rem] h-3/5 rounded-lg p-4 drop-shadow-lg',
+    container: 'mt-20 bg-neutrals-800 w-[30rem] rounded-lg p-4 drop-shadow-lg',
     headerContainer: 'flex text-xxs p-2',
     formHeader: 'font-semibold text-xl text-neutrals-100 tracking-wide text-center',
     tabsContainer:
@@ -30,7 +18,21 @@ const AddLiquidityStyles = {
     tab: 'text-neutrals-600 w-1/2 rounded-md hover:bg-neutrals-800 hover:text-neutrals-300',
     activeTab:
       'outline outline-2 outline-offset-2 outline-accents-royalBlue/50 bg-accents-royalBlue bg-text-lg w-1/2 rounded-md',
-    tokenContainer: 'bg-neutrals-700 mt-4 rounded-xl p-4 drop-shadow-lg flex',
+    selectPairContainer: 'bg-neutrals-700 mt-3 p-4 drop-shadow-md rounded-lg',
+    tokenInputContainer: 'flex flex-col space-y-3',
+    tokenSelectorContainer: 'text-neutrals-100 mt-3',
+    tokenInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-3xl text-neutrals-200 mt-4',
+    tokenBalance: 'font-semibold text-sm text-neutrals-600 tracking-wide text-right mt-2.5',
+    buttonContainer: 'text-xl font-semibold mt-9',
+    invalidatedButton: 'disabled text-center py-3 px-5 rounded-lg text-gray-600 border-2 border-gray-700',
+    confirmButton: 'bg-primary-blue text-center py-3 px-5 rounded-lg cursor-pointer',
+    depositHeader: 'flex space-x-1 items-center',
+    infoIcon: 'text-neutrals-400 w-4 h-4 cursor-pointer hover:text-neutrals-100',
+    sectionHeading: 'font-semibold text-neutrals-400',
+  },
+  reserveToken: {
+    tokensContainer: 'flex flex-col mt-5 space-y-5',
+    tokenContainer: 'bg-neutrals-700 rounded-lg drop-shadow-md p-4',
     maxButton:
       'w-[2rem] text-center bg-neutrals-900 bg-opacity-60 cursor-pointer drop-shadow-lg hover:bg-opacity-70 text-xxs font-normal p-0.5 rounded-sm text-accents-royalBlue text-opacity-50 hover:text-opacity-80',
     tokenSelectorContent:
@@ -44,7 +46,7 @@ const AddLiquidityStyles = {
       'w-full h-min flex justify-center items-center bg-primary-blue rounded-xl text-xl font-medium cursor-pointer p-2 shadow-md shadow-blue-300/20 hover:bg-blue-400 hover:shadow-blue-400/20',
   },
   lpToken: {
-    tokenContainer: 'bg-neutrals-700 mt-12 rounded-xl py-5 px-4 drop-shadow-lg',
+    tokenContainer: 'bg-neutrals-700 rounded-lg drop-shadow-md mt-5 p-4',
     maxButton:
       'w-1/6 text-center bg-neutrals-900 bg-opacity-60 drop-shadow-lg cursor-pointer hover:bg-opacity-70 text-xxs font-normal p-0.5 rounded-sm text-accents-royalBlue text-opacity-50 hover:text-opacity-80',
     tokenSelectorContainer: 'text-neutrals-100 w-[18rem] mt-1',
@@ -58,6 +60,8 @@ const AddLiquidityStyles = {
 }
 
 const AddLiquidity: NextPage = () => {
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
   const style = AddLiquidityStyles
   const {
     handleTokenInput,
@@ -84,20 +88,20 @@ const AddLiquidity: NextPage = () => {
 
   return (
     <>
-      <div className={style.reserveToken.wrapper}>
-        <div className={style.reserveToken.container}>
-          <Tab.Group>
-            <div className={style.reserveToken.headerContainer}>
-              <div className={style.reserveToken.formHeader}>Add Liquidity</div>
-              <Tab.List className={style.reserveToken.tabsContainer}>
+      <div className={style.common.wrapper}>
+        <div className={`${style.common.container} ${selectedIndex ? "h-[33rem]" : "h-[27rem]"}`}>
+          <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
+            <div className={style.common.headerContainer}>
+              <div className={style.common.formHeader}>Add Liquidity</div>
+              <Tab.List className={style.common.tabsContainer}>
                 <Tab as={Fragment}>
                   {({ selected }) => (
-                    <button className={selected ? style.reserveToken.activeTab : style.reserveToken.tab}>LP</button>
+                    <button className={selected ? style.common.activeTab : style.common.tab}>LP</button>
                   )}
                 </Tab>
                 <Tab as={Fragment}>
                   {({ selected }) => (
-                    <button className={selected ? style.reserveToken.activeTab : style.reserveToken.tab}>
+                    <button className={selected ? style.common.activeTab : style.common.tab}>
                       Reserve
                     </button>
                   )}
@@ -105,7 +109,12 @@ const AddLiquidity: NextPage = () => {
               </Tab.List>
             </div>
             <div className={style.common.selectPairContainer}>
-              <PairsSelector token0={tokenASelected} token1={tokenBSelected} setToken0={setTokenASelected} setToken1={setTokenBSelected} />
+              <PairsSelector
+                token0={tokenASelected}
+                token1={tokenBSelected}
+                setToken0={setTokenASelected}
+                setToken1={setTokenBSelected}
+              />
             </div>
             <Tab.Panels>
               {/* LP Token Pair TAB */}
@@ -113,6 +122,8 @@ const AddLiquidity: NextPage = () => {
                 <div className={style.lpToken.tokenContainer}>
                   <div className={style.common.depositHeader}>
                     <h2 className={style.common.sectionHeading}>Deposit</h2>
+                    {/* need to add popup for info */}
+                    <InformationCircleIcon className={style.common.infoIcon} />
                   </div>
                   <LabeledUserInput
                     tokenBalance={tokenABalance}
@@ -123,7 +134,7 @@ const AddLiquidity: NextPage = () => {
                     setTokenValue={setTokenAInputVal}
                   />
                 </div>
-                <div>
+                <div className={style.common.buttonContainer}>
                   {/* TODO: validation for LP tokens */}
                   {/* TODO: use ApproveConfirmButton */}
                   {isTokenEmpty(tokenASelected) ? (
@@ -140,29 +151,30 @@ const AddLiquidity: NextPage = () => {
               </Tab.Panel>
               {/* Reserve Tokens TAB */}
               <Tab.Panel>
-                <div className={style.lpToken.tokenContainer}>
-                  <div className={style.common.depositHeader}>
-                    <h2 className={style.common.sectionHeading}>Deposit</h2>
+                <div className={style.reserveToken.tokensContainer}>
+                  <div className={style.reserveToken.tokenContainer}>
+                    <LabeledUserInput
+                      tokenBalance={tokenABalance}
+                      inputType={'Token A'}
+                      token0={tokenASelected}
+                      token1={tokenBSelected}
+                      inputValue={tokenAInputVal}
+                      setTokenValue={setTokenAInputVal}
+                    />
                   </div>
-                  <LabeledUserInput
-                    tokenBalance={tokenABalance}
-                    inputType={'Token A'}
-                    token0={tokenASelected}
-                    token1={tokenBSelected}
-                    inputValue={tokenAInputVal}
-                    setTokenValue={setTokenAInputVal}
-                  />
-                  <LabeledUserInput
-                    tokenBalance={tokenBBalance}
-                    inputType={'Token B'}
-                    token0={tokenASelected}
-                    token1={tokenBSelected}
-                    inputValue={tokenBInputVal}
-                    setTokenValue={setTokenBInputVal}
-                  />
+                  <div className={style.reserveToken.tokenContainer}>
+                    <LabeledUserInput
+                      tokenBalance={tokenBBalance}
+                      inputType={'Token B'}
+                      token0={tokenASelected}
+                      token1={tokenBSelected}
+                      inputValue={tokenBInputVal}
+                      setTokenValue={setTokenBInputVal}
+                    />
+                  </div>
                 </div>
                 {/* TODO: use ApproveConfirmButton */}
-                <div>
+                <div className={style.common.buttonContainer}>
                   {isTokenEmpty(tokenBSelected) ? (
                     <div className={style.common.invalidatedButton}>Select Token</div>
                   ) : tokenAInputVal === '' || tokenBInputVal === '' ? (
