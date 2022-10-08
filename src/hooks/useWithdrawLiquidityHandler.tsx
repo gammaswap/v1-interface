@@ -1,13 +1,15 @@
 import { useState, useEffect, useContext } from 'react'
 import { WalletContext } from '../context/WalletContext'
 import { ethers, Contract, constants } from 'ethers'
-import PositionManager from '../../abis/v1-periphery/PositionManager.sol/PositionManager.json'
+import PositionManagerJSON from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
 import GammaPool from '@gammaswap/v1-core/artifacts/contracts/GammaPool.sol/GammaPool.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
+import { useRouter } from 'next/router'
 
 export const useWithdrawLiquidityHandler = () => {
+  const router = useRouter()
+  const { poolAddress } = router.query
   const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
-  const GAMMA_POOL_ADDRESS = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS
 
   const [positionManager, setPositionManager] = useState<Contract | null>(null)
   const [sliderPercentage, setsliderPercentage] = useState<number>(0)
@@ -18,6 +20,7 @@ export const useWithdrawLiquidityHandler = () => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [gammaPoolContract, setGammaPoolContract] = useState<Contract | null>(null)
   const [enableApprove, setEnableApprove] = useState<Boolean>(false)
+  const [invalidBtnText, setInvalidBtnText] = useState<String>('Confirm')
 
   async function changeSliderPercentage(percentage: number) {
     try {
@@ -41,20 +44,21 @@ export const useWithdrawLiquidityHandler = () => {
 
   useEffect(() => {
     if (provider) {
+      setInvalidBtnText('Confirm')
       if (!positionManager && POSITION_MANAGER_ADDRESS) {
         setPositionManager(
           new ethers.Contract(
             POSITION_MANAGER_ADDRESS,
-            PositionManager.abi,
+            PositionManagerJSON.abi,
             accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
           )
         )
       }
 
-      if (!gammaPoolContract && GAMMA_POOL_ADDRESS) {
+      if (!gammaPoolContract && poolAddress) {
         setGammaPoolContract(
           new ethers.Contract(
-            GAMMA_POOL_ADDRESS,
+            poolAddress.toString(),
             GammaPool.abi,
             accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
           )
@@ -88,8 +92,10 @@ export const useWithdrawLiquidityHandler = () => {
       amt = ethers.utils.parseEther(((liquidityAmt * balance) / 100).toString()).toString()
     }
     if (!accountInfo || !accountInfo.address) {
-      notifyError('Wallet not connected.')
-      return
+      setInvalidBtnText('Connect Wallet')
+      setEnableRemove(false)
+      setEnableApprove(false)
+      throw new Error('Wallet not connected')
     }
     try {
       if (parseInt(amt) === 0) {
@@ -126,16 +132,19 @@ export const useWithdrawLiquidityHandler = () => {
 
   async function approveWithdraw() {
     if (!provider) {
+      setInvalidBtnText('Connect Wallet')
       notifyError('Please connect wallet')
       return
     }
 
     if (!accountInfo || !accountInfo.address) {
+      setInvalidBtnText('Connect Wallet')
       notifyError('User wallet not found.')
       return
     }
 
     try {
+      setInvalidBtnText('Confirm')
       if (parseInt(totalLiquidityAmt) === 0) {
         const error: any = new Error('User does not have reserves to withdraw')
         error.code = '4002'
@@ -148,6 +157,7 @@ export const useWithdrawLiquidityHandler = () => {
         let tx = await gammaPoolContract.approve(POSITION_MANAGER_ADDRESS, constants.MaxUint256.toString())
         return await tx.wait()
       } else {
+        setInvalidBtnText('Connect Wallet')
         notifyError('Please connect wallet')
       }
     } catch (e: any) {
@@ -161,14 +171,18 @@ export const useWithdrawLiquidityHandler = () => {
 
   useEffect(() => {
     async function fetchData() {
-      if (!gammaPoolContract) {
-        return
+      try {
+        if (!gammaPoolContract) {
+          return
+        }
+        const liqBal = await gammaPoolContract.balanceOf(accountInfo?.address)
+        console.log(liqBal.toString())
+        setEnableApprove(liqBal.toString() > 0)
+        setTotalLiquidityAmt(liqBal.toString())
+        setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
+      } catch (e) {
+        notifyError('Balance not found. Please provide correct pool address')
       }
-      const liqBal = await gammaPoolContract.balanceOf(accountInfo?.address)
-      console.log(liqBal.toString())
-      setEnableApprove(liqBal.toString() > 0)
-      setTotalLiquidityAmt(liqBal.toString())
-      setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
     }
     fetchData()
   }, [gammaPoolContract])
@@ -191,16 +205,18 @@ export const useWithdrawLiquidityHandler = () => {
   const initializeGammaPoolContract = async () => {
     try {
       if (provider && accountInfo && accountInfo?.address) {
-        if (!gammaPoolContract && GAMMA_POOL_ADDRESS) {
+        setInvalidBtnText('Confirm')
+        if (!gammaPoolContract && poolAddress) {
           setGammaPoolContract(
             new ethers.Contract(
-              GAMMA_POOL_ADDRESS,
+              poolAddress.toString(),
               GammaPool.abi,
               accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
             )
           )
         }
       } else {
+        setInvalidBtnText('Connect Wallet')
         notifyError('Please connect wallet')
       }
     } catch (err) {
@@ -211,17 +227,21 @@ export const useWithdrawLiquidityHandler = () => {
   const initializePositionManagerContract = async () => {
     try {
       if (provider && accountInfo && accountInfo?.address) {
+        setInvalidBtnText('Confirm')
         if (!positionManager && POSITION_MANAGER_ADDRESS) {
           setPositionManager(
             new ethers.Contract(
               POSITION_MANAGER_ADDRESS,
-              PositionManager.abi,
+              PositionManagerJSON.abi,
               accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
             )
           )
         }
       } else {
-        notifyError('Please connect wallet')
+        setInvalidBtnText('Connect Wallet')
+        setEnableRemove(false)
+        setEnableApprove(false)
+        throw new Error('Wallet not connected')
       }
     } catch (err) {
       notifyError('An error occurred while initializing contract')
@@ -238,5 +258,6 @@ export const useWithdrawLiquidityHandler = () => {
     enableRemove,
     withdraw,
     enableApprove,
+    invalidBtnText,
   }
 }

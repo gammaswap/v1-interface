@@ -4,9 +4,9 @@ import Slider from 'rc-slider'
 import { Tab } from '@headlessui/react'
 import 'rc-slider/assets/index.css'
 import { ArrowLeftIcon } from '@heroicons/react/outline'
-import { useWithdrawLiquidityHandler } from '../../src/hooks/useWithdrawLiquidityHandler'
-import { LPTokensTab } from '../../src/components/Withdraw/LPTokensTab'
-import { ReserveTokensTab } from '../../src/components/Withdraw/ReserveTokensTab'
+import { useWithdrawLiquidityHandler } from '../../../src/hooks/useWithdrawLiquidityHandler'
+import { LPTokensTab } from '../../../src/components/Withdraw/LPTokensTab'
+import { ReserveTokensTab } from '../../../src/components/Withdraw/ReserveTokensTab'
 
 const WithdrawLiquidity: NextPage = () => {
   const {
@@ -18,7 +18,8 @@ const WithdrawLiquidity: NextPage = () => {
     approveTransaction,
     enableRemove,
     withdraw,
-    enableApprove
+    enableApprove,
+    invalidBtnText
   } = useWithdrawLiquidityHandler()
 
   const style = {
@@ -127,7 +128,7 @@ const WithdrawLiquidity: NextPage = () => {
               Confirm
             </div>
           ) : (
-            <div className={style.invalidatedButton}>Confirm</div>
+            <div className={style.invalidatedButton}>{invalidBtnText}</div>
           )}
         </div>
       </div>
