@@ -169,7 +169,7 @@ export const useAddLiquidityHandler = () => {
         let approvalA = await validateAllowance(
           accountInfo.address,
           tokenAContract,
-          BigNumber.from(parseFloat(tokenAInputVal)),
+          Number(tokenAInputVal),
           POSITION_MANAGER_ADDRESS || ''
         )
 
@@ -182,7 +182,7 @@ export const useAddLiquidityHandler = () => {
         let approvalB = await validateAllowance(
           accountInfo.address,
           tokenBContract,
-          BigNumber.from(parseFloat(tokenBInputVal)),
+          Number(tokenBInputVal),
           POSITION_MANAGER_ADDRESS || ''
         )
 
@@ -231,7 +231,7 @@ export const useAddLiquidityHandler = () => {
       let approval = await validateAllowance(
         accountInfo.address,
         tokenContract,
-        BigNumber.from(parseFloat(tokenAInputVal)),
+        Number(tokenAInputVal),
         POSITION_MANAGER_ADDRESS || ''
       )
       let loading = notifyLoading('Waiting for transaction to complete')

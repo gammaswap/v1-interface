@@ -1,11 +1,14 @@
 import Image from 'next/image'
+import { Dispatch, SetStateAction } from 'react'
+import { handleNumberInput } from '../../utils/validation'
 import { Token } from '../Tokens'
 
 const style = {
   tokenUserInputContainer: 'flex justify-around mt-2',
   tokenAmountContainer: '',
   loanAmountInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-2xl text-neutrals-200',
-  maxButton: 'w-[2rem] text-center bg-neutrals-900 bg-opacity-60 drop-shadow-lg cursor-pointer hover:bg-opacity-70 text-xxs font-normal p-0.5 rounded-sm text-accents-royalBlue text-opacity-50 hover:text-opacity-80 mt-1',
+  maxButton:
+    'w-[2rem] text-center bg-neutrals-900 bg-opacity-60 drop-shadow-lg cursor-pointer hover:bg-opacity-70 text-xxs font-normal p-0.5 rounded-sm text-accents-royalBlue text-opacity-50 hover:text-opacity-80 mt-1',
   tokenPairContainer: 'w-[12rem]',
   tokenPairContent: 'flex justify-end space-x-3',
   tokenPairIcons: 'relative w-[2rem] h-[2rem] self-center',
@@ -18,17 +21,19 @@ const style = {
 interface TokenUserInputProps {
   token0: Token
   token1: Token
+  inputValue: string
+  setTokenValue: Dispatch<SetStateAction<string>>
 }
 
-export const TokenUserInput = ({ token0, token1 }: TokenUserInputProps) => {
+export const TokenUserInput = ({ token0, token1, inputValue, setTokenValue }: TokenUserInputProps) => {
   return (
     <div className={style.tokenUserInputContainer}>
       {/* input side w/ max */}
       <div className={style.tokenAmountContainer}>
         <input
           type="text"
-          // onChange={(e) => handleTokenInput(e, setTokenAInputVal, setTokenBInputVal)}
-          // value={tokenAInputVal}
+          onChange={(e) => handleNumberInput(e, setTokenValue)}
+          value={inputValue}
           placeholder="0.0"
           className={style.loanAmountInput}
         />
@@ -45,7 +50,9 @@ export const TokenUserInput = ({ token0, token1 }: TokenUserInputProps) => {
               <Image src={token1.imgPath} width={20} height={20} />
             </div>
           </div>
-          <div className={style.tokenPairSymbol}>{token0.symbol} / {token1.symbol}</div>
+          <div className={style.tokenPairSymbol}>
+            {token0.symbol} / {token1.symbol}
+          </div>
         </div>
         <div className={style.tokenPairBalance}>Balance: {0}</div>
       </div>

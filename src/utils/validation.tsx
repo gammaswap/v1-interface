@@ -34,13 +34,13 @@ export function handleNumberInput(
 export const validateAllowance = async (
   accountAddress: string,
   erc20: Contract,
-  amountBN: BigNumber,
+  amountBN: number,
   spenderContract: string
 ) => {
   let loading = notifyLoading('Checking allowance')
   try {
     let balanceBN = await erc20.balanceOf(accountAddress)
-    if (parseFloat(ethers.utils.formatEther(balanceBN)) < parseFloat(amountBN.toString())) {
+    if (parseFloat(ethers.utils.formatEther(balanceBN)) < amountBN) {
       notifyDismiss(loading)
       notifyError('Not enough funds. Requested: ' + amountBN + ' Balance ' + ethers.utils.formatUnits(balanceBN, 18))
       return
