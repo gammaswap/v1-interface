@@ -62,11 +62,11 @@ export const LabeledUserInput = ({
             <>
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenAIcon}>
-                  <Image src={token0.imgPath} width={26} height={26} />
+                  <Image src={token0.imgPath} width={23} height={23} />
                 </div>
                 {token1.imgPath ? (
                   <div className={style.tokenBIcon}>
-                    <Image src={token1.imgPath} width={26} height={26} />
+                    <Image src={token1.imgPath} width={23} height={23} />
                   </div>
                 ) : null}
               </div>
@@ -78,7 +78,7 @@ export const LabeledUserInput = ({
             <>
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenBIcon}>
-                  <Image src={token0.imgPath} width={26} height={26} />
+                  <Image src={token0.imgPath} width={23} height={23} />
                 </div>
               </div>
               <div className={style.tokenPairSymbol}>{token0.symbol}</div>
@@ -88,7 +88,7 @@ export const LabeledUserInput = ({
               {/* Token B */}
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenBIcon}>
-                  {token1.imgPath && <Image src={token1.imgPath} width={26} height={26} />}
+                  {token1.imgPath && <Image src={token1.imgPath} width={23} height={23} />}
                 </div>
               </div>
               <div className={style.tokenPairSymbol}>{token1.symbol ? token1.symbol : "Select Token"}</div>

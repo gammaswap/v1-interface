@@ -22,7 +22,7 @@ export const useRebalanceHandler = () => {
     imgPath: '',
     symbol: '',
     address: '',
-    decimals: 18,
+    decimals: 0,
   })
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [tokenSelected, setTokenSelected] = useState<string>('')

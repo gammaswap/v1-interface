@@ -123,7 +123,8 @@ export const getTokenBalance = async (
     setTokenBalance(ethers.utils.formatEther(balance))
   } catch (err) {
     setTokenBalance('0')
-    notifyError('An error occurred while fetching ${tokenSymbol} balance')
+    // TODO Have a loading symbol on the balance label until balance received
+    console.log('An error occurred while fetching ${tokenSymbol} balance')
   }
 }
 

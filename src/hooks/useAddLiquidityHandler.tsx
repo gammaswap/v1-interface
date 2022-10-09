@@ -40,7 +40,6 @@ export const useAddLiquidityHandler = () => {
 
   useEffect(() => {
     if (!provider) {
-      notifyInfo('Please connect wallet.')
       return
     }
 
@@ -293,5 +292,6 @@ export const useAddLiquidityHandler = () => {
     tokenBBalance,
     maxTokenA,
     maxTokenB,
+    provider
   }
 }

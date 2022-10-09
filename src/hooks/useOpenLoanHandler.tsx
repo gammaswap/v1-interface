@@ -36,7 +36,7 @@ export const useOpenLoanHandler = () => {
     address: '',
     decimals: 0,
   })
-  const [peripheryPosManager, setPeripheryPosManager] = useState<Contract | null>(null)
+  const [positionManager, setPositionManager ] = useState<Contract | null>(null)
   const [protocol, setProtocol] = useState<Protocol>(Protocols[0])
   const [gammaPoolFactory, setGammaPoolFactory] = useState<Contract | null>(null)
   const [lpTokenBalance, setLpTokenBalance] = useState<string>('0')
@@ -49,6 +49,7 @@ export const useOpenLoanHandler = () => {
   const [token0Balance, setToken0Balance] = useState<string>('0')
   const [token1Balance, setToken1Balance] = useState<string>('0')
   const [isApproved, setIsApproved] = useState<boolean>(false)
+  const [buttonMessage, setButtonMessage] = useState<string>("")
   const [collateralElems, setCollateralElems] = useState<JSX.Element>(
     <CollateralUserInput
       token0Balance={token0Balance}
@@ -68,14 +69,14 @@ export const useOpenLoanHandler = () => {
     }
 
     if (accountInfo && accountInfo?.address) {
-      setPeripheryPosManager(
+      setPositionManager (
         new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider.getSigner(accountInfo?.address))
       )
       setGammaPoolFactory(
         new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider.getSigner(accountInfo?.address))
       )
     } else {
-      setPeripheryPosManager(new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
+      setPositionManager (new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
       setGammaPoolFactory(new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider))
     }
   }, [provider])
@@ -146,10 +147,10 @@ export const useOpenLoanHandler = () => {
       }
     }
 
-    if (!peripheryPosManager) {
-      await getPosMgr()
+    if (!positionManager) {
+      await getPositionManager()
     }
-    if (peripheryPosManager) {
+    if (positionManager) {
       let loan = await createLoan()
       if (!loan) {
         return
@@ -179,8 +180,8 @@ export const useOpenLoanHandler = () => {
   async function createLoan() {
     let loading = notifyLoading('Waiting for create loan')
     try {
-      if (peripheryPosManager && accountInfo) {
-        let tx = await peripheryPosManager.createLoan(
+      if (positionManager && accountInfo) {
+        let tx = await positionManager.createLoan(
           process.env.NEXT_PUBLIC_CFMM_ADDRESS,
           1,
           accountInfo?.address,
@@ -221,7 +222,7 @@ export const useOpenLoanHandler = () => {
           amounts = [collateralAmt0Str, collateralAmt1Str]
           break
       }
-      if (peripheryPosManager && accountInfo) {
+      if (positionManager && accountInfo) {
         const AddRemoveCollateralParams = {
           cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
           protocol: protocol.id,
@@ -231,7 +232,7 @@ export const useOpenLoanHandler = () => {
           deadline: ethers.constants.MaxUint256,
         }
 
-        let tx = await peripheryPosManager.increaseCollateral(AddRemoveCollateralParams, {
+        let tx = await positionManager.increaseCollateral(AddRemoveCollateralParams, {
           gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT,
         })
         notifyDismiss(loading)
@@ -253,7 +254,7 @@ export const useOpenLoanHandler = () => {
   async function borrowLiquidity(tokenId: string) {
     let loading = notifyLoading('Waiting for borrow liquidity')
     try {
-      if (peripheryPosManager && accountInfo) {
+      if (positionManager && accountInfo) {
         const BorrowLiquidityParams = {
           cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
           protocol: protocol.id,
@@ -262,7 +263,7 @@ export const useOpenLoanHandler = () => {
           to: accountInfo?.address,
           deadline: ethers.constants.MaxUint256,
         }
-        let tx = await peripheryPosManager.borrowLiquidity(BorrowLiquidityParams)
+        let tx = await positionManager.borrowLiquidity(BorrowLiquidityParams)
         notifyDismiss(loading)
         return await tx.wait()
       } else {
@@ -279,7 +280,7 @@ export const useOpenLoanHandler = () => {
     }
   }
 
-  const getPosMgr = async () => {
+  const getPositionManager = async () => {
     if (token0 == token1) {
       notifyInfo('Token values must be different')
       return
@@ -287,13 +288,13 @@ export const useOpenLoanHandler = () => {
 
     //TODO: when the factory is available need to call it to get the pair's pool address to set
 
-    if (provider && !peripheryPosManager) {
+    if (provider && !positionManager) {
       if (accountInfo && accountInfo?.address) {
-        await setPeripheryPosManager(
+        await setPositionManager (
           new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider.getSigner(accountInfo?.address))
         )
       } else {
-        await setPeripheryPosManager(new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
+        await setPositionManager (new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
       }
     } else {
       notifyInfo('Please connect wallet')
@@ -354,6 +355,7 @@ export const useOpenLoanHandler = () => {
   }
 
   const approveTransaction = async () => {
+    console.log("in approve")
     if (!validateInput()) {
       return
     }

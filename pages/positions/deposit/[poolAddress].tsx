@@ -84,6 +84,7 @@ const AddLiquidity: NextPage = () => {
     tokenBBalance,
     maxTokenA,
     maxTokenB,
+    provider
   } = useAddLiquidityHandler()
 
   return (
@@ -175,7 +176,9 @@ const AddLiquidity: NextPage = () => {
                 </div>
                 {/* TODO: use ApproveConfirmButton */}
                 <div className={style.common.buttonContainer}>
-                  {isTokenEmpty(tokenBSelected) ? (
+                  {!provider ? (
+                    <div className={style.common.invalidatedButton}>Connect Wallet</div>
+                  ) : isTokenEmpty(tokenBSelected) ? (
                     <div className={style.common.invalidatedButton}>Select Token</div>
                   ) : tokenAInputVal === '' || tokenBInputVal === '' ? (
                     <div className={style.common.invalidatedButton}>Enter an Amount</div>

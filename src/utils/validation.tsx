@@ -62,6 +62,7 @@ export const validateAllowance = async (
 }
 
 const doApprove = async (erc20: Contract, spender: string) => {
+  // TODO Have a loading symbol on the balance label until balance received
   let loadingApproval = notifyLoading('Waiting for approval')
   try {
     let tx = await erc20.approve(spender, constants.MaxUint256)
