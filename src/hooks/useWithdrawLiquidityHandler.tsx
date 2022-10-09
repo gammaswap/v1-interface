@@ -159,7 +159,11 @@ export const useWithdrawLiquidityHandler = () => {
         if (!gammaPoolContract) {
           return
         }
-        const liqBal = await gammaPoolContract.balanceOf(accountInfo?.address)
+        if (!accountInfo) {
+          console.log("Please connect wallet.")
+          return
+        }
+        const liqBal = await gammaPoolContract.balanceOf(accountInfo.address)
         console.log(liqBal.toString())
         setEnableApprove(liqBal.toString() > 0)
         setTotalLiquidityAmt(liqBal.toString())
