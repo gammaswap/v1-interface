@@ -18,7 +18,7 @@
 # misc
 .DS_Store
 *.pem
-yarn.lock
+package-lock.json
 
 # debug
 npm-debug.log*
@@ -34,7 +34,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-yarn.lock
 
 #access tokens
 .npmrc
+
+# graphql
+.graphclient
