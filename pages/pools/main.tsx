@@ -1,40 +1,42 @@
 import type { NextPage } from "next"
+import { useState } from "react"
+import Image from "next/image"
 import { InformationCircleIcon } from "@heroicons/react/outline"
-import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/outline"
+import { ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/outline"
 import Link from "next/link"
 import { PoolTableRow, PoolData } from "../../src/components/Pools/PoolTableRow"
 import { usePoolsHandler } from "../../src/hooks/usePoolsHandler"
-import { useState } from "react"
-import PoolDetailsModal from "../../src/components/Pools/PoolDetailsModal"
 
 const Pools: NextPage = () => {
   const style = {
-    wrapper: "w-screen flex flex-col",
-    topBar: "w-screen flex flex-col bg-gray-800 h-48 py-4 px-16 justify-center",
-    heading: "m-2 text-3xl text-white",
-    topBarHead: "flex flex-row items-center",
-    topBarListings: "flex pl-1",
-    topBarSingleListings: "m-2",
-    currencySymbol: "text-2xl text-slate-400",
-    topBarData: "text-sm text-gray-400",
-    topBarSingleValue: "text-2xl text-slate-100",
-    tableView: "overflow-x-auto relative bg-white mx-20",
-    tableContainer: "p-4 rounded-lg bg-gray-50 bg-gray-700 text-gray-400",
-    tableHead: "flex text-xs text-gray-700 uppercase pl-2 pr-4 border-b border-gray-500",
-    tableHeading: "flex align-center py-3",
-    infoSvg: "ml-2 w-4 h-4 text-lg",
-    poolHeading: "pb-12 pt-6 pl-3 text-xl",
-    topHeading: "flex justify-between",
-    createPool: "flex justify-center items-center",
-    createPoolBtn: "p-3 bg-red-400 font-semibold rounded-xl text-md cursor-pointer",
-    assetHead: "w-[20%] justify-start font-medium text-white",
-    totalSupplyHead: "w-[16%] justify-end font-medium text-white",
-    supplyApyHead: "w-[16%] justify-end font-medium text-white",
-    totalBorrowedHead: "w-[16%] justify-end font-medium text-white",
-    borrowApyVariableHead: "w-[16%] justify-end font-medium text-white",
-    borrowApyStableHead: "w-[16%] justify-end font-medium text-white",
-    arrow: "mt-2 w-4 h-4 text-2xl cursor-pointer",
-    allArrows: "flex justify-end",
+    wrapper: "w-full h-full flex justify-center text-neutrals-100",
+    container: "flex flex-col space-y-10 mx-auto mt-4",
+    poolStatsContainer: "w-[45rem] bg-neutrals-800 p-4 rounded-lg drop-shadow-md",
+    poolStatsHeader: "text-3xl",
+    poolStatsContent: "flex justify-between mt-4",
+    poolStatContainer: "bg-neutrals-800 rounded-lg py-2 px-4 drop-shadow-md",
+    poolStatHeader: "text-sm text-neutrals-600 flex items-center space-x-1",
+    infoIcon: "w-4 h-4 cursor-pointer hover:text-neutrals-100",
+    poolStatInfo: "flex items-center space-x-2 mt-1",
+    poolStatNumber: "text-2xl",
+    poolStatChange: "flex items-center",
+    poolStatChangeArrow: "text-secondary-jungleGreen",
+    downArrow: "",
+    poolStatChangeNumber: "text-secondary-jungleGreen",
+    poolsOverviewContainer: "font-normal flex flex-col space-y-2",
+    poolsOverviewHeader: "text-neutrals-600 font-medium",
+    poolsOverviewTable: "flex flex-col bg-neutrals-800 pt-4 px-3 rounded-lg drop-shadow-md",
+    poolsOverviewTableHeader: "",
+    poolsOverviewTableHeaderContent: "flex",
+    poolsOverviewTableHeaderPrimary: "flex space-x-6",
+    poolsOverviewTableHeaderItem: "text-neutrals-300",
+    poolsOverviewTableHeaderSecondary: "flex space-x-6 ml-auto",
+    poolsOverviewTableLine: "w-full h-[0.10rem] bg-neutrals-700 opacity-40 mt-2",
+    poolsOverviewPagination: "py-4 flex justify-center items-center space-x-5 text-neutrals-400",
+    poolsOverviewPaginationPreviousArrow: "",
+    arrow: "w-4 h-4",
+    poolsOverviewPaginationPage: "text-neutrals-100 text-sm",
+    poolsOverviewPaginationNextArrow: "",
   }
 
   const { poolsData } = usePoolsHandler()
@@ -48,77 +50,120 @@ const Pools: NextPage = () => {
 
   return (
     <div className={style.wrapper}>
-      <div className={style.topBar}>
-        <div className={style.topBarHead}>
-          <p className={style.heading}>GammaSwap Pools</p>
+      <div className={style.container}>
+        {/* Main Pool Statistics */}
+        <div className={style.poolStatsContainer}>
+          <h1 className={style.poolStatsHeader}>GammaSwap Overview</h1>
+          <div className={style.poolStatsContent}>
+            
+            {/* Pool Stat #1 */}
+            <div className={style.poolStatContainer}>
+              <div className={style.poolStatHeader}>
+                <h2>Total Pool Size</h2>
+                <InformationCircleIcon className={style.infoIcon} />
+              </div>
+              <div className={style.poolStatInfo}>
+                
+                <div className={style.poolStatNumber}>$25m</div>
+                
+                <div className={style.poolStatChange}>
+                  <div className={style.poolStatChangeArrow}>
+                    <ArrowUpIcon className={style.arrow} />
+                  </div>
+                  <p className={style.poolStatChangeNumber}>1.23%</p>
+                </div>
+              
+              </div>
+            </div>
+
+            {/* Pool Stat #2 */}
+            <div className={style.poolStatContainer}>
+              <div className={style.poolStatHeader}>
+                <h2>Total Pool Size</h2>
+                <InformationCircleIcon className={style.infoIcon} />
+              </div>
+              <div className={style.poolStatInfo}>
+                
+                <div className={style.poolStatNumber}>$6.03m</div>
+                
+                <div className={style.poolStatChange}>
+                  <div className={style.poolStatChangeArrow}>
+                    <ArrowUpIcon className={style.arrow} />
+                  </div>
+                  <p className={style.poolStatChangeNumber}>1.23%</p>
+                </div>
+              
+              </div>
+            </div>
+
+            {/* Pool Stat #3 */}
+            <div className={style.poolStatContainer}>
+              <div className={style.poolStatHeader}>
+                <h2>Total Pool Size</h2>
+                <InformationCircleIcon className={style.infoIcon} />
+              </div>
+              <div className={style.poolStatInfo}>
+                
+                <div className={style.poolStatNumber}>$4.04m</div>
+                
+                <div className={style.poolStatChange}>
+                  <div className={style.poolStatChangeArrow}>
+                    <ArrowUpIcon className={style.arrow} />
+                  </div>
+                  <p className={style.poolStatChangeNumber}>1.23%</p>
+                </div>
+              
+              </div>
+            </div>
+
+          </div>
         </div>
-        <div className={style.topBarListings}>
-          <div className={style.topBarSingleListings}>
-            <p className={style.topBarData}>Total Pool Size</p>
-            <p className={style.topBarSingleValue}>
-              <span className={style.currencySymbol}>$</span>5.60B
-            </p>
-          </div>
-          <div className={style.topBarSingleListings}>
-            <p className={style.topBarData}>Total Available</p>
-            <p className={style.topBarSingleValue}>
-              <span className={style.currencySymbol}>$</span>5.60B
-            </p>
-          </div>
-          <div className={style.topBarSingleListings}>
-            <p className={style.topBarData}>Total Borrow</p>
-            <p className={style.topBarSingleValue}>
-              <span className={style.currencySymbol}>$</span>5.60B
-            </p>
+        <div className={style.poolsOverviewContainer}>
+          <h1 className={style.poolsOverviewHeader}>Top Pools</h1>
+          <div className={style.poolsOverviewTable}>
+            
+            {/* Table Header */}
+            <div className={style.poolsOverviewTableHeader}>
+              <div className={style.poolsOverviewTableHeaderContent}>
+                <div className={style.poolsOverviewTableHeaderPrimary}>
+                  <p className={style.poolsOverviewTableHeaderItem}>#</p>
+                  <p className={style.poolsOverviewTableHeaderItem}>Pool</p>
+                </div>
+                
+                <div className={style.poolsOverviewTableHeaderSecondary}>
+                  <p className={style.poolsOverviewTableHeaderItem}>Total Supply</p>
+                  <p className={style.poolsOverviewTableHeaderItem}>Supply APY</p>
+                  <p className={style.poolsOverviewTableHeaderItem}>Total Borrowed</p>
+                  <p className={style.poolsOverviewTableHeaderItem}>Borrow APY</p>
+                </div>
+              </div>
+              <div className={style.poolsOverviewTableLine}></div>
+            </div>
+
+            {/* Table Row */}
+            <PoolTableRow />
+            <PoolTableRow />
+            <PoolTableRow />
+            <PoolTableRow />
+            <PoolTableRow />
+            
+            {/* Pagination Section */}
+            <div className={style.poolsOverviewPagination}>
+              
+              <div className={style.poolsOverviewPaginationPreviousArrow}>
+                <ArrowLeftIcon className={style.arrow} />
+              </div>
+              
+              <div className={style.poolsOverviewPaginationPage}>Page 1 of 5</div>
+              
+              <div className={style.poolsOverviewPaginationNextArrow}>
+                <ArrowRightIcon className={style.arrow} />
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
-      <div className={style.tableView}>
-        <div className={style.topHeading}>
-          <div className={style.poolHeading}>
-            <p>Gammaswap assets</p>
-          </div>
-          <div className={style.createPool}>
-            <Link href={"/pools/createpool"}>
-              <div className={style.createPoolBtn}>Create Pool</div>
-            </Link>
-          </div>
-        </div>
-        <div className={style.tableContainer}>
-          <div className={style.tableHead}>
-            <div className={style.tableHeading + " " + style.assetHead}>
-              <p>Asset</p>
-            </div>
-            <div className={style.tableHeading + " " + style.totalSupplyHead}>
-              <p>Total Supply</p>
-            </div>
-            <div className={style.tableHeading + " " + style.supplyApyHead}>
-              <p>Supply APY</p>
-            </div>
-            <div className={style.tableHeading + " " + style.totalBorrowedHead}>
-              <p>Total Borrowed</p>
-            </div>
-            <div className={style.tableHeading + " " + style.borrowApyVariableHead}>
-              <p>Borrow APY, variable</p>
-              <InformationCircleIcon className={style.infoSvg} />
-            </div>
-            <div className={style.tableHeading + " " + style.borrowApyStableHead}>
-              <p>Borrow APY, stable</p>
-              <InformationCircleIcon className={style.infoSvg} />
-            </div>
-          </div>
-          {poolsData && poolsData.length > 0 ? poolsData.map((poolData, index) => <PoolTableRow key={index} poolData={poolData} clickHandler={openPoolDetails} />) : null}
-          <div className={style.allArrows}>
-            <ArrowLeftIcon className={style.arrow} />
-            <ArrowRightIcon className={style.arrow} />
-          </div>
-        </div>
-      </div>
-      <PoolDetailsModal
-        isOpen={isDetailsOpen}
-        setIsOpen={setIsDetailsOpen}
-        poolData={selectedPoolData}
-      />
     </div>
   )
 }
