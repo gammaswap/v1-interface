@@ -1,16 +1,13 @@
 import { useState, useEffect, useContext, ChangeEvent, SetStateAction, Dispatch, useCallback } from 'react'
 import Tokens, { Token } from '../../src/components/Tokens'
 import { WalletContext } from '../../src/context/WalletContext'
-import { Provider } from '@ethersproject/providers'
 import { BigNumber, Contract, ethers } from 'ethers'
-import { getTokenContracts, getEstimatedOutput, TokenContracts, AmountsOut } from '../../src/utils/getSmartContract'
-import { BasicContractContext } from '../../src/context/BasicContractContext'
-import { getTokenBalance } from '../utils/getSmartContract'
-
+import { getTokenBalance, getTokensFromPoolAddress } from '../utils/getSmartContract'
 import PosManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
-import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
-import { doApprove, handleNumberInput, validateAllowance } from '../utils/validation'
+import { notifyDismiss, notifyError, notifyLoading, notifySuccess, notifyInfo } from './useNotification'
+import { handleNumberInput, validateAllowance } from '../utils/validation'
 import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
+import { useRouter } from 'next/router'
 
 export const useAddLiquidityHandler = () => {
   const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
@@ -24,7 +21,7 @@ export const useAddLiquidityHandler = () => {
     imgPath: '',
     symbol: '',
     address: '',
-    decimals: 18,
+    decimals: 0,
   })
   const [tokenABalance, setTokenABalance] = useState<string>('0')
   const [tokenBBalance, setTokenBBalance] = useState<string>('0')
@@ -34,32 +31,30 @@ export const useAddLiquidityHandler = () => {
   // holds state of what token input field was selected for modal opening
   const [tokenSelected, setTokenSelected] = useState<string>('')
 
-  // holds state of token contracts from selected tokens
-  const [tokenContracts, setTokenContracts] = useState<TokenContracts | null>(null)
-
   // holds state of modal open and close
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   // holds global state of user info and ethers provider for contract calls
   const { accountInfo, provider } = useContext(WalletContext)
+  const router = useRouter()
 
-  // checks for non-numeric value inputs
-  const validateTokenInput = (
-    e: ChangeEvent<HTMLInputElement> | string,
-    setToken: Dispatch<SetStateAction<string>>
-  ): void => {
-    let tokenInput: string
-    if (typeof e !== 'string') tokenInput = (e.target as HTMLInputElement).value
-    else tokenInput = e
-    let strToSet = ''
-    let i = tokenInput.indexOf('.')
-    if (i >= 0 && i + 1 < tokenInput.length) {
-      strToSet = tokenInput.substring(0, i + 1) + tokenInput.substring(i + 1).replace(/[^0-9]/g, '')
-    } else {
-      strToSet = tokenInput.replace(/[^0-9\.]/g, '')
+  useEffect(() => {
+    if (!provider) {
+      return
     }
-    setToken(strToSet)
-  }
+
+    let poolAddress = router.query.poolAddress
+    if (!poolAddress || poolAddress.length == 0 || poolAddress == "0") {
+      return
+    }
+
+    getTokensFromPoolAddress(
+      router.query.poolAddress as string,
+      provider,
+      setTokenASelected,
+      setTokenBSelected
+    )
+  }, [])
 
   // checks which tokenSelector element was selected and opens modal
   const handleTokenSelector = (tokenSelected: string): void => {
@@ -72,42 +67,31 @@ export const useAddLiquidityHandler = () => {
     return Object.values(tokenToCheck).every((tokenProp) => tokenProp === '' || tokenProp === 18)
   }
 
-  // every time token A or B selection changes,
-  // render new token A/B contracts, wallet balance, output value
   useEffect(() => {
-    const fetchedTokenContracts = getTokenContracts(
-      process.env.NEXT_PUBLIC_TOKEN_A_ADDR as string,
-      process.env.NEXT_PUBLIC_TOKEN_B_ADDR as string,
-      provider as Provider
-    )
-    setTokenContracts(fetchedTokenContracts)
-    // validates and gets new esimated output only on tokenAInputVal
-    handleTokenInput(tokenAInputVal, setTokenAInputVal, setTokenBInputVal)
+    setTokenAInputVal("")
+    setTokenBInputVal("")
   }, [tokenASelected, tokenBSelected])
 
   useEffect(() => {
-    async function fetchContract() {
+    async function loadPosMgr() {
       if (!provider) {
         notifyError('Please connect wallet.')
         return
       }
 
-      // Position Manager contract address
       let address = POSITION_MANAGER_ADDRESS || ''
-
-      // Variable to hold Position Manager contract
-      let _posManager = null
-
-      _posManager = new ethers.Contract(
+      let _posManager = new ethers.Contract(
         address,
         PosManager.abi,
-        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+        accountInfo && accountInfo.address ?
+          provider.getSigner(accountInfo.address) :
+          provider
       )
       if (_posManager) {
         setPosManager(_posManager)
       }
     }
-    fetchContract()
+    loadPosMgr()
   }, [provider])
 
   useEffect(() => {
@@ -308,5 +292,6 @@ export const useAddLiquidityHandler = () => {
     tokenBBalance,
     maxTokenA,
     maxTokenB,
+    provider
   }
 }

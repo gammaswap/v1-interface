@@ -4,6 +4,7 @@ import PairsSelector from '../../src/components/PairsSelector'
 import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
 import { CollateralUserInput } from '../../src/components/OpenLoan/CollateralUserInput'
 import { Listbox } from '@headlessui/react'
+import { ApproveConfirmButton } from '../../src/components/Positions/ApproveConfirmButton'
 
 export const OpenLoanStyles = {
   wrapper: 'w-full h-full flex justify-center',
@@ -58,10 +59,6 @@ export const OpenLoanStyles = {
   loanMetric: 'bg-neutrals-700 w-1/3 py-3 drop-shadow-md rounded-lg',
   loanMetricHeader: 'flex justify-center items-center space-x-1 text-xxs',
   metricValue: 'text-center',
-
-  buttonDiv: 'flex text-xl font-semibold space-x-5 mt-6',
-  confirmButton: 'w-1/2 bg-primary-blue text-center py-3 px-5 rounded-lg cursor-pointer',
-  invalidatedButton: 'w-1/2 disabled text-center py-3 px-5 rounded-lg text-gray-600 border-2 border-gray-700',
 }
 
 const tips = {
@@ -251,23 +248,12 @@ const OpenLoan: NextPage = () => {
             <p className={`${style.metricValue} text-secondary-jungleGreen`}>+ $29.1030</p>
           </div>
         </div>
-        {/* TODO: need to add logic */}
-        <div className={style.buttonDiv}>
-          {token0.address && token1.address && !isApproved ? (
-            <div className={style.confirmButton} onClick={approveTransaction}>
-              Approve
-            </div>
-          ) : (
-            <div className={style.invalidatedButton}>Approve</div>
-          )}
-          {!isApproved ? (
-            <div className={style.invalidatedButton}>Remove</div>
-          ) : (
-            <div className={style.confirmButton} onClick={openLoanHandler}>
-              Remove
-            </div>
-          )}
-        </div>
+        <ApproveConfirmButton 
+          isApproveEnabled={(token0.address && token1.address && !isApproved) as boolean}
+          isConfirmEnabled={isApproved}
+          approveHandler={approveTransaction}
+          actionHandler={openLoanHandler}
+        />
       </div>
     </div>
   )

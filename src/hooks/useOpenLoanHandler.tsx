@@ -5,12 +5,11 @@ import { WalletContext } from '../context/WalletContext'
 // TODO: import Factory from '../../abis/Factory.json'
 import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
 import { ethers, Contract, BigNumber, constants } from 'ethers'
-import toast from 'react-hot-toast'
 import { InformationCircleIcon } from '@heroicons/react/solid'
 import { useForm } from 'react-hook-form'
 import PositionManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
 import GammaPoolFactory from '@gammaswap/v1-core/artifacts/contracts/GammaPoolFactory.sol/GammaPoolFactory.json'
-import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
+import { notifyDismiss, notifyError, notifyLoading, notifySuccess, notifyInfo } from './useNotification'
 import { calcPoolKey, getTokenBalance } from '../utils/getSmartContract'
 import { validateAllowance } from '../utils/validation'
 import Protocols, { Protocol } from '../components/Protocols'
@@ -37,7 +36,7 @@ export const useOpenLoanHandler = () => {
     address: '',
     decimals: 0,
   })
-  const [peripheryPosManager, setPeripheryPosManager] = useState<Contract | null>(null)
+  const [positionManager, setPositionManager ] = useState<Contract | null>(null)
   const [protocol, setProtocol] = useState<Protocol>(Protocols[0])
   const [gammaPoolFactory, setGammaPoolFactory] = useState<Contract | null>(null)
   const [lpTokenBalance, setLpTokenBalance] = useState<string>('0')
@@ -50,6 +49,7 @@ export const useOpenLoanHandler = () => {
   const [token0Balance, setToken0Balance] = useState<string>('0')
   const [token1Balance, setToken1Balance] = useState<string>('0')
   const [isApproved, setIsApproved] = useState<boolean>(false)
+  const [buttonMessage, setButtonMessage] = useState<string>("")
   const [collateralElems, setCollateralElems] = useState<JSX.Element>(
     <CollateralUserInput
       token0Balance={token0Balance}
@@ -64,19 +64,19 @@ export const useOpenLoanHandler = () => {
 
   useEffect(() => {
     if (!provider) {
-      toast('Please connect wallet.', { icon: <InformationCircleIcon /> })
+      notifyInfo('Please connect wallet.')
       return
     }
 
     if (accountInfo && accountInfo?.address) {
-      setPeripheryPosManager(
+      setPositionManager (
         new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider.getSigner(accountInfo?.address))
       )
       setGammaPoolFactory(
         new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider.getSigner(accountInfo?.address))
       )
     } else {
-      setPeripheryPosManager(new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
+      setPositionManager (new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
       setGammaPoolFactory(new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider))
     }
   }, [provider])
@@ -147,10 +147,10 @@ export const useOpenLoanHandler = () => {
       }
     }
 
-    if (!peripheryPosManager) {
-      await getPosMgr()
+    if (!positionManager) {
+      await getPositionManager()
     }
-    if (peripheryPosManager) {
+    if (positionManager) {
       let loan = await createLoan()
       if (!loan) {
         return
@@ -180,8 +180,8 @@ export const useOpenLoanHandler = () => {
   async function createLoan() {
     let loading = notifyLoading('Waiting for create loan')
     try {
-      if (peripheryPosManager && accountInfo) {
-        let tx = await peripheryPosManager.createLoan(
+      if (positionManager && accountInfo) {
+        let tx = await positionManager.createLoan(
           process.env.NEXT_PUBLIC_CFMM_ADDRESS,
           1,
           accountInfo?.address,
@@ -222,7 +222,7 @@ export const useOpenLoanHandler = () => {
           amounts = [collateralAmt0Str, collateralAmt1Str]
           break
       }
-      if (peripheryPosManager && accountInfo) {
+      if (positionManager && accountInfo) {
         const AddRemoveCollateralParams = {
           cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
           protocol: protocol.id,
@@ -232,7 +232,7 @@ export const useOpenLoanHandler = () => {
           deadline: ethers.constants.MaxUint256,
         }
 
-        let tx = await peripheryPosManager.increaseCollateral(AddRemoveCollateralParams, {
+        let tx = await positionManager.increaseCollateral(AddRemoveCollateralParams, {
           gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT,
         })
         notifyDismiss(loading)
@@ -254,7 +254,7 @@ export const useOpenLoanHandler = () => {
   async function borrowLiquidity(tokenId: string) {
     let loading = notifyLoading('Waiting for borrow liquidity')
     try {
-      if (peripheryPosManager && accountInfo) {
+      if (positionManager && accountInfo) {
         const BorrowLiquidityParams = {
           cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
           protocol: protocol.id,
@@ -263,7 +263,7 @@ export const useOpenLoanHandler = () => {
           to: accountInfo?.address,
           deadline: ethers.constants.MaxUint256,
         }
-        let tx = await peripheryPosManager.borrowLiquidity(BorrowLiquidityParams)
+        let tx = await positionManager.borrowLiquidity(BorrowLiquidityParams)
         notifyDismiss(loading)
         return await tx.wait()
       } else {
@@ -280,24 +280,24 @@ export const useOpenLoanHandler = () => {
     }
   }
 
-  const getPosMgr = async () => {
+  const getPositionManager = async () => {
     if (token0 == token1) {
-      toast('Token values must be different', { icon: <InformationCircleIcon /> })
+      notifyInfo('Token values must be different')
       return
     }
 
     //TODO: when the factory is available need to call it to get the pair's pool address to set
 
-    if (provider && !peripheryPosManager) {
+    if (provider && !positionManager) {
       if (accountInfo && accountInfo?.address) {
-        await setPeripheryPosManager(
+        await setPositionManager (
           new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider.getSigner(accountInfo?.address))
         )
       } else {
-        await setPeripheryPosManager(new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
+        await setPositionManager (new ethers.Contract(POSITION_MANAGER_ADDRESS, PositionManager.abi, provider))
       }
     } else {
-      toast('Please connect wallet', { icon: <InformationCircleIcon /> })
+      notifyInfo('Please connect wallet')
     }
   }
 
@@ -311,7 +311,7 @@ export const useOpenLoanHandler = () => {
         await setGammaPoolFactory(new ethers.Contract(GAMMAFACTORY_ADDR, GammaPoolFactory.abi, provider))
       }
     } else {
-      toast('Please connect wallet', { icon: <InformationCircleIcon /> })
+      notifyInfo('Please connect wallet')
     }
   }
 

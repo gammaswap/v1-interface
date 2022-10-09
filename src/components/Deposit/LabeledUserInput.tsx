@@ -4,7 +4,7 @@ import { handleNumberInput } from '../../utils/validation'
 import { Token } from '../Tokens'
 
 const style = {
-  CollateralUserInputContainer: 'flex justify-around mt-2',
+  UserInputContainer: 'flex justify-around mt-2',
   tokenAmountContainer: '',
   loanAmountInput: 'bg-transparent placeholder:text-neutrals-600 outline-none w-full text-2xl text-neutrals-200',
   maxButton:
@@ -18,27 +18,25 @@ const style = {
   tokenPairBalance: 'font-semibold text-xxs text-neutrals-600 tracking-wide text-right mt-2',
 }
 
-interface CollateralUserInputProps {
-  collateralType: string
+interface LabeledUserInputProps {
+  inputType: string
   token0: Token
   token1: Token
-  token0Balance: string
-  token1Balance: string
+  tokenBalance: string
   inputValue: string
   setTokenValue: Dispatch<React.SetStateAction<string>>
 }
 
-export const CollateralUserInput = ({
-  collateralType,
+export const LabeledUserInput = ({
+  inputType,
   token0,
   token1,
-  token0Balance,
-  token1Balance,
+  tokenBalance,
   inputValue,
   setTokenValue,
-}: CollateralUserInputProps) => {
+}: LabeledUserInputProps) => {
   return (
-    <div className={style.CollateralUserInputContainer}>
+    <div className={style.UserInputContainer}>
       {/* input side w/ max */}
       <div className={style.tokenAmountContainer}>
         <input
@@ -51,7 +49,7 @@ export const CollateralUserInput = ({
         <div
           className={style.maxButton}
           onClick={() => {
-            setTokenValue(token0Balance || token1Balance)
+            setTokenValue(tokenBalance)
           }}
         >
           MAX
@@ -60,7 +58,7 @@ export const CollateralUserInput = ({
       {/* tokens side w/ balance */}
       <div className={style.tokenPairContainer}>
         <div className={style.tokenPairContent}>
-          {collateralType == 'Liquidity Pool Tokens' ? (
+          {inputType == 'Liquidity Pool Tokens' ? (
             <>
               <div className={style.tokenPairIcons}>
                 <div className={style.tokenAIcon}>
@@ -73,13 +71,13 @@ export const CollateralUserInput = ({
                 ) : null}
               </div>
               <div className={style.tokenPairSymbol}>
-                {token0.symbol} {token1.address ? '/' + token1.symbol : null}
+                {token0.symbol} / {token1.symbol ? token1.symbol : "Select"}
               </div>
             </>
-          ) : collateralType == 'Token A' ? (
+          ) : inputType == 'Token A' ? (
             <>
               <div className={style.tokenPairIcons}>
-                <div className={style.tokenAIcon}>
+                <div className={style.tokenBIcon}>
                   <Image src={token0.imgPath} width={23} height={23} />
                 </div>
               </div>
@@ -93,13 +91,12 @@ export const CollateralUserInput = ({
                   {token1.imgPath && <Image src={token1.imgPath} width={23} height={23} />}
                 </div>
               </div>
-              <div className={style.tokenPairSymbol}>{token1.symbol}</div>
+              <div className={style.tokenPairSymbol}>{token1.symbol ? token1.symbol : "Select Token"}</div>
             </>
           )}
         </div>
         <div className={style.tokenPairBalance}>
-          Balance: {token0Balance ? token0Balance : ''} {token0Balance && token1Balance ? '/' : null}{' '}
-          {token1Balance ? token1Balance : ''}
+          Balance: {tokenBalance}
         </div>
       </div>
     </div>

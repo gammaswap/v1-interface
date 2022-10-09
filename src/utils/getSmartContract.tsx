@@ -4,7 +4,8 @@ import { Provider } from '@ethersproject/providers'
 import { AccountInfo } from '../context/WalletContext'
 import { notifyError } from '../hooks/useNotification'
 import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
-import { Token } from '../components/Tokens'
+import Tokens, { Token } from '../components/Tokens'
+import GammaPool from '@gammaswap/v1-core/artifacts/contracts/GammaPool.sol/GammaPool.json'
 
 const erc20ABI = require('erc-20-abi')
 const { abi: IUniswapV2FactoryABI } = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
@@ -122,6 +123,34 @@ export const getTokenBalance = async (
     setTokenBalance(ethers.utils.formatEther(balance))
   } catch (err) {
     setTokenBalance('0')
-    notifyError(`An error occurred while fetching ${tokenSymbol} balance`)
+    // TODO Have a loading symbol on the balance label until balance received
+    console.log('An error occurred while fetching ${tokenSymbol} balance')
   }
+}
+
+export const getTokensFromPoolAddress = async (
+  poolAddress: string,
+  provider: Provider,
+  setTokenASelected: Dispatch<SetStateAction<Token>>,
+  setTokenBSelected: Dispatch<SetStateAction<Token>>
+) => {
+  // get them from the pool tokens()
+  try {
+    console.log("address ", poolAddress)
+    let pool = new ethers.Contract(poolAddress, GammaPool.abi, provider)
+    let tokenAddrs = await pool.tokens()
+    let tokenA = Tokens.find(token => token.address == tokenAddrs[0])
+    let tokenB = Tokens.find(token => token.address == tokenAddrs[1])
+    if (!tokenA || !tokenB) {
+      console.log("Unable to find one of the tokens")
+      return
+    }
+    setTokenASelected(tokenA)
+    setTokenBSelected(tokenB)
+  } catch (err) {
+    notifyError(
+      'An error occurred while fetching token addresses from pool: ' + err
+    )
+  }
+
 }

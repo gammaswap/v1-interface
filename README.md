@@ -1,7 +1,7 @@
 <p align="center"><a href="https://gammaswap.com" target="_blank" rel="noopener noreferrer"><img width="100" src="https://gammaswap.com/assets/images/image02.svg" alt="Gammaswap logo"></a></p>
 
 <p align="center">
-  <a href="https://github.com/gammaswap/v1-interface/actions/workflows/main.yaml"><img src="https://github.com/gammaswap/v1-interface/actions/workflows/main.yaml/badge.svg?branch=main" alt="Build Status">
+  <a href="https://github.com/gammaswap/v1-interface/actions/workflows/build.yaml"><img src="https://github.com/gammaswap/v1-interface/actions/workflows/build.yaml/badge.svg?branch=main" alt="Build Status">
 </p>
 
 # Local Development
