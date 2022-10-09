@@ -355,7 +355,6 @@ export const useOpenLoanHandler = () => {
   }
 
   const approveTransaction = async () => {
-    console.log("in approve")
     if (!validateInput()) {
       return
     }

@@ -17,6 +17,8 @@ export const ApproveConfirmButton = ({
   approveHandler,
   actionHandler,
 }: ApproveConfirmButtonProps) => {
+  // TODO: need a way to show error messages to the user. Through the confirm
+  // button? It might be too small. Or some other message.
   return (
     <div className={style.buttonDiv}>
       {isApproveEnabled ? (
@@ -26,7 +28,6 @@ export const ApproveConfirmButton = ({
       ) : (
         <div className={style.disabledButton}>Approve</div>
       )}
-
       {isConfirmEnabled ? (
         <div className={style.enabledButton} onClick={actionHandler}>
           Confirm
