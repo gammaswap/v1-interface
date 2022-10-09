@@ -1,10 +1,11 @@
 import { useState, useEffect, useContext } from 'react'
 import { WalletContext } from '../context/WalletContext'
-import { ethers, Contract, constants } from 'ethers'
+import { ethers, Contract, constants, BigNumber } from 'ethers'
 import PositionManagerJSON from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
 import GammaPool from '@gammaswap/v1-core/artifacts/contracts/GammaPool.sol/GammaPool.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess } from './useNotification'
 import { useRouter } from 'next/router'
+import { validateAllowance } from '../utils/validation'
 
 export const useWithdrawLiquidityHandler = () => {
   const router = useRouter()
@@ -68,17 +69,39 @@ export const useWithdrawLiquidityHandler = () => {
   }, [provider])
 
   async function approveTransaction() {
-    let loading = notifyLoading('Waiting for block confirmation')
-    approveWithdraw()
-      .then(() => {
+    try {
+      let approval
+
+      if (!gammaPoolContract) {
+        await initializeGammaPoolContract()
+      }
+
+      if (gammaPoolContract && poolAddress && accountInfo?.address && provider) {
+        let amt = '0'
+        if (sliderPercentage === 0) {
+          throw new Error('Please select a valid amount to withdraw')
+        }
+        if (sliderPercentage === 100) {
+          amt = totalLiquidityAmt.toString()
+        } else {
+          amt = ((liquidityAmt * sliderPercentage) / 100).toString().toString()
+        }
+        approval = await validateAllowance(
+          accountInfo.address,
+          gammaPoolContract,
+          BigNumber.from(amt.toString()),
+          POSITION_MANAGER_ADDRESS || ''
+        )
+      }
+
+      if (approval) {
         setEnableRemove(true)
-        notifyDismiss(loading)
-      })
-      .catch((err) => {
-        notifyDismiss(loading)
+      } else {
         setEnableRemove(false)
-        notifyError(err.toString())
-      })
+      }
+    } catch (e: any) {
+      notifyError(e.toString())
+    }
   }
 
   async function withdrawLiquidity(balance: number) {
@@ -126,45 +149,6 @@ export const useWithdrawLiquidityHandler = () => {
         throw new Error(e.message)
       } else {
         throw new Error('An error occurred while whithdrawing reserves')
-      }
-    }
-  }
-
-  async function approveWithdraw() {
-    if (!provider) {
-      setInvalidBtnText('Connect Wallet')
-      notifyError('Please connect wallet')
-      return
-    }
-
-    if (!accountInfo || !accountInfo.address) {
-      setInvalidBtnText('Connect Wallet')
-      notifyError('User wallet not found.')
-      return
-    }
-
-    try {
-      setInvalidBtnText('Confirm')
-      if (parseInt(totalLiquidityAmt) === 0) {
-        const error: any = new Error('User does not have reserves to withdraw')
-        error.code = '4002'
-        throw error
-      }
-      if (!gammaPoolContract) {
-        await initializeGammaPoolContract()
-      }
-      if (provider && gammaPoolContract) {
-        let tx = await gammaPoolContract.approve(POSITION_MANAGER_ADDRESS, constants.MaxUint256.toString())
-        return await tx.wait()
-      } else {
-        setInvalidBtnText('Connect Wallet')
-        notifyError('Please connect wallet')
-      }
-    } catch (e: any) {
-      if (e?.code && e?.code === '4002') {
-        throw new Error(e.message)
-      } else {
-        throw new Error('An error occurred while approval')
       }
     }
   }
