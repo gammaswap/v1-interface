@@ -1,6 +1,6 @@
-import { HexString } from "@coinbase/wallet-sdk/dist/types"
 import React from "react"
 import Image from "next/image"
+import Link from "next/link"
 
 export type PoolData = {
   name: string
