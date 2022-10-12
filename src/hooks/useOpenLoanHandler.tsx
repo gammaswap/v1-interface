@@ -369,7 +369,7 @@ export const useOpenLoanHandler = () => {
       approvalA = await validateAllowance(
         accountInfo.address,
         token0Contract,
-        BigNumber.from(collateralAmt0Str),
+        Number(collateralAmt0Str),
         POSITION_MANAGER_ADDRESS || ''
       )
 
@@ -386,7 +386,7 @@ export const useOpenLoanHandler = () => {
       approvalB = await validateAllowance(
         accountInfo.address,
         token1Contract,
-        BigNumber.from(collateralAmt1Str),
+        Number(collateralAmt1Str),
         POSITION_MANAGER_ADDRESS || ''
       )
 
@@ -403,7 +403,7 @@ export const useOpenLoanHandler = () => {
       approvalCFMM = await validateAllowance(
         accountInfo.address,
         cfmmContract,
-        BigNumber.from(collateralAmt0Str),
+        Number(collateralAmt0Str),
         POSITION_MANAGER_ADDRESS || ''
       )
 
