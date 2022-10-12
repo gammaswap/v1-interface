@@ -47,6 +47,8 @@ export const useRepayLoanHandler = () => {
       if (_gammaPool) {
         setGammaPool(_gammaPool)
         let tx = await _gammaPool.loan(tokenId)
+        setOutstandingLoanAmount(tx.liquidity.toString())
+        setLoanAmount(parseFloat(tx.liquidity.toString()))
       }
 
       _positionManager = new ethers.Contract(
@@ -70,7 +72,6 @@ export const useRepayLoanHandler = () => {
   }, [gammaPool])
 
   useEffect(() => {
-    console.log(cfmm)
     if (positionManager && cfmm) {
       getLoan().then((res) => setLoanAmount(res.liquidity.toString()))
     }
@@ -97,9 +98,10 @@ export const useRepayLoanHandler = () => {
   }
 
   const changeSliderPercentage = (value: number) => {
-    console.log(loanAmount)
     setRepayAmt(value)
     let repay = (loanAmount * value) / 100
+    let remainingAmount = (loanAmount - (value / 100) * loanAmount).toString()
+    setOutstandingLoanAmount(remainingAmount)
     setRepayCal(repay)
     if (repay > 0) {
       setEnableApprove(true)
@@ -111,6 +113,8 @@ export const useRepayLoanHandler = () => {
     if (typeof values === 'number') {
       setRepayAmt(values)
       let repay = (loanAmount * values) / 100
+      let remainingAmount = (loanAmount - (values / 100) * loanAmount).toString()
+      setOutstandingLoanAmount(remainingAmount)
       setRepayCal(repay)
       if (repay > 0) {
         setEnableApprove(true)

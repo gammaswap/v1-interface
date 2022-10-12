@@ -23,9 +23,10 @@ interface TokenUserInputProps {
   token1: Token
   inputValue: string
   setTokenValue: Dispatch<SetStateAction<string>>
+  isDisabled: boolean
 }
 
-export const TokenUserInput = ({ token0, token1, inputValue, setTokenValue }: TokenUserInputProps) => {
+export const TokenUserInput = ({ token0, token1, inputValue, setTokenValue, isDisabled }: TokenUserInputProps) => {
   return (
     <div className={style.tokenUserInputContainer}>
       {/* input side w/ max */}
@@ -36,6 +37,7 @@ export const TokenUserInput = ({ token0, token1, inputValue, setTokenValue }: To
           value={inputValue}
           placeholder="0.0"
           className={style.loanAmountInput}
+          disabled={isDisabled}
         />
         <div className={style.maxButton}>MAX</div>
       </div>

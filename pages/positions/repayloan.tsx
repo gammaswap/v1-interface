@@ -144,6 +144,7 @@ const Repayloan: NextPage = () => {
                   token1={token1}
                   inputValue={outstandingLoanAmount}
                   setTokenValue={setOutstandingLoanAmount}
+                  isDisabled={true}
                 />
               </div>
 
