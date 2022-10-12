@@ -89,7 +89,7 @@ export const useWithdrawLiquidityHandler = () => {
         approval = await validateAllowance(
           accountInfo.address,
           gammaPoolContract,
-          BigNumber.from(amt.toString()),
+          Number(amt),
           POSITION_MANAGER_ADDRESS || ''
         )
       }
