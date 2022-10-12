@@ -100,8 +100,8 @@ export const useRepayLoanHandler = () => {
   const changeSliderPercentage = (value: number) => {
     setRepayAmt(value)
     let repay = (loanAmount * value) / 100
-    let remainingAmount = (loanAmount - (value / 100) * loanAmount).toString()
-    setOutstandingLoanAmount(remainingAmount)
+    let remainingAmount = loanAmount - repay
+    setOutstandingLoanAmount(remainingAmount.toString())
     setRepayCal(repay)
     if (repay > 0) {
       setEnableApprove(true)
@@ -113,8 +113,8 @@ export const useRepayLoanHandler = () => {
     if (typeof values === 'number') {
       setRepayAmt(values)
       let repay = (loanAmount * values) / 100
-      let remainingAmount = (loanAmount - (values / 100) * loanAmount).toString()
-      setOutstandingLoanAmount(remainingAmount)
+      let remainingAmount = loanAmount - repay
+      setOutstandingLoanAmount(remainingAmount.toString())
       setRepayCal(repay)
       if (repay > 0) {
         setEnableApprove(true)
