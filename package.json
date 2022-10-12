@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "yarn graphclient-build && next dev",
     "clean": "rm -rf ./.graphclient",
-    "graphclient-build": "graphClient build",
+    "graphclient-build": "graphclient build",
     "build": "yarn graphclient-build && next build",
     "start": "next start"
   },

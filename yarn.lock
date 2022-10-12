@@ -1055,19 +1055,19 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@gammaswap/v1-core@>=0.1.11", "@gammaswap/v1-core@^0.1.2":
-  version "0.1.11"
-  resolved "https://npm.pkg.github.com/download/@gammaswap/v1-core/0.1.11/05734e511aec444789d79e134223dce27a402516#05734e511aec444789d79e134223dce27a402516"
-  integrity sha512-gPuU+8DMoslXlrWeipfGJRJ2oh54VzJ7clIxYkS4Ms9guxtcFpqvRgt3iIHmqStqkg8tn8aqkrtzXYiDRu6LDQ==
+"@gammaswap/v1-core@^0.1.11", "@gammaswap/v1-core@^0.1.12":
+  version "0.1.12"
+  resolved "https://npm.pkg.github.com/download/@gammaswap/v1-core/0.1.12/e8c7a86938c6b92ad33efff4fa8d1c4e42d50a17#e8c7a86938c6b92ad33efff4fa8d1c4e42d50a17"
+  integrity sha512-ghHvxF+/131QPkqCKFH7B7PwyAF2SvplJBktf24KwXE+5g0g1po5xVlBb+hHR7rR1jXBpHKygc4gEDu9Nu/X9w==
   dependencies:
     "@openzeppelin/contracts" "^4.7.0"
 
-"@gammaswap/v1-periphery@>=0.1.4":
-  version "0.1.5"
-  resolved "https://npm.pkg.github.com/download/@gammaswap/v1-periphery/0.1.5/b307cf6fcc15473ba9e0a1d42793ae8a79cb1ac6#b307cf6fcc15473ba9e0a1d42793ae8a79cb1ac6"
-  integrity sha512-JXp+Pc74Isd8uCnsgnif3P8TLqaTQI7XAftewGrAZSboxSdEI7a9cahnMupaEohE6Effnn9PfKZJ9UaC7zBmqg==
+"@gammaswap/v1-periphery@^0.1.9":
+  version "0.1.9"
+  resolved "https://npm.pkg.github.com/download/@gammaswap/v1-periphery/0.1.9/b3bbd6d06cf8dd06447778142361abad26a0a459#b3bbd6d06cf8dd06447778142361abad26a0a459"
+  integrity sha512-JL4c/77c4cvvQAZ3zvI+Uxj1cgOHq+hm/4CBDtGPGMrSKtYS9OyOc61+8VNrxOItlKVV6R5oQkm92jvoYXswHQ==
   dependencies:
-    "@gammaswap/v1-core" "^0.1.2"
+    "@gammaswap/v1-core" "^0.1.11"
     "@openzeppelin/contracts" "^4.7.0"
     "@uniswap/v2-core" "^1.0.1"
     "@uniswap/v2-periphery" "^1.1.0-beta.0"
