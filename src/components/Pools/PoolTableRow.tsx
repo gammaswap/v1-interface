@@ -1,5 +1,6 @@
-import { HexString } from "@coinbase/wallet-sdk/dist/types"
 import React from "react"
+import Image from "next/image"
+import Link from "next/link"
 
 export type PoolData = {
   name: string
@@ -16,42 +17,43 @@ type PoolTableRowProps = {
   clickHandler: (poolData: PoolData) => void
 }
 
-export const PoolTableRow = (props: PoolTableRowProps) => {
-  const { poolData, clickHandler} = props
+export const PoolTableRow = () => {
+  // const { poolData, clickHandler} = props
 
   const style = {
-    tableBodyRow: "flex border-b border-gray-500 pl-2 pr-4",
-    tableBodyDefinition: "py-4 flex overflow-hidden mr-2 ml-2",
-    assetHead: "w-[20%] justify-start font-medium text-white",
-    totalSupplyHead: "w-[16%] justify-end font-medium text-white",
-    supplyApyHead: "w-[16%] justify-end font-medium text-white",
-    totalBorrowedHead: "w-[16%] justify-end font-medium text-white",
-    borrowApyVariableHead: "w-[16%] justify-end font-medium text-white",
-    borrowApyStableHead: "w-[16%] justify-end font-medium text-white",
+    poolsOverviewTableRow: "pt-4",
+    poolsOverviewTableContent: "flex space-x-32",
+    poolsOverviewTableRowPrimary: "flex space-x-6",
+    poolsOverviewTableRowItem: "",
+    poolsOverviewTableRowPool: "flex space-x-2",
+    poolsOverviewTableRowPoolIcons: "",
+    poolsOverviewTableRowPoolIcon: "",
+    poolsOverviewTableRowSecondary: "flex space-x-20 ml-auto",
+    poolsOverviewTableLine: "w-full h-[0.10rem] bg-neutrals-700 opacity-40 mt-4",
   }
 
   return (
-    <div onClick={() => clickHandler(poolData)}>
-      <div className={style.tableBodyRow}>
-        <div className={style.tableBodyDefinition + " " + style.assetHead}>
-          <p>{poolData.name}</p>
+    <div className={style.poolsOverviewTableRow}>
+      <div className={style.poolsOverviewTableContent}>
+        <div className={style.poolsOverviewTableRowPrimary}>
+          <p className={style.poolsOverviewTableRowItem}>1</p>
+          <div className={style.poolsOverviewTableRowPool}>
+            <div className={style.poolsOverviewTableRowPoolIcons}>
+              <Image src={""} className={style.poolsOverviewTableRowPoolIcon} width={""} height={""} />
+              <Image src={""} className={style.poolsOverviewTableRowPoolIcon} width={""} height={""} />
+            </div>
+            <p className={style.poolsOverviewTableRowItem}>USDC/ETH</p>
+          </div>
         </div>
-        <div className={style.tableBodyDefinition + " " + style.totalSupplyHead}>
-          <p>{poolData.totalSupply}M</p>
-        </div>
-        <div className={style.tableBodyDefinition + " " + style.supplyApyHead}>
-          <p>{poolData.supplyApy}%</p>
-        </div>
-        <div className={style.tableBodyDefinition + " " + style.totalBorrowedHead}>
-          <p>{poolData.totalBorrowed}M</p>
-        </div>
-        <div className={style.tableBodyDefinition + " " + style.borrowApyVariableHead}>
-          <p>{poolData.borrowApyVariable}%</p>
-        </div>
-        <div className={style.tableBodyDefinition + " " + style.borrowApyStableHead}>
-          <p>{poolData.borrowApyStable}%</p>
+        
+        <div className={style.poolsOverviewTableRowSecondary}>
+          <p className={style.poolsOverviewTableRowItem}>1.34m</p>
+          <p className={style.poolsOverviewTableRowItem}>3.34%</p>
+          <p className={style.poolsOverviewTableRowItem}>432k</p>
+          <p className={style.poolsOverviewTableRowItem}>2.22%</p>
         </div>
       </div>
+      <div className={style.poolsOverviewTableLine}></div>
     </div>
   )
 }
