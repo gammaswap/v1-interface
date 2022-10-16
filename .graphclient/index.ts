@@ -1077,11 +1077,17 @@ const merger = new(BareMerger as any)({
     get documents() {
       return [
       {
-        document: PoolsQueryDocument,
+        document: PoolsDocument,
         get rawSDL() {
-          return printWithCache(PoolsQueryDocument);
+          return printWithCache(PoolsDocument);
         },
-        location: 'PoolsQueryDocument.graphql'
+        location: 'PoolsDocument.graphql'
+      },{
+        document: LatestPoolDataDocument,
+        get rawSDL() {
+          return printWithCache(LatestPoolDataDocument);
+        },
+        location: 'LatestPoolDataDocument.graphql'
       }
     ];
     },
@@ -1120,14 +1126,21 @@ export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(
   const sdkRequester$ = getBuiltGraphClient().then(({ sdkRequesterFactory }) => sdkRequesterFactory(globalContext));
   return getSdk<TOperationContext, TGlobalContext>((...args) => sdkRequester$.then(sdkRequester => sdkRequester(...args)));
 }
-export type PoolsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+export type PoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PoolsQueryQuery = { pools: Array<Pick<Pool, 'id' | 'address' | 'cfmm' | 'protocolId' | 'protocol' | 'count'>> };
+export type PoolsQuery = { pools: Array<Pick<Pool, 'id' | 'address' | 'cfmm' | 'protocolId' | 'protocol' | 'count'>> };
+
+export type LatestPoolDataQueryVariables = Exact<{
+  address?: InputMaybe<Scalars['Bytes']>;
+}>;
 
 
-export const PoolsQueryDocument = gql`
-    query PoolsQuery {
+export type LatestPoolDataQuery = { poolDatas: Array<Pick<PoolData, 'id' | 'address' | 'tokenBalances' | 'lpTokenBalance' | 'lpTokenBorrowed' | 'lpTokenBorrowedPlusInterest' | 'lpTokenTotal' | 'accFeeIndex' | 'lastBlockNumber' | 'borrowRate' | 'lastFeeIndex'>> };
+
+
+export const PoolsDocument = gql`
+    query Pools {
   pools {
     id
     address
@@ -1137,14 +1150,40 @@ export const PoolsQueryDocument = gql`
     count
   }
 }
-    ` as unknown as DocumentNode<PoolsQueryQuery, PoolsQueryQueryVariables>;
+    ` as unknown as DocumentNode<PoolsQuery, PoolsQueryVariables>;
+export const LatestPoolDataDocument = gql`
+    query LatestPoolData($address: Bytes) {
+  poolDatas(
+    where: {address: $address}
+    orderBy: lastBlockNumber
+    first: 1
+    orderDirection: desc
+  ) {
+    id
+    address
+    tokenBalances
+    lpTokenBalance
+    lpTokenBorrowed
+    lpTokenBorrowedPlusInterest
+    lpTokenTotal
+    accFeeIndex
+    lastBlockNumber
+    borrowRate
+    lastFeeIndex
+  }
+}
+    ` as unknown as DocumentNode<LatestPoolDataQuery, LatestPoolDataQueryVariables>;
+
 
 
 export type Requester<C = {}, E = unknown> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R> | AsyncIterable<R>
 export function getSdk<C, E>(requester: Requester<C, E>) {
   return {
-    PoolsQuery(variables?: PoolsQueryQueryVariables, options?: C): Promise<PoolsQueryQuery> {
-      return requester<PoolsQueryQuery, PoolsQueryQueryVariables>(PoolsQueryDocument, variables, options) as Promise<PoolsQueryQuery>;
+    Pools(variables?: PoolsQueryVariables, options?: C): Promise<PoolsQuery> {
+      return requester<PoolsQuery, PoolsQueryVariables>(PoolsDocument, variables, options) as Promise<PoolsQuery>;
+    },
+    LatestPoolData(variables?: LatestPoolDataQueryVariables, options?: C): Promise<LatestPoolDataQuery> {
+      return requester<LatestPoolDataQuery, LatestPoolDataQueryVariables>(LatestPoolDataDocument, variables, options) as Promise<LatestPoolDataQuery>;
     }
   };
 }

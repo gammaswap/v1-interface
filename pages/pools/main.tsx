@@ -3,11 +3,14 @@ import { useState } from "react"
 import Image from "next/image"
 import { InformationCircleIcon } from "@heroicons/react/outline"
 import { ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/outline"
-import { PoolData } from "../../src/components/Pools/PoolTableRow"
+import { PoolData } from "../../.graphclient"
 import { usePoolsHandler } from "../../src/hooks/usePoolsHandler"
 import { PoolsOverviewTable } from "../../src/components/Pools/PoolsOverviewTable"
 
 const Pools: NextPage = () => {
+  const { pools, latestPoolsData } = usePoolsHandler()
+  const [selectedPoolData, setSelectedPoolData] = useState<PoolData>()
+
   const style = {
     wrapper: "w-full h-full flex justify-center text-neutrals-100",
     container: "flex flex-col space-y-10 mx-auto mt-4",
@@ -25,9 +28,6 @@ const Pools: NextPage = () => {
     arrow: "w-4 h-4",
     poolStatChangeNumber: "text-secondary-jungleGreen",
   }
-
-  const { poolsData } = usePoolsHandler()
-  const [selectedPoolData, setSelectedPoolData] = useState<PoolData>()
 
   const poolStats = [
     {
