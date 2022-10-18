@@ -225,6 +225,8 @@ type PoolData {
   lpTokenBorrowed: BigDecimal!
   lpTokenBorrowedPlusInterest: BigDecimal!
   lpTokenTotal: BigDecimal!
+  lpInvariant: BigDecimal!
+  lpBorrowedInvariant: BigDecimal!
   borrowRate: BigDecimal!
   accFeeIndex: BigDecimal!
   lastFeeIndex: BigDecimal!
@@ -284,6 +286,22 @@ input PoolData_filter {
   lpTokenTotal_lte: BigDecimal
   lpTokenTotal_in: [BigDecimal!]
   lpTokenTotal_not_in: [BigDecimal!]
+  lpInvariant: BigDecimal
+  lpInvariant_not: BigDecimal
+  lpInvariant_gt: BigDecimal
+  lpInvariant_lt: BigDecimal
+  lpInvariant_gte: BigDecimal
+  lpInvariant_lte: BigDecimal
+  lpInvariant_in: [BigDecimal!]
+  lpInvariant_not_in: [BigDecimal!]
+  lpBorrowedInvariant: BigDecimal
+  lpBorrowedInvariant_not: BigDecimal
+  lpBorrowedInvariant_gt: BigDecimal
+  lpBorrowedInvariant_lt: BigDecimal
+  lpBorrowedInvariant_gte: BigDecimal
+  lpBorrowedInvariant_lte: BigDecimal
+  lpBorrowedInvariant_in: [BigDecimal!]
+  lpBorrowedInvariant_not_in: [BigDecimal!]
   borrowRate: BigDecimal
   borrowRate_not: BigDecimal
   borrowRate_gt: BigDecimal
@@ -328,6 +346,8 @@ enum PoolData_orderBy {
   lpTokenBorrowed
   lpTokenBorrowedPlusInterest
   lpTokenTotal
+  lpInvariant
+  lpBorrowedInvariant
   borrowRate
   accFeeIndex
   lastFeeIndex

@@ -25,6 +25,8 @@ query LatestPoolData($address: Bytes) {
     lpTokenBorrowed
     lpTokenBorrowedPlusInterest
     lpTokenTotal
+    lpInvariant
+    lpBorrowedInvariant
     accFeeIndex
     lastBlockNumber
     borrowRate
