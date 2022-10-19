@@ -25,7 +25,7 @@ export const useRepayLoanHandler = () => {
   const [tokenId, setTokenId] = useState(19)
   const [loanAmount, setLoanAmount] = useState<number>(0)
   const [repayCal, setRepayCal] = useState(0)
-  const [cfmm, setCfmm] = useState()
+  const [cfmmPoolAddr, setCfmmPoolAddr] = useState<string>("")
   const [outstandingLoanAmount, setOutstandingLoanAmount] = useState<string>('')
   let percentages = [25, 50, 75, 100]
 
@@ -37,9 +37,7 @@ export const useRepayLoanHandler = () => {
       }
 
       let _positionManager = null
-      let _gammaPool
-
-      _gammaPool = new ethers.Contract(
+      let _gammaPool = new ethers.Contract(
         GAMMAPOOL_ADDRESS,
         GammaPool.abi,
         accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
@@ -65,19 +63,19 @@ export const useRepayLoanHandler = () => {
 
   useEffect(() => {
     if (gammaPool) {
-      getCfmm()
-        .then((res) => setCfmm(res))
+      getCfmmPoolAddr()
+        .then((res) => setCfmmPoolAddr(res))
         .catch((err) => console.log(err))
     }
   }, [gammaPool])
 
   useEffect(() => {
-    if (positionManager && cfmm) {
+    if (positionManager && cfmmPoolAddr) {
       getLoan().then((res) => setLoanAmount(res.liquidity.toString()))
     }
-  }, [positionManager, cfmm])
+  }, [positionManager, cfmmPoolAddr])
 
-  const getCfmm = async () => {
+  const getCfmmPoolAddr = async () => {
     if (gammaPool) {
       try {
         return await gammaPool?.cfmm()
@@ -90,7 +88,7 @@ export const useRepayLoanHandler = () => {
   const getLoan = async () => {
     if (positionManager) {
       try {
-        return await positionManager.loan(cfmm, 1, tokenId)
+        return await positionManager.loan(cfmmPoolAddr, 1, tokenId)
       } catch (err) {
         throw err
       }
@@ -156,8 +154,12 @@ export const useRepayLoanHandler = () => {
   }
 
   const repayTransaction = async () => {
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
     const RepayLiquidityParams = {
-      cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+      cfmm: cfmmPoolAddr,
       protocol: 1,
       tokenId: tokenId,
       liquidity: ethers.utils.parseUnits(repayCal.toString()),

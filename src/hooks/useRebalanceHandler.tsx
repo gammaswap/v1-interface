@@ -2,17 +2,18 @@ import { ChangeEvent, Dispatch, SetStateAction, useCallback, useContext, useEffe
 import Tokens, { Token } from '../components/Tokens'
 import { WalletContext } from '../context/WalletContext'
 import PositionManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
-import GammaPool from '@gammaswap/v1-core/artifacts/contracts/GammaPool.sol/GammaPool.json'
+import GammaPoolJSON from '@gammaswap/v1-core/artifacts/contracts/GammaPool.sol/GammaPool.json'
 import { Contract, ethers } from 'ethers'
 import { notifySuccess, notifyError } from '../hooks/useNotification'
-import { getTokenBalance } from '../utils/getSmartContract'
+import { getTokenBalance, getCfmmPoolAddr } from '../utils/getSmartContract'
 
 export const useRebalanceHandler = () => {
   const { accountInfo, connectWallet, provider } = useContext(WalletContext)
 
   const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
   const GAMMAPOOL_ADDRESS = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS
-  const CFMM_ADDRESS = process.env.NEXT_PUBLIC_CFMM_ADDRESS
+  // TODO AMMAPOOL_ADDRESS should not be hardcoded, instead we need to use the 
+  // loan id (tokenId) to get what we want pending subgraph returning this
 
   const [tokenAInputVal, setTokenAInputVal] = useState<string>('')
   const [tokenBInputVal, setTokenBInputVal] = useState<string>('')
@@ -35,6 +36,7 @@ export const useRebalanceHandler = () => {
   const [loanLiquidity, setLoanLiquidity] = useState<string>('')
   const [tokenABalance, setTokenABalance] = useState<string>('0')
   const [tokenBBalance, setTokenBBalance] = useState<string>('0')
+  const [cfmmPoolAddr, setCfmmPoolAddr] = useState<string>("")
 
   const openSlippage = () => {
     setIsSlippageOpen((prevState) => !prevState)
@@ -53,6 +55,17 @@ export const useRebalanceHandler = () => {
       getTokenBalance(accountAddress, tokenBSelected.address, tokenBSelected.symbol, provider, setTokenBBalance)
     }
   }, [provider, tokenBSelected])
+
+  useEffect(() => {
+    if (provider && tokenASelected.address && tokenBSelected.address) {
+      getCfmmPoolAddr(
+        tokenASelected.address,
+        tokenBSelected.address,
+        provider,
+        setCfmmPoolAddr
+      )
+    }
+  }, [tokenASelected, tokenBSelected])
 
   const handleSlippageMinutes = (e: ChangeEvent<HTMLInputElement> | string) => {
     let minuteInput: string
@@ -189,9 +202,14 @@ export const useRebalanceHandler = () => {
   }
 
   const doRebalance = async (tokenId: number, liquidity: number) => {
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
+
     if (posManager) {
       const RebalanceCollateralParams = {
-        cfmm: CFMM_ADDRESS,
+        cfmm: cfmmPoolAddr,
         protocol: 1,
         tokenId: tokenId,
         deltas: [tokenAInputVal, tokenBInputVal],
@@ -223,7 +241,7 @@ export const useRebalanceHandler = () => {
     if (!gammaPool && provider) {
       let _gammaPool = new ethers.Contract(
         GAMMAPOOL_ADDRESS || '',
-        GammaPool.abi,
+        GammaPoolJSON.abi,
         accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
       )
       setGammaPool(_gammaPool)
@@ -231,15 +249,14 @@ export const useRebalanceHandler = () => {
   }, [gammaPool, provider])
 
   const getLoan = useCallback(async () => {
-    if (posManager) {
+    if (posManager && ethers.utils.isAddress(cfmmPoolAddr)) {
       try {
-        let cfmm_address = CFMM_ADDRESS
-        if (!cfmm_address && gammaPool) {
-          cfmm_address = await gammaPool.cfmm()
-          console.log(cfmm_address)
+        if (!cfmmPoolAddr && gammaPool) {
+          let _cfmmPoolAddr = await gammaPool.cfmm()
+          setCfmmPoolAddr(_cfmmPoolAddr)
         }
         // TODO: Hardcoded the tokenId value. We will get it from subgraph when we query user's positions
-        return await posManager.loan(cfmm_address, 1, 19)
+        return await posManager.loan(cfmmPoolAddr, 1, 19)
       } catch (e) {
         throw e
       }

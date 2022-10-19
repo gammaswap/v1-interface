@@ -74,8 +74,6 @@ export const useAddLiquidityHandler = () => {
     setTokenBInputVal("")
 
     if (provider && tokenASelected.address && tokenBSelected.address) {
-      console.log(tokenASelected.address)
-      console.log(tokenBSelected.address)
       getCfmmPoolAddr(
         tokenASelected.address,
         tokenBSelected.address,
@@ -176,7 +174,6 @@ export const useAddLiquidityHandler = () => {
       return
     }
 
-    console.log("cfmm pool addr", cfmmPoolAddr)
     if (!ethers.utils.isAddress(cfmmPoolAddr)) {
       notifyError('Selected pair is not a valid cfmm pool pair.')
       return
@@ -243,9 +240,14 @@ export const useAddLiquidityHandler = () => {
   }
 
   const addLpLiquidity = async () => {
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
+
     if (posManager && accountInfo?.address && provider) {
       let tokenContract = new ethers.Contract(
-        process.env.NEXT_PUBLIC_CFMM_ADDRESS || '',
+        cfmmPoolAddr,
         IERC20.abi,
         accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
       )
@@ -260,7 +262,7 @@ export const useAddLiquidityHandler = () => {
       try {
         if (approval) {
           const DepositNoPullParams = {
-            cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+            cfmm: cfmmPoolAddr,
             protocol: 1,
             lpTokens: parseFloat(tokenAInputVal),
             to: accountInfo.address,
