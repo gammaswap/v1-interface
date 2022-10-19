@@ -74,7 +74,7 @@ const Pools: NextPage = () => {
             ))}
           </div>
         </div>
-        <PoolsOverviewTable />
+        <PoolsOverviewTable poolsData={latestPoolsData} />
       </div>
     </div>
   )
