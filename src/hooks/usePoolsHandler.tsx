@@ -2,10 +2,11 @@ import { useEffect, useState, useCallback } from 'react'
 import { notifyError } from './useNotification'
 import { ExecutionResult } from 'graphql'
 import { PoolsDocument, Pool, PoolsQuery, LatestPoolDataDocument, execute, PoolData } from '../../.graphclient'
+import { usePoolsData } from '../context/PoolsDataContext'
 
 export const usePoolsHandler = () => {
   const [pools, setPools] = useState<ExecutionResult<PoolsQuery>>()
-  const [latestPoolsData, setLatestPoolsData]  = useState<Array<PoolData>>([])
+  const { latestPoolsData, setLatestPoolsData } = usePoolsData()
   
   // fetches all pool entities
   const fetchPoolsData = useCallback(async () => {

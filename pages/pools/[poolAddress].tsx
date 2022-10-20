@@ -113,9 +113,9 @@ const PoolDetails: NextPage = () => {
 
         <div className={style.poolDetailsGridContainer}>
           <div className={style.poolDetailsGridHeaderContainer}>
-            {poolDetails.map(poolDetail => {
+            {poolDetails.map((poolDetail, idx) => {
               return (
-                <div className={style.poolDetailsGridMainMetricContainer}>
+                <div key={idx} className={style.poolDetailsGridMainMetricContainer}>
                   <h1 className={style.poolDetailsGridMainMetricTitle}>{poolDetail.title}</h1>
                   <div className={style.poolDetailsGridMainMetricContents}>
                     <h1 className={style.poolDetailsGridMainMetricValue}>{poolDetail.value}</h1>
