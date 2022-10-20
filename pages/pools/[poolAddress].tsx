@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import { ArrowUpIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
 
@@ -181,8 +182,12 @@ const PoolDetails: NextPage = () => {
               </div>
             </div>
             <div className={style.actionButtonsContainer}>
-              <div className={style.actionButton}>Provide Liquidity</div>
-              <div  className={style.actionButton}>Short Liquidity</div>
+              <Link href={"/positions/deposit/0"}>
+                <div className={style.actionButton}>Provide Liquidity</div>
+              </Link>
+              <Link  href={"/positions/openloan"}>
+                <div className={style.actionButton}>Short Liquidity</div>
+              </Link>
             </div>
           </div>
           <div className={style.poolDetailsGridGraphsContainer}>
