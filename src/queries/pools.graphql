@@ -1,5 +1,5 @@
 # queries basic info about each pool created
-query PoolsQuery {
+query Pools {
   pools {
     id
     address
@@ -7,5 +7,29 @@ query PoolsQuery {
     protocolId
     protocol
     count
+  }
+}
+
+# queries latest data for pool
+query LatestPoolData($address: Bytes) {
+  poolDatas(
+    where: {address: $address}
+    orderBy: lastBlockNumber
+    first: 1
+    orderDirection: desc
+  ) {
+    id
+    address
+    tokenBalances
+    lpTokenBalance
+    lpTokenBorrowed
+    lpTokenBorrowedPlusInterest
+    lpTokenTotal
+    lpInvariant
+    lpBorrowedInvariant
+    accFeeIndex
+    lastBlockNumber
+    borrowRate
+    lastFeeIndex
   }
 }

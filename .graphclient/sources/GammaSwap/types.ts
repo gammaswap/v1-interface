@@ -225,6 +225,8 @@ export type PoolData = {
   lpTokenBorrowed: Scalars['BigDecimal'];
   lpTokenBorrowedPlusInterest: Scalars['BigDecimal'];
   lpTokenTotal: Scalars['BigDecimal'];
+  lpInvariant: Scalars['BigDecimal'];
+  lpBorrowedInvariant: Scalars['BigDecimal'];
   borrowRate: Scalars['BigDecimal'];
   accFeeIndex: Scalars['BigDecimal'];
   lastFeeIndex: Scalars['BigDecimal'];
@@ -284,6 +286,22 @@ export type PoolData_filter = {
   lpTokenTotal_lte?: InputMaybe<Scalars['BigDecimal']>;
   lpTokenTotal_in?: InputMaybe<Array<Scalars['BigDecimal']>>;
   lpTokenTotal_not_in?: InputMaybe<Array<Scalars['BigDecimal']>>;
+  lpInvariant?: InputMaybe<Scalars['BigDecimal']>;
+  lpInvariant_not?: InputMaybe<Scalars['BigDecimal']>;
+  lpInvariant_gt?: InputMaybe<Scalars['BigDecimal']>;
+  lpInvariant_lt?: InputMaybe<Scalars['BigDecimal']>;
+  lpInvariant_gte?: InputMaybe<Scalars['BigDecimal']>;
+  lpInvariant_lte?: InputMaybe<Scalars['BigDecimal']>;
+  lpInvariant_in?: InputMaybe<Array<Scalars['BigDecimal']>>;
+  lpInvariant_not_in?: InputMaybe<Array<Scalars['BigDecimal']>>;
+  lpBorrowedInvariant?: InputMaybe<Scalars['BigDecimal']>;
+  lpBorrowedInvariant_not?: InputMaybe<Scalars['BigDecimal']>;
+  lpBorrowedInvariant_gt?: InputMaybe<Scalars['BigDecimal']>;
+  lpBorrowedInvariant_lt?: InputMaybe<Scalars['BigDecimal']>;
+  lpBorrowedInvariant_gte?: InputMaybe<Scalars['BigDecimal']>;
+  lpBorrowedInvariant_lte?: InputMaybe<Scalars['BigDecimal']>;
+  lpBorrowedInvariant_in?: InputMaybe<Array<Scalars['BigDecimal']>>;
+  lpBorrowedInvariant_not_in?: InputMaybe<Array<Scalars['BigDecimal']>>;
   borrowRate?: InputMaybe<Scalars['BigDecimal']>;
   borrowRate_not?: InputMaybe<Scalars['BigDecimal']>;
   borrowRate_gt?: InputMaybe<Scalars['BigDecimal']>;
@@ -328,6 +346,8 @@ export type PoolData_orderBy =
   | 'lpTokenBorrowed'
   | 'lpTokenBorrowedPlusInterest'
   | 'lpTokenTotal'
+  | 'lpInvariant'
+  | 'lpBorrowedInvariant'
   | 'borrowRate'
   | 'accFeeIndex'
   | 'lastFeeIndex'
