@@ -3,11 +3,11 @@ import { useState, Fragment } from 'react'
 import TokenSelectorModal from '../../../src/components/TokenSelectorModal'
 import { Tab } from '@headlessui/react'
 import { InformationCircleIcon } from '@heroicons/react/outline'
-import { useAddLiquidityHandler } from '../../../src/hooks/useAddLiquidityHandler'
+import { useDepositHandler } from '../../../src/hooks/useAddLiquidityHandler'
 import PairsSelector from '../../../src/components/PairsSelector'
 import { LabeledUserInput } from '../../../src/components/Deposit/LabeledUserInput'
 
-const AddLiquidityStyles = {
+const DepositStyles = {
   common: {
     wrapper: 'w-full h-full flex justify-center',
     container: 'mt-20 bg-neutrals-800 w-[30rem] rounded-lg p-4 drop-shadow-lg',
@@ -59,10 +59,10 @@ const AddLiquidityStyles = {
   },
 }
 
-const AddLiquidity: NextPage = () => {
+const Deposit: NextPage = () => {
   const [selectedIndex, setSelectedIndex] = useState(0)
 
-  const style = AddLiquidityStyles
+  const style = DepositStyles
   const {
     handleTokenInput,
     setTokenAInputVal,
@@ -78,14 +78,14 @@ const AddLiquidity: NextPage = () => {
     tokenSelected,
     setTokenASelected,
     setTokenBSelected,
-    addLiquidity,
-    addLpLiquidity,
+    depositReserves,
+    depositLpTokens,
     tokenABalance,
     tokenBBalance,
     maxTokenA,
     maxTokenB,
     provider
-  } = useAddLiquidityHandler()
+  } = useDepositHandler()
 
   return (
     <>
@@ -93,7 +93,7 @@ const AddLiquidity: NextPage = () => {
         <div className={`${style.common.container} ${selectedIndex ? "h-[33rem]" : "h-[27rem]"}`}>
           <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
             <div className={style.common.headerContainer}>
-              <div className={style.common.formHeader}>Add Liquidity</div>
+              <div className={style.common.formHeader}>Deposit Reserves</div>
               <Tab.List className={style.common.tabsContainer}>
                 <Tab as={Fragment}>
                   {({ selected }) => (
@@ -122,7 +122,7 @@ const AddLiquidity: NextPage = () => {
               <Tab.Panel>
                 <div className={style.lpToken.tokenContainer}>
                   <div className={style.common.depositHeader}>
-                    <h2 className={style.common.sectionHeading}>Deposit</h2>
+                    <h2 className={style.common.sectionHeading}>Deposit LP Tokens</h2>
                     {/* need to add popup for info */}
                     <InformationCircleIcon className={style.common.infoIcon} />
                   </div>
@@ -143,7 +143,7 @@ const AddLiquidity: NextPage = () => {
                   ) : tokenAInputVal === '' ? (
                     <div className={style.common.invalidatedButton}>Enter an Amount</div>
                   ) : !isTokenEmpty(tokenASelected) && tokenAInputVal !== '' ? (
-                    <div className={style.common.confirmButton} onClick={addLpLiquidity}>
+                    <div className={style.common.confirmButton} onClick={depositLpTokens}>
                       Confirm
                     </div>
                   ) : null}
@@ -183,7 +183,7 @@ const AddLiquidity: NextPage = () => {
                   ) : tokenAInputVal === '' || tokenBInputVal === '' ? (
                     <div className={style.common.invalidatedButton}>Enter an Amount</div>
                   ) : !isTokenEmpty(tokenBSelected) && tokenAInputVal !== '' && tokenBInputVal !== '' ? (
-                    <div className={style.common.confirmButton} onClick={addLiquidity}>
+                    <div className={style.common.confirmButton} onClick={depositReserves}>
                       Confirm
                     </div>
                   ) : null}
@@ -205,4 +205,4 @@ const AddLiquidity: NextPage = () => {
   )
 }
 
-export default AddLiquidity
+export default Deposit

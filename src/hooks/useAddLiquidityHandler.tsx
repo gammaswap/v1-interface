@@ -9,7 +9,7 @@ import { handleNumberInput, validateAllowance } from '../utils/validation'
 import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
 import { useRouter } from 'next/router'
 
-export const useAddLiquidityHandler = () => {
+export const useDepositHandler = () => {
   const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
   // holds state of user amount inputted for each of the token input fields
   const [tokenAInputVal, setTokenAInputVal] = useState<string>('')
@@ -168,7 +168,7 @@ export const useAddLiquidityHandler = () => {
   //   }
   // }
 
-  const addLiquidity = async () => {
+  const depositReserves = async () => {
     if (!posManager || !accountInfo) {
       notifyError('Please connect wallet.')
       return
@@ -222,7 +222,7 @@ export const useAddLiquidityHandler = () => {
           })
           let res = await tx.wait()
           const { args } = res.events[0]
-          let message = 'Add Liquidity Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
+          let message = 'Deposit Reserves Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
           notifyDismiss(loading)
           notifySuccess(message)
         } else {
@@ -233,13 +233,13 @@ export const useAddLiquidityHandler = () => {
         if (e?.code === 'ACTION_REJECTED') {
           notifyError('User rejected the transaction')
         } else {
-          notifyError('An error occurred while adding LP Token Liquidity. Please try again')
+          notifyError('An error occurred while depositing reserves. Please try again')
         }
       }
     }
   }
 
-  const addLpLiquidity = async () => {
+  const depositLpTokens = async () => {
     if (!ethers.utils.isAddress(cfmmPoolAddr)) {
       notifyError('Selected pair is not a valid cfmm pool pair.')
       return
@@ -271,7 +271,7 @@ export const useAddLiquidityHandler = () => {
           let tx = await posManager.depositNoPull(DepositNoPullParams, { gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT })
           let res = await tx.wait()
           const { args } = res.events[0]
-          let message = 'Add Liquidity Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
+          let message = 'Deposit LP Tokens Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
           notifyDismiss(loading)
           notifySuccess(message)
         } else {
@@ -282,7 +282,7 @@ export const useAddLiquidityHandler = () => {
         if (e?.code === 'ACTION_REJECTED') {
           notifyError('User rejected the transaction')
         } else {
-          notifyError('An error occurred while adding LP Token Liquidity. Please try again')
+          notifyError('An error occurred while depositing LP Token Liquidity. Please try again')
         }
       }
     }
@@ -310,8 +310,8 @@ export const useAddLiquidityHandler = () => {
     tokenSelected,
     setTokenASelected,
     setTokenBSelected,
-    addLiquidity,
-    addLpLiquidity,
+    depositReserves,
+    depositLpTokens,
     tokenABalance,
     tokenBBalance,
     maxTokenA,

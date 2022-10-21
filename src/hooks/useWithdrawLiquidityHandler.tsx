@@ -164,7 +164,7 @@ export const useWithdrawLiquidityHandler = () => {
   }
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
         if (!gammaPoolContract) {
           return

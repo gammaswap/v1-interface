@@ -12,7 +12,7 @@ export const useRebalanceHandler = () => {
 
   const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
   const GAMMAPOOL_ADDRESS = process.env.NEXT_PUBLIC_GAMMAPOOL_ADDRESS
-  // TODO AMMAPOOL_ADDRESS should not be hardcoded, instead we need to use the 
+  // TODO GAMMAPOOL_ADDRESS should not be hardcoded, instead we need to use the 
   // loan id (tokenId) to get what we want pending subgraph returning this
 
   const [tokenAInputVal, setTokenAInputVal] = useState<string>('')

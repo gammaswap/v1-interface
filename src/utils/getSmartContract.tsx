@@ -80,15 +80,6 @@ export const getCfmmPoolAddr = async (
   setCfmmPoolAddr(cfmmPoolAddress)
 }
 
-/**
- * shortened function of the original format wei to ethers func
- * @param weiNumber
- * @returns the number in ethers of type string
- */
-const formatEther = (weiNumber: number | BigNumber): string => {
-  return ethers.utils.formatEther(weiNumber)
-}
-
 export const getTokenBalance = async (
   accountAddress: string,
   tokenAddress: string,

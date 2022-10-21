@@ -62,11 +62,14 @@ export const useRepayLoanHandler = () => {
   }, [provider])
 
   useEffect(() => {
-    if (gammaPool) {
-      getCfmmPoolAddr()
-        .then((res) => setCfmmPoolAddr(res))
-        .catch((err) => console.log(err))
+    const getCfmmPoolAddr = async () => {
+      if (gammaPool) {
+        let _cfmmPoolAddr = await gammaPool.cfmm()
+        setCfmmPoolAddr(_cfmmPoolAddr)
+      }
     }
+
+    getCfmmPoolAddr()
   }, [gammaPool])
 
   useEffect(() => {
@@ -74,16 +77,6 @@ export const useRepayLoanHandler = () => {
       getLoan().then((res) => setLoanAmount(res.liquidity.toString()))
     }
   }, [positionManager, cfmmPoolAddr])
-
-  const getCfmmPoolAddr = async () => {
-    if (gammaPool) {
-      try {
-        return await gammaPool?.cfmm()
-      } catch (err) {
-        throw err
-      }
-    }
-  }
 
   const getLoan = async () => {
     if (positionManager) {
