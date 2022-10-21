@@ -1,13 +1,10 @@
 import React from "react"
 import Image from "next/image"
-interface PoolTableRowProps {
-  totalSupply: number,
-  supplyAPY: number,
-  totalBorrowed: number,
-  borrowAPY: number
-}
+import { usePoolsData } from "../../context/PoolsDataContext"
 
-export const PoolTableRow = ({ totalSupply, supplyAPY, totalBorrowed, borrowAPY }: PoolTableRowProps) => {
+export const PoolTableRow = () => {
+  const { selectedPoolData } = usePoolsData()
+
   const style = {
     poolsOverviewTableRow: "pt-4 px-2 rounded-lg hover:bg-neutrals-300 hover:bg-opacity-30 cursor-pointer",
     poolsOverviewTableContent: "flex space-x-32",

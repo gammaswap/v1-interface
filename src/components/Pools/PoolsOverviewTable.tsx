@@ -57,14 +57,9 @@ export const PoolsOverviewTable = ({ poolsData }: PoolsOverviewTableProps) => {
             <LinkWrapper
               key={idx}
               pathName={`/pools/[poolAddress]`}
-              query={{ poolAddress: poolData.address }}
+              poolData={poolData}
             >
-              <PoolTableRow
-                totalSupply={1}
-                supplyAPY={1}
-                totalBorrowed={2}
-                borrowAPY={22}
-              />
+              <PoolTableRow />
             </LinkWrapper>
           )
         })}

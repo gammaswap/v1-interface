@@ -1,10 +1,11 @@
 import type { NextPage } from 'next'
 import { ChevronDownIcon, ArrowLeftIcon, CheckIcon, InformationCircleIcon } from '@heroicons/react/outline'
-import PairsSelector from '../../src/components/PairsSelector'
-import { useOpenLoanHandler } from '../../src/hooks/useOpenLoanHandler'
-import { CollateralUserInput } from '../../src/components/OpenLoan/CollateralUserInput'
+import PairsSelector from '../../../src/components/PairsSelector'
+import { useOpenLoanHandler } from '../../../src/hooks/useOpenLoanHandler'
+import { CollateralUserInput } from '../../../src/components/OpenLoan/CollateralUserInput'
 import { Listbox } from '@headlessui/react'
-import { ApproveConfirmButton } from '../../src/components/Positions/ApproveConfirmButton'
+import { ApproveConfirmButton } from '../../../src/components/Positions/ApproveConfirmButton'
+import { usePoolsData } from '../../../src/context/PoolsDataContext'
 
 export const OpenLoanStyles = {
   wrapper: 'w-full h-full flex justify-center',
@@ -81,6 +82,8 @@ const tips = {
 }
 
 const OpenLoan: NextPage = () => {
+  const { selectedPoolData } = usePoolsData()
+
   const style = OpenLoanStyles
   const {
     token0,

@@ -49,6 +49,6 @@ export const usePoolsHandler = () => {
   useEffect(() => {
     if (pools) fetchLatestPoolsData(pools as Array<Pool>)
   }, [pools])
-  
+
   return { pools, latestPoolsData }
 }

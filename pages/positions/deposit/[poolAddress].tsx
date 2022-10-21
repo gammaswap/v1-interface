@@ -6,6 +6,7 @@ import { InformationCircleIcon } from '@heroicons/react/outline'
 import { useAddLiquidityHandler } from '../../../src/hooks/useAddLiquidityHandler'
 import PairsSelector from '../../../src/components/PairsSelector'
 import { LabeledUserInput } from '../../../src/components/Deposit/LabeledUserInput'
+import { usePoolsData } from '../../../src/context/PoolsDataContext'
 
 const AddLiquidityStyles = {
   common: {
@@ -61,6 +62,7 @@ const AddLiquidityStyles = {
 
 const AddLiquidity: NextPage = () => {
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const { selectedPoolData } = usePoolsData()
 
   const style = AddLiquidityStyles
   const {

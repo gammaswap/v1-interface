@@ -3,14 +3,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
+import { usePoolsData } from '../../src/context/PoolsDataContext'
 
 // testing purposes
 import Tokens from '../../src/components/Tokens'
 
 const PoolDetails: NextPage = () => {
   const router = useRouter()
+  const { selectedPoolData } = usePoolsData()
   const poolAddress = router.query.poolAddress as string
-
+  
   const style = {
     wrapper: "w-full h-full flex justify-center",
     container: "mt-20 w-[75rem] text-neutrals-100",
@@ -182,10 +184,10 @@ const PoolDetails: NextPage = () => {
               </div>
             </div>
             <div className={style.actionButtonsContainer}>
-              <Link href={"/positions/deposit/0"}>
+              <Link href={`/positions/deposit/${poolAddress}`}>
                 <div className={style.actionButton}>Provide Liquidity</div>
               </Link>
-              <Link  href={"/positions/openloan"}>
+              <Link href={`/positions/openloan/${poolAddress}`}>
                 <div className={style.actionButton}>Short Liquidity</div>
               </Link>
             </div>
