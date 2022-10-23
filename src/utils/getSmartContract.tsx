@@ -62,52 +62,22 @@ export const calcPoolKey = (cfmm: string, protocol: number): string => {
   return ethers.utils.solidityKeccak256(['bytes'], [bytesData])
 }
 
-// /**
-//  * Gets token pair address non-negotiably,
-//  * creates it if doesn't exist otherwise returns exsisting pair
-//  * @param tokenAAddr
-//  * @param tokenBAddr
-//  * @param FactoryContract
-//  * @returns a pair address of type string
-//  */
-// const getLiquidityPair = async (
-//     tokenAAddr: string,
-//     tokenBAddr: string,
-//     FactoryContract: Contract
-// ): Promise<string> => {
-//     if (!await ifPairExists(tokenAAddr, tokenBAddr, FactoryContract)) {
-//         const pairCreated = await FactoryContract.createPair(tokenAAddr, tokenBAddr)
-//         return pairCreated
-//     }
-
-//     const existingPair = await FactoryContract.getPair(tokenAAddr, tokenBAddr)
-//     return existingPair
-// }
-
-// /**
-//  * Checks if the current token pair exists or not
-//  * @param tokenAAddr
-//  * @param tokenBAddr
-//  * @param FactoryContract
-//  * @returns a boolean whether the pair exists or not
-//  */
-// const ifPairExists = async (
-//     tokenAAddr: string,
-//     tokenBAddr: string,
-//     FactoryContract: Contract
-// ): Promise<boolean> => {
-//     const tokenPair = await FactoryContract.getPair(tokenAAddr, tokenBAddr)
-//     if (formatEther(tokenPair) == "0.0") return false
-//     else return true
-// }
-
-/**
- * shortened function of the original format wei to ethers func
- * @param weiNumber
- * @returns the number in ethers of type string
- */
-const formatEther = (weiNumber: number | BigNumber): string => {
-  return ethers.utils.formatEther(weiNumber)
+export const getCfmmPoolAddr = async (
+  tokenAAddr: string,
+  tokenBAddr: string,
+  provider: Provider,
+  setCfmmPoolAddr: Dispatch<SetStateAction<string>>
+) => {
+  let tokens = tokenAAddr < tokenBAddr ?
+    [tokenAAddr, tokenBAddr] :
+    [tokenBAddr, tokenAAddr]
+  let uniFactory = new ethers.Contract(
+    process.env.NEXT_PUBLIC_IUNISWAP_V2_FACTORY_ADDR as string,
+    IUniswapV2FactoryABI,
+    provider
+  )
+  const cfmmPoolAddress = await uniFactory.getPair(tokens[0], tokens[1])
+  setCfmmPoolAddr(cfmmPoolAddress)
 }
 
 export const getTokenBalance = async (

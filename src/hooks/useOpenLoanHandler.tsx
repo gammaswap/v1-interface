@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form'
 import PositionManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
 import GammaPoolFactory from '@gammaswap/v1-core/artifacts/contracts/GammaPoolFactory.sol/GammaPoolFactory.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess, notifyInfo } from './useNotification'
-import { calcPoolKey, getTokenBalance } from '../utils/getSmartContract'
+import { calcPoolKey, getTokenBalance, getCfmmPoolAddr } from '../utils/getSmartContract'
 import { validateAllowance } from '../utils/validation'
 import Protocols, { Protocol } from '../components/Protocols'
 import GammaPool from '@gammaswap/v1-core/artifacts/contracts/GammaPool.sol/GammaPool.json'
@@ -50,6 +50,7 @@ export const useOpenLoanHandler = () => {
   const [token1Balance, setToken1Balance] = useState<string>('0')
   const [isApproved, setIsApproved] = useState<boolean>(false)
   const [buttonMessage, setButtonMessage] = useState<string>("")
+  const [cfmmPoolAddr, setCfmmPoolAddr] = useState<string>("")
   const [collateralElems, setCollateralElems] = useState<JSX.Element>(
     <CollateralUserInput
       token0Balance={token0Balance}
@@ -116,7 +117,18 @@ export const useOpenLoanHandler = () => {
       }
     }
     if (token0.address && token1.address) {
-      getPoolData(process.env.NEXT_PUBLIC_CFMM_ADDRESS || '', protocol.id)
+      getPoolData(cfmmPoolAddr, protocol.id)
+    }
+  }, [cfmmPoolAddr])
+
+  useEffect(() => {
+    if (provider && token0.address && token1.address) {
+      getCfmmPoolAddr(
+        token0.address,
+        token1.address,
+        provider,
+        setCfmmPoolAddr
+      )
     }
   }, [token0, token1])
 
@@ -139,8 +151,13 @@ export const useOpenLoanHandler = () => {
       await getGammaPoolFactory()
     }
 
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
+
     if (gammaPoolFactory) {
-      let pool = await gammaPoolFactory.getPool(calcPoolKey(process.env.NEXT_PUBLIC_CFMM_ADDRESS || '', protocol.id))
+      let pool = await gammaPoolFactory.getPool(calcPoolKey(cfmmPoolAddr, protocol.id))
       if (pool === ethers.constants.AddressZero) {
         notifyError('Please create a pool before continuing')
         return
@@ -178,11 +195,16 @@ export const useOpenLoanHandler = () => {
   }
 
   async function createLoan() {
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
+
     let loading = notifyLoading('Waiting for create loan')
     try {
       if (positionManager && accountInfo) {
         let tx = await positionManager.createLoan(
-          process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+          cfmmPoolAddr,
           1,
           accountInfo?.address,
           ethers.constants.MaxUint256,
@@ -205,6 +227,11 @@ export const useOpenLoanHandler = () => {
   }
 
   const increaseCollateral = async (tokenId: string) => {
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
+
     let loading = notifyLoading('Waiting for increase collateral')
     try {
       let amounts = ['0']
@@ -224,7 +251,7 @@ export const useOpenLoanHandler = () => {
       }
       if (positionManager && accountInfo) {
         const AddRemoveCollateralParams = {
-          cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+          cfmm: cfmmPoolAddr,
           protocol: protocol.id,
           tokenId: tokenId,
           amounts: amounts,
@@ -252,11 +279,16 @@ export const useOpenLoanHandler = () => {
   }
 
   async function borrowLiquidity(tokenId: string) {
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
+
     let loading = notifyLoading('Waiting for borrow liquidity')
     try {
       if (positionManager && accountInfo) {
         const BorrowLiquidityParams = {
-          cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+          cfmm: cfmmPoolAddr,
           protocol: protocol.id,
           tokenId: tokenId,
           lpTokens: loanAmtStr,
@@ -358,6 +390,12 @@ export const useOpenLoanHandler = () => {
     if (!validateInput()) {
       return
     }
+
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
+
     if (accountInfo?.address && provider) {
       let approvalA, approvalB, approvalCFMM
       let token0Contract = new ethers.Contract(
@@ -395,7 +433,7 @@ export const useOpenLoanHandler = () => {
       }
 
       let cfmmContract = new ethers.Contract(
-        process.env.NEXT_PUBLIC_CFMM_ADDRESS || '',
+        cfmmPoolAddr,
         IERC20.abi,
         accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
       )

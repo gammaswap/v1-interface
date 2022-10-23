@@ -2,14 +2,14 @@ import { useState, useEffect, useContext, ChangeEvent, SetStateAction, Dispatch,
 import Tokens, { Token } from '../../src/components/Tokens'
 import { WalletContext } from '../../src/context/WalletContext'
 import { BigNumber, Contract, ethers } from 'ethers'
-import { getTokenBalance, getTokensFromPoolAddress } from '../utils/getSmartContract'
+import { getTokenBalance, getTokensFromPoolAddress, getCfmmPoolAddr } from '../utils/getSmartContract'
 import PosManager from '@gammaswap/v1-periphery/artifacts/contracts/PositionManager.sol/PositionManager.json'
 import { notifyDismiss, notifyError, notifyLoading, notifySuccess, notifyInfo } from './useNotification'
 import { handleNumberInput, validateAllowance } from '../utils/validation'
 import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json'
 import { useRouter } from 'next/router'
 
-export const useAddLiquidityHandler = () => {
+export const useDepositHandler = () => {
   const POSITION_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_POSITION_MANAGER_ADDRESS
   // holds state of user amount inputted for each of the token input fields
   const [tokenAInputVal, setTokenAInputVal] = useState<string>('')
@@ -37,6 +37,8 @@ export const useAddLiquidityHandler = () => {
   // holds global state of user info and ethers provider for contract calls
   const { accountInfo, provider } = useContext(WalletContext)
   const router = useRouter()
+  const [cfmmPoolAddr, setCfmmPoolAddr] = useState<string>("")
+
 
   useEffect(() => {
     if (!provider) {
@@ -70,6 +72,15 @@ export const useAddLiquidityHandler = () => {
   useEffect(() => {
     setTokenAInputVal("")
     setTokenBInputVal("")
+
+    if (provider && tokenASelected.address && tokenBSelected.address) {
+      getCfmmPoolAddr(
+        tokenASelected.address,
+        tokenBSelected.address,
+        provider,
+        setCfmmPoolAddr
+      )
+    }
   }, [tokenASelected, tokenBSelected])
 
   useEffect(() => {
@@ -157,73 +168,86 @@ export const useAddLiquidityHandler = () => {
   //   }
   // }
 
-  const addLiquidity = async () => {
-    if (posManager && accountInfo) {
-      if (posManager && accountInfo?.address && provider) {
-        let tokenAContract = new ethers.Contract(
-          tokenASelected.address,
-          IERC20.abi,
-          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
-        )
+  const depositReserves = async () => {
+    if (!posManager || !accountInfo) {
+      notifyError('Please connect wallet.')
+      return
+    }
 
-        let approvalA = await validateAllowance(
-          accountInfo.address,
-          tokenAContract,
-          Number(tokenAInputVal),
-          POSITION_MANAGER_ADDRESS || ''
-        )
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
 
-        let tokenBContract = new ethers.Contract(
-          tokenBSelected.address,
-          IERC20.abi,
-          accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
-        )
+    if (accountInfo.address && provider) {
+      let tokenAContract = new ethers.Contract(
+        tokenASelected.address,
+        IERC20.abi,
+        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+      )
 
-        let approvalB = await validateAllowance(
-          accountInfo.address,
-          tokenBContract,
-          Number(tokenBInputVal),
-          POSITION_MANAGER_ADDRESS || ''
-        )
+      let approvalA = await validateAllowance(
+        accountInfo.address,
+        tokenAContract,
+        Number(tokenAInputVal),
+        POSITION_MANAGER_ADDRESS || ''
+      )
 
-        let loading = notifyLoading('Waiting for transaction to complete')
-        try {
-          if (approvalA && approvalB) {
-            const DepositReservesParams = {
-              cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
-              amountsDesired: [BigNumber.from(parseFloat(tokenAInputVal)), BigNumber.from(parseFloat(tokenBInputVal))],
-              amountsMin: [0, 0],
-              to: accountInfo.address,
-              protocol: 1,
-              deadline: ethers.constants.MaxUint256,
-            }
-            let tx = await posManager.depositReserves(DepositReservesParams, {
-              gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT,
-            })
-            let res = await tx.wait()
-            const { args } = res.events[0]
-            let message = 'Add Liquidity Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
-            notifyDismiss(loading)
-            notifySuccess(message)
-          } else {
-            notifyDismiss('Waiting for transaction to complete')
+      let tokenBContract = new ethers.Contract(
+        tokenBSelected.address,
+        IERC20.abi,
+        accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
+      )
+
+      let approvalB = await validateAllowance(
+        accountInfo.address,
+        tokenBContract,
+        Number(tokenBInputVal),
+        POSITION_MANAGER_ADDRESS || ''
+      )
+
+      let loading = notifyLoading('Waiting for transaction to complete')
+      try {
+        if (approvalA && approvalB) {
+          const DepositReservesParams = {
+            cfmm: cfmmPoolAddr,
+            amountsDesired: [BigNumber.from(parseFloat(tokenAInputVal)), BigNumber.from(parseFloat(tokenBInputVal))],
+            amountsMin: [0, 0],
+            to: accountInfo.address,
+            protocol: 1,
+            deadline: ethers.constants.MaxUint256,
           }
-        } catch (e: any) {
+          let tx = await posManager.depositReserves(DepositReservesParams, {
+            gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT,
+          })
+          let res = await tx.wait()
+          const { args } = res.events[0]
+          let message = 'Deposit Reserves Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
           notifyDismiss(loading)
-          if (e?.code === 'ACTION_REJECTED') {
-            notifyError('User rejected the transaction')
-          } else {
-            notifyError('An error occurred while adding LP Token Liquidity. Please try again')
-          }
+          notifySuccess(message)
+        } else {
+          notifyDismiss('Waiting for transaction to complete')
+        }
+      } catch (e: any) {
+        notifyDismiss(loading)
+        if (e?.code === 'ACTION_REJECTED') {
+          notifyError('User rejected the transaction')
+        } else {
+          notifyError('An error occurred while depositing reserves. Please try again')
         }
       }
     }
   }
 
-  const addLpLiquidity = async () => {
+  const depositLpTokens = async () => {
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      notifyError('Selected pair is not a valid cfmm pool pair.')
+      return
+    }
+
     if (posManager && accountInfo?.address && provider) {
       let tokenContract = new ethers.Contract(
-        process.env.NEXT_PUBLIC_CFMM_ADDRESS || '',
+        cfmmPoolAddr,
         IERC20.abi,
         accountInfo && accountInfo?.address ? provider.getSigner(accountInfo?.address) : provider
       )
@@ -238,7 +262,7 @@ export const useAddLiquidityHandler = () => {
       try {
         if (approval) {
           const DepositNoPullParams = {
-            cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+            cfmm: cfmmPoolAddr,
             protocol: 1,
             lpTokens: parseFloat(tokenAInputVal),
             to: accountInfo.address,
@@ -247,7 +271,7 @@ export const useAddLiquidityHandler = () => {
           let tx = await posManager.depositNoPull(DepositNoPullParams, { gasLimit: process.env.NEXT_PUBLIC_GAS_LIMIT })
           let res = await tx.wait()
           const { args } = res.events[0]
-          let message = 'Add Liquidity Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
+          let message = 'Deposit LP Tokens Success: ' + args.pool + args.reservesLen.toNumber() + args.shares.toNumber()
           notifyDismiss(loading)
           notifySuccess(message)
         } else {
@@ -258,7 +282,7 @@ export const useAddLiquidityHandler = () => {
         if (e?.code === 'ACTION_REJECTED') {
           notifyError('User rejected the transaction')
         } else {
-          notifyError('An error occurred while adding LP Token Liquidity. Please try again')
+          notifyError('An error occurred while depositing LP Token Liquidity. Please try again')
         }
       }
     }
@@ -286,8 +310,8 @@ export const useAddLiquidityHandler = () => {
     tokenSelected,
     setTokenASelected,
     setTokenBSelected,
-    addLiquidity,
-    addLpLiquidity,
+    depositReserves,
+    depositLpTokens,
     tokenABalance,
     tokenBBalance,
     maxTokenA,

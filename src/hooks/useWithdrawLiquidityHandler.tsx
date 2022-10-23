@@ -22,6 +22,7 @@ export const useWithdrawLiquidityHandler = () => {
   const [gammaPoolContract, setGammaPoolContract] = useState<Contract | null>(null)
   const [enableApprove, setEnableApprove] = useState<Boolean>(false)
   const [invalidBtnText, setInvalidBtnText] = useState<String>('Confirm')
+  const [cfmmPoolAddr, setCfmmPoolAddr] = useState<string>("")
 
   async function changeSliderPercentage(percentage: number) {
     try {
@@ -105,6 +106,10 @@ export const useWithdrawLiquidityHandler = () => {
   }
 
   async function withdrawLiquidity(balance: number) {
+    // TODO this function should be combined with withdraw non-async
+    // all the checks should be non-async, they should not throw, just
+    // display error message and return because they are not really exceptions
+    // they are possible conditions which we know about and can handle
     let amt = '0'
     if (balance === 0) {
       throw new Error('Please select a valid amount to withdraw')
@@ -120,6 +125,11 @@ export const useWithdrawLiquidityHandler = () => {
       setEnableApprove(false)
       throw new Error('Wallet not connected')
     }
+
+    if (!ethers.utils.isAddress(cfmmPoolAddr)) {
+      throw new Error('Selected pair is not a valid cfmm pool pair.')
+    }
+
     try {
       if (parseInt(amt) === 0) {
         const error: any = new Error('User does not have enough reserves to withdraw')
@@ -132,7 +142,7 @@ export const useWithdrawLiquidityHandler = () => {
       }
 
       const WithdrawReservesParams = {
-        cfmm: process.env.NEXT_PUBLIC_CFMM_ADDRESS,
+        cfmm: cfmmPoolAddr,
         protocol: 1,
         amount: amt,
         amountsMin: [100, 200, 300],
@@ -154,7 +164,7 @@ export const useWithdrawLiquidityHandler = () => {
   }
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
         if (!gammaPoolContract) {
           return
@@ -168,6 +178,8 @@ export const useWithdrawLiquidityHandler = () => {
         setEnableApprove(liqBal.toString() > 0)
         setTotalLiquidityAmt(liqBal.toString())
         setLiquidityAmt(parseFloat(ethers.utils.formatEther(liqBal)))
+        const _cfmmPoolAddr = await gammaPoolContract.cfmm()
+        setCfmmPoolAddr(_cfmmPoolAddr)
       } catch (e) {
         notifyError('Balance not found. Please provide correct pool address')
       }

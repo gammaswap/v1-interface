@@ -28,11 +28,6 @@ const BasicContractProvider = ({ children }: BasicContractProviderProps) => {
     const { provider, signer } = useContext(WalletContext)
 
     useEffect(() => {
-        const newPairContract = new ethers.Contract(
-            process.env.NEXT_PUBLIC_IUNISWAP_V2_PAIR_ADDR as string,
-            IUniswapV2PairABI,
-            provider as Provider
-        )
         const newFactoryContract = new ethers.Contract(
             process.env.NEXT_PUBLIC_IUNISWAP_V2_FACTORY_ADDR as string,
             IUniswapV2FactoryABI,
@@ -44,7 +39,6 @@ const BasicContractProvider = ({ children }: BasicContractProviderProps) => {
             provider as Provider
         )
 
-        setPairContract(newPairContract)
         setFactoryContract(newFactoryContract)
         setRouterContract(newRouterContract)
     }, [])
