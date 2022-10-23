@@ -1,9 +1,16 @@
 import { NextPage } from "next"
+import Link from "next/link"
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/outline"
 import { PoolTableRow } from "./PoolTableRow"
+import { Pool, PoolData } from '../../../.graphclient'
+import { BigNumber } from "ethers"
+import { LinkWrapper } from '../../components/LinkWrapper'
 
+interface PoolsOverviewTableProps {
+  poolsData: Array<PoolData>
+}
 
-export const PoolsOverviewTable: NextPage = () => {
+export const PoolsOverviewTable = ({ poolsData }: PoolsOverviewTableProps) => {
   const style = {
     poolsOverviewContainer: "font-normal flex flex-col space-y-2",
     poolsOverviewHeader: "text-neutrals-600 font-medium",
@@ -45,11 +52,17 @@ export const PoolsOverviewTable: NextPage = () => {
         </div>
 
         {/* Table Row */}
-        <PoolTableRow />
-        <PoolTableRow />
-        <PoolTableRow />
-        <PoolTableRow />
-        <PoolTableRow />
+        {poolsData.map((poolData, idx) => {
+          return (
+            <LinkWrapper
+              key={idx}
+              pathName={`/pools/[poolAddress]`}
+              poolData={poolData}
+            >
+              <PoolTableRow />
+            </LinkWrapper>
+          )
+        })}
         
         {/* TODO: Pagination Section */}
         <div className={style.poolsOverviewPagination}>
@@ -67,6 +80,5 @@ export const PoolsOverviewTable: NextPage = () => {
         </div>
       </div>
     </div>
-
   )
 }

@@ -41,7 +41,7 @@ const Header = () => {
               Positions
             </div>
           </Link>
-          <Link href={'/pools/main'}>
+          <Link href={'/pools'}>
             <div
               onClick={() => setSelectedNavItem("pools")}
               className={`${style.navItem} ${selectedNavItem === "pools" && style.activeNavItem

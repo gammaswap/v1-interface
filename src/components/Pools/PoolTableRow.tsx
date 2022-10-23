@@ -1,27 +1,12 @@
 import React from "react"
 import Image from "next/image"
-import Link from "next/link"
-
-export type PoolData = {
-  name: string
-  address: string
-  totalSupply: string
-  supplyApy: string
-  totalBorrowed: string
-  borrowApyVariable: string
-  borrowApyStable: string
-}
-
-type PoolTableRowProps = {
-  poolData: PoolData
-  clickHandler: (poolData: PoolData) => void
-}
+import { usePoolsData } from "../../context/PoolsDataContext"
 
 export const PoolTableRow = () => {
-  // const { poolData, clickHandler} = props
+  const { selectedPoolData } = usePoolsData()
 
   const style = {
-    poolsOverviewTableRow: "pt-4",
+    poolsOverviewTableRow: "pt-4 px-2 rounded-lg hover:bg-neutrals-300 hover:bg-opacity-30 cursor-pointer",
     poolsOverviewTableContent: "flex space-x-32",
     poolsOverviewTableRowPrimary: "flex space-x-6",
     poolsOverviewTableRowItem: "",
