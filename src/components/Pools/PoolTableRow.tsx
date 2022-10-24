@@ -1,44 +1,83 @@
-import React from "react"
-import Image from "next/image"
-import { usePoolsData } from "../../context/PoolsDataContext"
+import React from 'react'
+import Image from 'next/image'
+import { usePoolsData } from '../../context/PoolsDataContext'
 
-export const PoolTableRow = () => {
+export const PoolTableRow = ({ poolData, mockData }: any) => {
   const { selectedPoolData } = usePoolsData()
-
+  console.log(mockData)
   const style = {
-    poolsOverviewTableRow: "pt-4 px-2 rounded-lg hover:bg-neutrals-300 hover:bg-opacity-30 cursor-pointer",
-    poolsOverviewTableContent: "flex space-x-32",
-    poolsOverviewTableRowPrimary: "flex space-x-6",
-    poolsOverviewTableRowItem: "",
-    poolsOverviewTableRowPool: "flex space-x-2",
-    poolsOverviewTableRowPoolIcons: "",
-    poolsOverviewTableRowPoolIcon: "",
-    poolsOverviewTableRowSecondary: "flex space-x-20 ml-auto",
-    poolsOverviewTableLine: "w-full h-[0.10rem] bg-neutrals-700 opacity-40 mt-4",
+    poolsOverviewTableRow: 'pt-4 px-2 rounded-lg hover:bg-neutrals-300 hover:bg-opacity-30 cursor-pointer',
+    poolsOverviewTableContent: 'flex space-x-32',
+    poolsOverviewTableRowPrimary: 'flex space-x-6',
+    poolsOverviewTableRowItem: '',
+    poolsOverviewTableRowPool: 'flex space-x-2',
+    poolsOverviewTableRowPoolIcons: '',
+    poolsOverviewTableRowPoolIcon: '',
+    poolsOverviewTableRowSecondary: 'flex space-x-20 ml-auto',
+    poolsOverviewTableLine: 'w-full h-[0.10rem] bg-neutrals-700 opacity-40 mt-4',
   }
 
   return (
-    <div className={style.poolsOverviewTableRow}>
-      <div className={style.poolsOverviewTableContent}>
-        <div className={style.poolsOverviewTableRowPrimary}>
-          <p className={style.poolsOverviewTableRowItem}>1</p>
-          <div className={style.poolsOverviewTableRowPool}>
-            <div className={style.poolsOverviewTableRowPoolIcons}>
-              <Image src={""} className={style.poolsOverviewTableRowPoolIcon} width={""} height={""} />
-              <Image src={""} className={style.poolsOverviewTableRowPoolIcon} width={""} height={""} />
+    <>
+      {poolData ? (
+        <div className={style.poolsOverviewTableRow}>
+          <div className={style.poolsOverviewTableContent}>
+            <div className={style.poolsOverviewTableRowPrimary}>
+              <p className={style.poolsOverviewTableRowItem}>1</p>
+              <div className={style.poolsOverviewTableRowPool}>
+                <div className={style.poolsOverviewTableRowPoolIcons}>
+                  <Image src={''} className={style.poolsOverviewTableRowPoolIcon} width={''} height={''} />
+                  <Image src={''} className={style.poolsOverviewTableRowPoolIcon} width={''} height={''} />
+                </div>
+                <p className={style.poolsOverviewTableRowItem}>USDC/ETH</p>
+              </div>
             </div>
-            <p className={style.poolsOverviewTableRowItem}>USDC/ETH</p>
+
+            <div className={style.poolsOverviewTableRowSecondary}>
+              <p className={style.poolsOverviewTableRowItem}>1.34m</p>
+              <p className={style.poolsOverviewTableRowItem}>3.34%</p>
+              <p className={style.poolsOverviewTableRowItem}>432k</p>
+              <p className={style.poolsOverviewTableRowItem}>2.22%</p>
+            </div>
           </div>
+          <div className={style.poolsOverviewTableLine}></div>
         </div>
-        
-        <div className={style.poolsOverviewTableRowSecondary}>
-          <p className={style.poolsOverviewTableRowItem}>1.34m</p>
-          <p className={style.poolsOverviewTableRowItem}>3.34%</p>
-          <p className={style.poolsOverviewTableRowItem}>432k</p>
-          <p className={style.poolsOverviewTableRowItem}>2.22%</p>
+      ) : mockData ? (
+        <div className={style.poolsOverviewTableRow}>
+          <div className={style.poolsOverviewTableContent}>
+            <div className={style.poolsOverviewTableRowPrimary}>
+              <p className={style.poolsOverviewTableRowItem}>{mockData.id}</p>
+              <div className={style.poolsOverviewTableRowPool}>
+                <div className={style.poolsOverviewTableRowPoolIcons}>
+                  <Image
+                    src={mockData.tokenAvatar1}
+                    className={style.poolsOverviewTableRowPoolIcon}
+                    width={20}
+                    height={20}
+                  />
+                  <Image
+                    src={mockData.tokenAvatar2}
+                    className={style.poolsOverviewTableRowPoolIcon}
+                    width={20}
+                    height={20}
+                  />
+                </div>
+                <p className={style.poolsOverviewTableRowItem}>
+                  {mockData.token1}/{mockData.token2}
+                </p>
+              </div>
+            </div>
+
+            <div className={style.poolsOverviewTableRowSecondary}>
+              <p className={style.poolsOverviewTableRowItem}>{mockData.totalSupply}</p>
+              <p className={style.poolsOverviewTableRowItem}>{mockData.supplyAPY}</p>
+              <p className={style.poolsOverviewTableRowItem}>{mockData.totalBorrowed}</p>
+              <p className={style.poolsOverviewTableRowItem}>{mockData.borrowAPY}</p>
+            </div>
+          </div>
+          <div className={style.poolsOverviewTableLine}></div>
         </div>
-      </div>
-      <div className={style.poolsOverviewTableLine}></div>
-    </div>
+      ) : null}
+    </>
   )
 }

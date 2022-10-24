@@ -4,7 +4,7 @@ import { WalletContext } from '../../src/context/WalletContext'
 import GammaPoolFactory from '@gammaswap/v1-core/artifacts/contracts/GammaPoolFactory.sol/GammaPoolFactory.json'
 import { calcPoolKey } from '../../src/utils/getSmartContract'
 import Protocols, { Protocol } from '../components/Protocols'
-import {notifySuccess, notifyError} from '../../src/hooks/useNotification'
+import { notifySuccess, notifyError } from '../../src/hooks/useNotification'
 
 export const useCreatePoolHandler = () => {
   const [gammaPoolFactory, setGammaPoolFactory] = useState<Contract | null>(null)
@@ -38,7 +38,7 @@ export const useCreatePoolHandler = () => {
   const createPool = async () => {
     try {
       if (!accountInfo || !gammaPoolFactory) {
-        notifyError("Please connect your wallet.")
+        notifyError('Please connect your wallet.')
         return
       }
 
@@ -64,7 +64,7 @@ export const useCreatePoolHandler = () => {
       notifySuccess(msg)
       resetParameters()
     } catch (e) {
-      let errorMsg = "Pool not created: "
+      let errorMsg = 'Pool not created: '
       if (typeof e === 'string') {
         notifyError(errorMsg + e)
       } else if (e instanceof Error) {
@@ -88,6 +88,6 @@ export const useCreatePoolHandler = () => {
     cfmmAddr,
     setCfmmAddr,
     protocol,
-    setProtocol
+    setProtocol,
   }
 }
