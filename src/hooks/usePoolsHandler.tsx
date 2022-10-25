@@ -3,31 +3,37 @@ import { notifyError } from './useNotification'
 import { ExecutionResult } from 'graphql'
 import { PoolsDocument, Pool, PoolsQuery, LatestPoolDataDocument, execute, PoolData } from '../../.graphclient'
 import { usePoolsData } from '../context/PoolsDataContext'
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { addMocksToSchema } from '@graphql-tools/mock'
+import { graphql } from 'graphql'
+import { getGraphQlMockData } from '../utils/getMockData'
+import { PoolsMockData } from '../utils/mockdata/PoolsMockData'
 
 export const usePoolsHandler = () => {
   const [pools, setPools] = useState<ExecutionResult<PoolsQuery>>()
   const { latestPoolsData, setLatestPoolsData } = usePoolsData()
-  
+  const [mockData, setMockData] = useState<any[]>([])
+
   // fetches all pool entities
   const fetchPoolsData = useCallback(async () => {
     const res = await execute(PoolsDocument, {})
     if (res?.data) {
       setPools(res.data.pools)
     } else {
-      console.log("NO RESPONSE")
+      console.log('NO RESPONSE')
     }
   }, [])
-  
+
   // fetches pool's latest data by pool address
   const fetchLatestPoolData = async (address: string): Promise<PoolData | number> => {
     const res = await execute(LatestPoolDataDocument, { address })
     if (res?.data.poolDatas[0]) {
       return res.data.poolDatas[0]
     }
-  
+
     return 0
   }
-  
+
   // iterates through all pool addresses and fetches latest pool data for it
   const fetchLatestPoolsData = useCallback(async (pools: Array<Pool>) => {
     const newPoolsData: Array<PoolData> = []
@@ -38,17 +44,42 @@ export const usePoolsHandler = () => {
         newPoolsData.push(latestPoolData as PoolData)
       }
     }
-    
+
     setLatestPoolsData(newPoolsData)
   }, [])
-  
+
   useEffect(() => {
     fetchPoolsData()
   }, [fetchPoolsData])
 
   useEffect(() => {
-    if (pools) fetchLatestPoolsData(pools as Array<Pool>)
+    if (process.env.NEXT_PUBLIC_SUBGRAPH_URL) {
+      if (pools) fetchLatestPoolsData(pools as Array<Pool>)
+    } else {
+      setMockData(PoolsMockData)
+      // const query = /* GraphQL */ `
+      //   query Query {
+      //     posts {
+      //       id
+      //       address
+      //       tokenAvatar1
+      //       tokenAvatar2
+      //       token1
+      //       token2
+      //       totalSupply
+      //       supplyAPY
+      //       totalBorrowed
+      //       borrowAPY
+      //     }
+      //   }
+      // `
+      // getGraphQlMockData(query).then((res: any) => {
+      //   if (res) {
+      //     setMockData(res)
+      //   }
+      // })
+    }
   }, [pools])
 
-  return { pools, latestPoolsData }
+  return { pools, latestPoolsData, mockData }
 }

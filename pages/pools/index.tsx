@@ -8,8 +8,9 @@ import { usePoolsHandler } from "../../src/hooks/usePoolsHandler"
 import { PoolsOverviewTable } from "../../src/components/Pools/PoolsOverviewTable"
 
 const Pools: NextPage = () => {
-  const { pools, latestPoolsData } = usePoolsHandler()
+  const { pools, latestPoolsData, mockData } = usePoolsHandler()
   const [selectedPoolData, setSelectedPoolData] = useState<PoolData>()
+  console.log(mockData)
 
   const style = {
     wrapper: "w-full h-full flex justify-center text-neutrals-100",
@@ -74,7 +75,7 @@ const Pools: NextPage = () => {
             ))}
           </div>
         </div>
-        <PoolsOverviewTable poolsData={latestPoolsData} />
+        <PoolsOverviewTable poolsData={latestPoolsData} mockData={mockData} />
       </div>
     </div>
   )
