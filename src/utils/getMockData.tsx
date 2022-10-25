@@ -1,5 +1,5 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import { addMocksToSchema } from '@graphql-tools/mock'
+import { addMocksToSchema, MockList } from '@graphql-tools/mock'
 import { graphql } from 'graphql'
 import { schemaString } from '../queries/mockQueries'
 import { faker } from '@faker-js/faker'
@@ -11,13 +11,16 @@ export const getGraphQlMockData = (query: string) => {
   const schemaWithMocks = addMocksToSchema({
     schema,
     mocks: {
+      Query: () => ({
+        posts: () => new MockList(10),
+      }),
       Post: () => ({
         id: faker.datatype.number(),
         address: faker.finance.ethereumAddress(),
         tokenAvatar1: faker.image.avatar(),
         tokenAvatar2: faker.image.avatar(),
-        token1: faker.random.alpha({ count: 3, casing: 'upper' }),
-        token2: faker.random.alpha({ count: 3, casing: 'upper' }),
+        token1: faker.helpers.arrayElement(['BTC', 'ETH', 'USDT', 'BNB', 'USDC', 'XRP', 'BUSD', 'ADA', 'SOL', 'DOT', 'NEO', 'GRT', 'HNT', 'FTM', 'BAT', 'STX', 'ZIL']),
+        token2: faker.helpers.arrayElement(['BTC', 'ETH', 'USDT', 'BNB', 'USDC', 'XRP', 'BUSD', 'ADA', 'SOL', 'DOT', 'NEO', 'GRT', 'HNT', 'FTM', 'BAT', 'STX', 'ZIL']),
         totalSupply: faker.finance.amount(1000, 4000, 2, '$'),
         supplyAPY: faker.finance.amount(0, 100),
         totalBorrowed: faker.finance.amount(1000, 4000, 2, '$'),
