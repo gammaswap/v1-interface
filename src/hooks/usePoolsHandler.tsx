@@ -7,11 +7,12 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { addMocksToSchema } from '@graphql-tools/mock'
 import { graphql } from 'graphql'
 import { getGraphQlMockData } from '../utils/getMockData'
+import { PoolsMockData } from '../utils/mockdata/PoolsMockData'
 
 export const usePoolsHandler = () => {
   const [pools, setPools] = useState<ExecutionResult<PoolsQuery>>()
   const { latestPoolsData, setLatestPoolsData } = usePoolsData()
-  const [mockData, setMockData] = useState([])
+  const [mockData, setMockData] = useState<any[]>([])
 
   // fetches all pool entities
   const fetchPoolsData = useCallback(async () => {
@@ -55,27 +56,28 @@ export const usePoolsHandler = () => {
     if (process.env.NEXT_PUBLIC_SUBGRAPH_URL) {
       if (pools) fetchLatestPoolsData(pools as Array<Pool>)
     } else {
-      const query = /* GraphQL */ `
-        query Query {
-          posts {
-            id
-            address
-            tokenAvatar1
-            tokenAvatar2
-            token1
-            token2
-            totalSupply
-            supplyAPY
-            totalBorrowed
-            borrowAPY
-          }
-        }
-      `
-      getGraphQlMockData(query).then((res: any) => {
-        if (res) {
-          setMockData(res)
-        }
-      })
+      setMockData(PoolsMockData)
+      // const query = /* GraphQL */ `
+      //   query Query {
+      //     posts {
+      //       id
+      //       address
+      //       tokenAvatar1
+      //       tokenAvatar2
+      //       token1
+      //       token2
+      //       totalSupply
+      //       supplyAPY
+      //       totalBorrowed
+      //       borrowAPY
+      //     }
+      //   }
+      // `
+      // getGraphQlMockData(query).then((res: any) => {
+      //   if (res) {
+      //     setMockData(res)
+      //   }
+      // })
     }
   }, [pools])
 
